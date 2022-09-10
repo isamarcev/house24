@@ -1,0 +1,165 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+<script src="{% static 'content/plugins/ckeditor/ckeditor.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Редактирование страницы</h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 10px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span>  Редактирование страницы</li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Редактирование страницы "Главная"</h3>
+{#                        <div class="box-tools">#}
+                    <a href="#" class="btn btn-default " style="position: absolute; top: 3px; border-radius: 3px;right: 5px; color: #444; background-color: #f4f4f4; font-size: 12px; border-color: #ddd;">
+                        <span class="hidden-xs">Обновить robots и sitemap</span>
+                    </a>
+                </div>
+                    <div class="box-body">
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <h3 class="page-header">Слайдер</h3>
+                            <!-- SLIDER -->
+                            <div class="row page-main-slider">
+                                <div class="col-md-4">
+                                    <h4>Слайд 1</h4>
+                                    <img id=logo_preview" style="width: 100%; height: 350px" src="{{ form.instance.slide1.url }}" alt="" class="img-responsive margin-bottom-15">
+                                    <div class="form-group {{ form.slide1.id_for_label }}">
+                                        <div class="help-block"></div></div>
+                                    <div class="form-group margin-bottom-30 {{ form.slide1.id_for_label }}-imagefile">
+                                    <label class="control-label" for="{{ form.slide1.id_for_label }}">Рекомендуемый размер: (1920x800)</label>
+                                        <input type="file" id="id_slide1" name="slide1" accept="image/*">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h4>Слайд 2</h4>
+                                    <img style="width: 100%; height: 350px" src="{{ form.instance.slide2.url }}" alt="" class="img-responsive margin-bottom-15">
+                                    <div class="form-group {{ form.slide2.id_for_label }}">
+{#                                        <input type="hidden" id="{{ form.slide2.id_for_label }}" class="form-control" name="{{ form.slide2.name }}" value="{{ form.id }}">#}
+                                        <div class="help-block"></div></div>
+                                    <div class="form-group margin-bottom-30 {{ form.slide2.id_for_label }}-imagefile">
+                                    <label class="control-label" for="{{ form.slide2.id_for_label }}">Рекомендуемый размер: (1920x800)</label>
+{#                                    <input type="hidden" name="{{ form.slide2.name }}" value="">#}
+                                        <input type="file" id="id_slide2" name="slide2" accept="image/*">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h4>Слайд 3</h4>
+                                    <img style="width: 100%; height: 350px" src="{{ form.instance.slide3.url }}" alt="" class="img-responsive margin-bottom-15">
+                                    <div class="form-group {{ form.slide3.id_for_label }}">
+{#                                        <input type="hidden" id="{{ form.slide3.id_for_label }}" class="form-control" name="{{ form.slide3.name }}" value="{{ form.id }}">#}
+                                        <div class="help-block"></div></div>
+                                    <div class="form-group margin-bottom-30 {{ form.slide3.id_for_label }}-imagefile">
+                                    <label class="control-label" for="{{ form.slide3.id_for_label }}">Рекомендуемый размер: (1920x800)</label>
+{#                                    <input type="hidden" name="{{ form.slide3.name }}" value="">#}
+                                        <input type="file" id="id_slide3" name="slide3" accept="image/*">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END SLIDER-->
+                            <!-- SHORT INFORMAATION -->
+                            <h3 class="page-header">Краткая информация</h3>
+                            <div class="form-group">
+                                <label class="control-label" for="{{ form.header.id_for_label }}">Заголовок</label>
+                                {{ form.header }}
+                                <div class="help-block"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.text.id_for_label }}" class="control-label">Краткий текст</label>
+                                {{ form.text }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.apps_links }}
+                                <label for="{{ form.apps_links.id_for_label }}" class="control-label">Показать ссылки на приложения </label>
+                            </div>
+                            <div class="row blocks">
+                                <h3 class="page-header">Рядом с нами</h3>
+                                {{ formset.management_form }}
+                                {% for form in formset %}
+                                    <div class="col-md-4">
+                                    <h4>Блок {{ forloop.counter }}</h4>
+                                        <img src="{{ form.instance.image.url }}" width="100%" height="200px" alt="">
+                                        <div class="form-group">
+                                            {% for hidded in form.hidden_fields %}
+                                                {{ hidded }}
+                                                {% endfor %}
+                                            <div class="help-block"></div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label" for="{{ form.image.id_for_label }}">Рекомендуемый размер: (1000x600)</label>
+                                            <input type="file" id="{{ form.image.id_for_label }}" name="{{ form.prefix }}-image" accept="image/*">
+                                            <div class="help-block"></div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="{{ form.prefix }}-title">Заголовок блока</label>
+                                            {{ form.header }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="{{ form.prefix }}-description">Описание</label>
+                                            {{ form.description }}
+                                        </div>
+{#                                        {{ form }}#}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        <div class="col-md-12">
+                            <h3 class="page-header">Настройки SEO</h3>
+                            {% for field in form3 %}
+                                <div class="form-group">
+                                    <b>{{ field.label }}</b>
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+<div class="form-group" style="text-align: center">
+                                <a href="{% url 'content:main-change' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;">Отменить</a>
+                                <button type="submit" class="btn btn-success" style="height: 34px; font-size: 14px;background-color: #00a65a!important;
+    border-color: #008d4c!important;">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+    </section>
+    <div>
+
+    </div>
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+{#        <script rel="stylesheet" href="{% static 'content/plugins/summernote/summernote.min.css' %}" type="text/css">#}
+{#    <script src="{% static 'content/plugins/summernote/summernote.min.js' %}"></script>#}
+            <script>
+                        CKEDITOR.replace( 'id_text' );
+                </script>
+    {% for i in formset %}
+        <script>
+                        CKEDITOR.replace( '{{ i.description.id_for_label }}' );
+                </script>
+    {% endfor %}
+{#    <script src="{% static "content/js/admin_main_page.js" %}"></script>#}
+{% endblock %}

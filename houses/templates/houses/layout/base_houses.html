@@ -1,0 +1,369 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru-RU" style="height: auto; min-height: 100%;"><head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="icon" type="image/png" href="http://myhouse24.avada-media.ua/favicon.png">
+        <title>{% block title %}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+ <!-- Google Font: Source Sans Pro -->
+{% block css %}
+{% endblock %}
+  <link  type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link type="text/css" rel="stylesheet" href="{% static 'houses/plugins/fontawesome-free/css/all.min.css' %}">
+  <link type="text/css" rel="stylesheet" href="{% static 'houses/plugins/fontawesome-free/css/v4-shims.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'houses/dist/css/adminlte.min.css' %}">
+  <link rel="stylesheet" href="{% static 'houses/css/bootstrap.css' %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static 'houses/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+        <link href="{% static 'houses/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'houses/css/style.css' %}" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" rel="stylesheet">
+ <style>
+      .nav-pills {
+          --bs-nav-pills-link-active-color: #000000;
+          --bs-nav-pills-link-active-bg: #e1f1ea;
+          --bs-nav-pills-border-radius: 0;
+      }
+  </style>
+    <body class="skin-black-light sidebar-mini fixed sidebar-mini-expand-feature" style="height: auto; min-height: 100%;">
+
+    <div class="wrapper">
+
+  <!-- Preloader -->
+{#  <div class="preloader flex-column justify-content-center align-items-center" style="height: 0px;">#}
+{#    <img class="animation__shake" src="{% static 'content/img/logo.svg' %}" alt="HOME 24 LOGO" height="60" width="60" style="display: none;">#}
+{#  </div>#}
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="padding: 0; height: 50px">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+      <li class="nav-item" style="">
+        <a class="nav-link" data-widget="pushmenu" id="dropleft" style="padding: 15px 15px; color: #333; border-right: 1px solid #d2d6de; height: 50px" href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <div class="header-title" style="padding: 15px; ">Панель Администратора</div>
+      </li>
+    </ul>
+
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+
+
+      <!-- Notifications Dropdown Menu -->
+      <li class="nav-item dropdown" style="height: 50px; ">
+        <a class="nav-link" id="messege" style="height: 50px" data-toggle="dropdown" href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" aria-expanded="false">
+          <i class="fa fa-child fa-lg" style=""></i>
+            <span class="">43</span>
+{#          <span class="badge badge-warning navbar-badge">15</span>#}
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
+          <span class="dropdown-item dropdown-header">15 Notifications</span>
+          <div class="dropdown-divider"></div>
+          <a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> 4 new messages
+            <span class="float-right text-muted text-sm">3 mins</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> 8 friend requests
+            <span class="float-right text-muted text-sm">12 hours</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" class="dropdown-item">
+            <i class="fas fa-file mr-2"></i> 3 new reports
+            <span class="float-right text-muted text-sm">2 days</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" class="dropdown-item dropdown-footer">See All Notifications</a>
+        </div>
+      </li>
+{#        <li class="dropdown user user-menu">#}
+{#                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">#}
+{#                            <!--<img src="/admin/dist/img/user2-160x160.jpg" class="user-image" alt="ава тар">-->#}
+{#                                                                                    <i class="fa fa-user-circle text-purple"></i>#}
+{#                            <span class="hidden-xs">ава тар</span>#}
+{#                        </a>#}
+{#                        <ul class="dropdown-menu">#}
+{#                            <!-- User image -->#}
+{#                            <li class="user-header">#}
+{#                                <!--<img src="/admin/dist/img/user2-160x160.jpg" class="img-circle" alt="ава тар">-->#}
+{#                                <span><i class="fa fa-user-circle text-purple bg-gray-light img-circle"></i></span>#}
+{#                                <p>ава тар (Директор)</p>#}
+{#                            </li>#}
+{#                            <!-- Menu Footer-->#}
+{#                            <li class="user-footer">#}
+{#                                <div class="pull-left">#}
+{#                                    <a class="btn btn-default btn-flat" href="/admin/user-admin/update-my">Профиль</a>                                </div>#}
+{#                                <div class="pull-right">#}
+{#                                    <a class="btn btn-default btn-flat" href="/admin/site/logout" data-method="post">Выход</a>                                </div>#}
+{#                            </li>#}
+{#                        </ul>#}
+{#                    </li>#}
+
+      <li class="nav-item" style="height: 50px; text-align: center;">
+        <a class="nav-link" data-toggle="dropdown" style="height: 50px;border-bottom: 1px solid #d2d6de;" href="#" role="button">
+          <i class="fa fa-user-circle text-purple"></i>
+            <span>User's name</span>
+        </a>
+          <ul class="dropdown-menu" id="dropdown_user" style="position: absolute; right: 0!important;left: auto!important;">
+                            <!-- User image -->
+                            <li class="user-header">
+                                <span><i class="fa fa-user-circle text-purple bg-gray-light img-circle"></i></span>
+                                <p> user.name </p>
+                            </li>
+                            <!-- Menu Footer-->
+                            <li class="user-footer">
+                                <div class="pull-left">
+                                    <a class="btn btn-default btn-flat" href="/admin/user-admin/update-my">Профиль</a>                                </div>
+                                <div class="pull-right">
+                                    <a class="btn btn-default btn-flat" href="/admin/site/logout" data-method="post">Выход</a>                                </div>
+                            </li>
+                        </ul>
+      </li>
+
+    </ul>
+  </nav>
+  <!-- /.navbar -->
+
+
+
+
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar " style="background-color: #f9fafc; position: fixed; height: 100vh;">
+    <!-- Brand Logo -->
+       <a href="/" class="brand-link" id="small-photo" style="display: none; text-align: center; padding: 5px 0;border-bottom: 1px solid #d2d6de;border-right: 1px solid #d2d6de;">
+      <span class="logo-lg">
+        <img height="40px" src="{% static 'content/img/logo.svg.png' %}" alt="AdminLTE Logo" class="img-responsive" style="opacity: .8">
+          </span>
+    </a>
+    <a href="/" class="brand-link" id="big-photo" style="text-align: center; padding: 5px 0;border-bottom: 1px solid #d2d6de;border-right: 1px solid #d2d6de;">
+      <span class="logo-lg">
+        <img height="40px" src="{% static 'content/img/logo.svg' %}" alt="AdminLTE Logo" class="img-responsive" style="opacity: .8">
+          </span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar os-host os-theme-light os-host-overflow os-host-overflow-y os-host-resize-disabled os-host-scrollbar-horizontal-hidden os-host-transition" style="z-index: 10000;border-right: 1px solid #d2d6de;"><div class="os-resize-observer-host observed"><div class="os-resize-observer" style="left: 0px; right: auto;"></div></div><div class="os-size-auto-observer observed" style="height: calc(100% + 1px); float: left;"><div class="os-resize-observer"></div></div><div class="os-content-glue" style="margin: 0px -8px; width: 249px; height: 861px;"></div><div class="os-padding"><div class="os-viewport os-viewport-native-scrollbars-invisible" style="overflow-y: scroll;"><div class="os-content" style="padding: 0px 0px; height: 100%; width: 100%;">
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2" style="width:100%; margin-top: 0">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+          <li class="nav-item">
+            <a href="#" style="width: 100%; border-radius: 0" class="nav-link active">
+              <i class="fa fa-line-chart"></i>
+              <p>
+                Статистика
+              </p>
+            </a>
+          </li>
+             <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-dollar"></i>
+                     <p>Касса</p>
+                 </a>
+             </li>
+
+             <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-files-o"></i>
+                     <p>Квитанция на оплату</p>
+                 </a>
+             </li>
+             <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-credit-card"></i>
+                     <p>Лицевые счета</p>
+                 </a>
+             </li>
+
+            <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-key"></i>
+                     <p>Квартиры</p>
+                 </a>
+             </li>
+            <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-users"></i>
+                     <p>Владельцы квартир</p>
+                 </a>
+             </li>
+            <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-building"></i>
+                     <p>Дома</p>
+                 </a>
+             </li>
+
+            <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-envelope-o"></i>
+                     <p>Сообщения</p>
+                 </a>
+             </li>
+            <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-wrench"></i>
+                     <p>Заявки на вызов мастера</p>
+                 </a>
+             </li>
+            <li class="nav-item">
+                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                    <i class="fa fa-dashboard"></i>
+                     <p>Показания счетчиков</p>
+                 </a>
+             </li>
+
+
+            <li class="nav-item" >
+                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                    <i class="fa fa-desktop"></i>
+                     <p style="align-items: center">Управление сайтом
+                        <i class="right fas fa-angle-left" style="top: 1rem"></i>
+                     </p>
+                 </a>
+            </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'content:main-change' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Главная страница</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="{% url 'content:about-change' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>О нас</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="№" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Услуги</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="№" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Тарифы</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="№" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Контакты</p>
+                    </a>
+                  </li>
+                </ul>
+            </li>
+
+            <li class="nav-item" >
+                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                    <i class="fa fa-desktop"></i>
+                     <p style="align-items: center">Настройки системы
+                        <i class="right fas fa-angle-left" style="top: 1rem"></i>
+                     </p>
+                 </a>
+            </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      <i class="fa fa-briefcase"></i>
+                      <p>Услуги</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      <i class="fa fa-money"></i>
+                      <p>Тарифы</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      <i class="fa fa-user nav-icon"></i>
+                      <p>Роли</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      <i class="fa fa-user-plus nav-icon"></i>
+                      <p>Пользователи</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="№" class="nav-link">
+                      <i class="fa fa-credit-card"></i>
+                      <p>Платежные реквизиты</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="№" class="nav-link">
+                      <i class="fa fa-list-ol"></i>
+                      <p>Статьи платежей</p>
+                    </a>
+                  </li>
+                </ul>
+            </li>
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    </div>
+    </div>
+        <div class="os-scrollbar os-scrollbar-horizontal os-scrollbar-unusable os-scrollbar-auto-hidden">
+            <div class="os-scrollbar-track">
+                <div class="os-scrollbar-handle" style="width: 100%; transform: translate(0px, 0px);">
+                </div>
+            </div>
+        </div>
+
+        <div class="os-scrollbar os-scrollbar-vertical os-scrollbar-auto-hidden"><div class="os-scrollbar-track"><div class="os-scrollbar-handle" style="background-color: red; width: 5px; height: 63.429%; transform: translate(0px, 0px);"></div></div></div><div class="os-scrollbar-corner"></div></div>
+    <!-- /.sidebar -->
+  </aside>
+
+
+
+        <!-- ASIDE SECOND-->
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper" style="min-height: 805px; background-color: #ecf0f5">
+ {% block content %}
+
+    {% endblock %}
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark" style="display: none; top: 57px; height: 862px;">
+    <!-- Control sidebar content goes here -->
+  <div class="p-3 control-sidebar-content os-host os-theme-light os-host-resize-disabled os-host-scrollbar-horizontal-hidden os-host-scrollbar-vertical-hidden os-host-transition" style="height: 862px;"><div class="os-resize-observer-host observed"><div class="os-resize-observer" style="left: 0px; right: auto;"></div></div><div class="os-size-auto-observer observed" style="height: calc(100% + 1px); float: left;"><div class="os-resize-observer"></div></div><div class="os-content-glue" style="margin: -16px; width: 0px; height: 0px;"></div><div class="os-padding"><div class="os-viewport os-viewport-native-scrollbars-invisible"><div class="os-content" style="padding: 16px; height: 100%; width: 100%;"><h5>Customize AdminLTE</h5><hr class="mb-2"><div class="mb-4"><input type="checkbox" value="1" class="mr-1"><span>Dark Mode</span></div><h6>Header Options</h6><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Fixed</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Dropdown Legacy Offset</span></div><div class="mb-4"><input type="checkbox" value="1" class="mr-1"><span>No border</span></div><h6>Sidebar Options</h6><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Collapsed</span></div><div class="mb-1"><input type="checkbox" value="1" checked="checked" class="mr-1"><span>Fixed</span></div><div class="mb-1"><input type="checkbox" value="1" checked="checked" class="mr-1"><span>Sidebar Mini</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Sidebar Mini MD</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Sidebar Mini XS</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Nav Flat Style</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Nav Legacy Style</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Nav Compact</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Nav Child Indent</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Nav Child Hide on Collapse</span></div><div class="mb-4"><input type="checkbox" value="1" class="mr-1"><span>Disable Hover/Focus Auto-Expand</span></div><h6>Footer Options</h6><div class="mb-4"><input type="checkbox" value="1" class="mr-1"><span>Fixed</span></div><h6>Small Text Options</h6><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Body</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Navbar</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Brand</span></div><div class="mb-1"><input type="checkbox" value="1" class="mr-1"><span>Sidebar Nav</span></div><div class="mb-4"><input type="checkbox" value="1" class="mr-1"><span>Footer</span></div><h6>Navbar Variants</h6><div class="d-flex"><select class="custom-select mb-3 text-light border-0 bg-white"><option class="bg-primary">Primary</option><option class="bg-secondary">Secondary</option><option class="bg-info">Info</option><option class="bg-success">Success</option><option class="bg-danger">Danger</option><option class="bg-indigo">Indigo</option><option class="bg-purple">Purple</option><option class="bg-pink">Pink</option><option class="bg-navy">Navy</option><option class="bg-lightblue">Lightblue</option><option class="bg-teal">Teal</option><option class="bg-cyan">Cyan</option><option class="bg-dark">Dark</option><option class="bg-gray-dark">Gray dark</option><option class="bg-gray">Gray</option><option class="bg-light">Light</option><option class="bg-warning">Warning</option><option class="bg-white">White</option><option class="bg-orange">Orange</option></select></div><h6>Accent Color Variants</h6><div class="d-flex"></div><select class="custom-select mb-3 border-0"><option>None Selected</option><option class="bg-primary">Primary</option><option class="bg-warning">Warning</option><option class="bg-info">Info</option><option class="bg-danger">Danger</option><option class="bg-success">Success</option><option class="bg-indigo">Indigo</option><option class="bg-lightblue">Lightblue</option><option class="bg-navy">Navy</option><option class="bg-purple">Purple</option><option class="bg-fuchsia">Fuchsia</option><option class="bg-pink">Pink</option><option class="bg-maroon">Maroon</option><option class="bg-orange">Orange</option><option class="bg-lime">Lime</option><option class="bg-teal">Teal</option><option class="bg-olive">Olive</option></select><h6>Dark Sidebar Variants</h6><div class="d-flex"></div><select class="custom-select mb-3 text-light border-0 bg-primary"><option>None Selected</option><option class="bg-primary">Primary</option><option class="bg-warning">Warning</option><option class="bg-info">Info</option><option class="bg-danger">Danger</option><option class="bg-success">Success</option><option class="bg-indigo">Indigo</option><option class="bg-lightblue">Lightblue</option><option class="bg-navy">Navy</option><option class="bg-purple">Purple</option><option class="bg-fuchsia">Fuchsia</option><option class="bg-pink">Pink</option><option class="bg-maroon">Maroon</option><option class="bg-orange">Orange</option><option class="bg-lime">Lime</option><option class="bg-teal">Teal</option><option class="bg-olive">Olive</option></select><h6>Light Sidebar Variants</h6><div class="d-flex"></div><select class="custom-select mb-3 border-0"><option>None Selected</option><option class="bg-primary">Primary</option><option class="bg-warning">Warning</option><option class="bg-info">Info</option><option class="bg-danger">Danger</option><option class="bg-success">Success</option><option class="bg-indigo">Indigo</option><option class="bg-lightblue">Lightblue</option><option class="bg-navy">Navy</option><option class="bg-purple">Purple</option><option class="bg-fuchsia">Fuchsia</option><option class="bg-pink">Pink</option><option class="bg-maroon">Maroon</option><option class="bg-orange">Orange</option><option class="bg-lime">Lime</option><option class="bg-teal">Teal</option><option class="bg-olive">Olive</option></select><h6>Brand Logo Variants</h6><div class="d-flex"></div><select class="custom-select mb-3 border-0"><option>None Selected</option><option class="bg-primary">Primary</option><option class="bg-secondary">Secondary</option><option class="bg-info">Info</option><option class="bg-success">Success</option><option class="bg-danger">Danger</option><option class="bg-indigo">Indigo</option><option class="bg-purple">Purple</option><option class="bg-pink">Pink</option><option class="bg-navy">Navy</option><option class="bg-lightblue">Lightblue</option><option class="bg-teal">Teal</option><option class="bg-cyan">Cyan</option><option class="bg-dark">Dark</option><option class="bg-gray-dark">Gray dark</option><option class="bg-gray">Gray</option><option class="bg-light">Light</option><option class="bg-warning">Warning</option><option class="bg-white">White</option><option class="bg-orange">Orange</option><a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#">clear</a></select></div></div></div><div class="os-scrollbar os-scrollbar-horizontal os-scrollbar-unusable os-scrollbar-auto-hidden"><div class="os-scrollbar-track"><div class="os-scrollbar-handle" style="transform: translate(0px, 0px);"></div></div></div><div class="os-scrollbar os-scrollbar-vertical os-scrollbar-unusable os-scrollbar-auto-hidden"><div class="os-scrollbar-track"><div class="os-scrollbar-handle" style="transform: translate(0px, 0px);"></div></div></div><div class="os-scrollbar-corner"></div></div></aside>
+  <!-- /.control-sidebar -->
+<div id="sidebar-overlay"></div></div>
+<!-- ./wrapper -->
+
+
+<footer class="main-footer">
+    Разработано <a href="https://avada-media.ua/">AVADA-MEDIA</a>. На базе системы управления <a href="https://avada-media.ua/moydom24/">"МойДом24"</a>.
+    Документация API доступна <a href="/doc">по ссылке</a>.
+</footer>
+    </div>
+
+    <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>
+<script src="{% static 'houses/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'houses/dist/js/adminlte.min.js' %}"></script>
+{#                <script src="{% static 'houses/plugins/jquery/jquery.min.js' %}"></script>#}
+<script src="{% static 'houses/plugins/jquery-ui/jquery-ui.js' %}"></script>
+
+<script src="{% static 'houses/js/main.js' %}"></script>
+{% block script %}
+
+{% endblock %}
+
+    </body></html>

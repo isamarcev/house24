@@ -1,0 +1,213 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+<script src="{% static 'content/plugins/ckeditor/ckeditor.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Редактирование страницы</h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 10px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span>  Редактирование страницы</li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Редактирование страницы "О нас"</h3>
+{#                        <div class="box-tools">#}
+{#                    <a href="#" class="btn btn-default " style="position: absolute; top: 3px; border-radius: 3px;right: 5px; color: #444; background-color: #f4f4f4; font-size: 12px; border-color: #ddd;">#}
+{#                        <span class="hidden-xs">Обновить robots и sitemap</span>#}
+{#                    </a>#}
+                </div>
+                    <div class="box-body">
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <h3 class="page-header">Информация</h3>
+                            <!-- INFORMATION -->
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                     <label for="{{ form.header.id_for_label }}" class="control-label">Заголовок</label>
+                                {{ form.header }}
+                                        </div>
+                                     <div class="form-group">
+                                     <label for="{{ form.text.id_for_label }}" class="control-label">Краткий текст</label>
+                                {{ form.text }}
+                                        </div>
+
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Фото директора</h4>
+                                    <img style="width: 237px; height: 300px" src="{{ form.instance.image.url }}" alt="" class="img-responsive margin-bottom-15">
+                                    <div class="form-group {{ form.image.id_for_label }}">
+                                        <div class="help-block"></div></div>
+                                    <div class="form-group margin-bottom-30 {{ form.image.id_for_label }}-imagefile">
+                                    <label class="control-label" for="{{ form.image.id_for_label }}">Рекомендуемый размер: (250Х310)</label>
+{#                                    <input type="hidden" name="{{ form.slide2.name }}" value="">#}
+                                        <input style="line-height: 1!important;" type="file" id="{{ form.image.id_for_label }}" name="{{ form.image.name }}" accept="image/*">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END INFO-->
+                            <!-- SHORT GALLERY -->
+                            <h3 class="page-header">Фотогалерея</h3>
+                            <div class="row form-group">
+                                {% for foo in gallery %}
+                                    {% if foo.image %}
+                                <div class="col-xs-4 col-sm-2 col-md-2 col-xl-2" style="text-align: center; " >
+                                    <img src="{{ foo.image.url }}"  alt="" style="object-fit: cover; height: 150px; width: 100%" class="margin-bottom-15 img-thumbnail">
+                                    <div class="form-group margin-bottom-15">
+                                        <a href="{% url 'content:delete-gallery' foo.id %}" style="font-size: 12px" data-confirm="Удалить?" title="Удалить"><i class="fa fa-trash text-red" aria-hidden="true" style="width: 11px!important; height: 14px!important;"></i></a>
+                                    </div>
+                                </div>
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="form-group input-file" style="display: grid">
+                                    <label class="control-label" for="{{ form_gallery.id_for_label }}">Рекомендуемый размер: (1200x1200)</label>
+                                    {{ form_gallery.image }}
+{#                                    <input type="file"  style="line-height: 1!important;" id="id_{{ form_gallery.image.id_for_label }}" name="{{ form_gallery.prefix }}" multiple="" accept="image/*">#}
+                                    <div class="help-block"></div>
+                                </div>
+                                    <div class="help-block"></div>
+                            </div>
+                            <!-- END SHORT GALLERY-->
+                            <!-- ADDITIONAL INFO-->
+                            <h3 class="page-header">Дополнительная информация</h3>
+                            <div class="form-group">
+                                     <label for="{{ form.additional_header.id_for_label }}" class="control-label">Заголовок</label>
+                                {{ form.additional_header }}
+                                        </div>
+                            <div class="form-group">
+                                     <label for="{{ form.additional_text.id_for_label }}" class="control-label">Краткий текст</label>
+                                {{ form.additional_text }}
+                            </div>
+                            <!-- END ADDITIONAL INFO-->
+                            <!-- ADDITIONAL GALLERY -->
+                            <h3 class="page-header">Дополнительная фотогалерея</h3>
+                            <div class="row form-group">
+                            {% if add_gallery.count %}
+                                {% for foo in add_gallery %}
+                                    {% if foo.image %}
+                                    <div class="col-xs-4 col-sm-2 col-md-2 col-xl-2" style="text-align: center; " >
+                                    <img src="{{ foo.image.url }}"  alt="" style="object-fit: cover; height: 150px" class="margin-bottom-15 img-thumbnail">
+                                    <div class="form-group margin-bottom-15">
+                                        <a href="{% url 'content:delete-add-gallery' foo.id %}" style="font-size: 12px" data-confirm="Удалить?" title="Удалить"><i class="fa fa-trash text-red" aria-hidden="true" style="width: 11px!important; height: 14px!important;"></i></a>
+                                    </div>
+                                </div>
+                                    {% endif %}
+                                    {% endfor %}
+                            {% else %}
+                            <h2>Еще не добавлено ни одного фото</h2>
+                            {% endif %}
+                            </div>
+                                <div class="form-group input-file" style="display: grid">
+                                    <label class="control-label" for="{{ form_gallery.id_for_label }}">Рекомендуемый размер: (1200x1200)</label>
+                                    {{ add_form_gallery.image }}
+                                    <div class="help-block"></div>
+                                </div>
+                            <!-- END ADDITIONAL GALLERY block-->
+                            <!-- DOCUMENT -->
+                            <div class="row site-about-document">
+                                <h3 class="page-header">Документы</h3>
+                                <div class="col-sm-12 col-md-6" id="form_set">
+                                {{ formset.management_form }}
+                                    {% for foo in formset %}
+                                        {% if foo %}
+                                            {% for field in  foo.hidden_fields%}
+                                                {{ field }}
+                                            {% endfor %}
+{#                                            <div class="row"></div>#}
+                                    <div class="row form-document" id="{{ foo.prefix }}-form" style="margin-bottom: 15px">
+                                        <img style="width: 32px; height: 42px; padding: 0; margin-left: 15px" class="fa fa-3x pull-left" id="id_{{ foo.prefix }}-image" src="{{ foo.instance.document.url }}" alt="">
+                                        <div style="width: min-content;">
+                                        <label style="font-size: 14px!important; margin-bottom: 0!important;" for="{{ foo.document.id_for_label }}">PDF, JPG (макс. размер 20 Mb)</label>
+{#                                        {{ foo.document }}#}
+                                            <input class="doc-valid" type="file" id="id_{{ foo.prefix }}-{{ foo.document.name }}" name="{{ foo.prefix }}-{{ foo.document.name }}">    </div>
+                                        <a class="pull-right text-red" id="{{ foo.prefix }}" onclick="delete_form(this.id)" style="position: absolute; right: 0; top: 0; width:20px; font-size: 12px" data-confirm="Удалить?"><i class="fa fa-trash"></i></a>
+                                    </div>
+                                    <div class="form-group" id="{{ foo.prefix }}-title">
+                                        <label style="font-size: 14px!important;" for="{{ foo.title.id_for_label }}">Название документа</label>
+                                        {{ foo.title }}
+                                    </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            <!-- EMPTY FORM-->
+                                <div id="empty_form" class="col-sm-12 col-md-6" style="display: none">
+                                    <div class="row form-document" id="form-__prefix__-form" style="margin-bottom: 15px">
+                                        <i class="fa fa-file-o fa-3x pull-left" style="width: 32px;height: 42px; padding: 0; margin-left: 15px" aria-hidden="true"></i>
+{#                                        <img style="width: 32px; height: 42px; padding: 0; margin-left: 15px" class="fa fa-3x pull-left" src="/media/content/document/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA_%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0_%D0%BE%D1%82_2022-09-03_10-38-31.png" alt="">#}
+                                        <div style="width: min-content;">
+                                        <label style="font-size: 14px!important; margin-bottom: 0!important;" for="id_form-__prefix__-document">PDF, JPG (макс. размер 20 Mb)</label>
+                                            <input class="doc-valid" type="file" id="id_form-__prefix__-document" name="form-__prefix__-document">    </div>
+                                        <a class="pull-right text-red" id="form-__prefix__" onclick="delete_form(this.id)" style="position: absolute; right: 0; top: 0; width:20px; font-size: 12px" data-confirm="Удалить?"><i class="fa fa-trash"></i></a>
+                                    </div>
+
+
+                                    <div class="form-group" id="form-__prefix__-title">
+                                        <label style="font-size: 14px!important;" for="id_form-__prefix__-title">Название документа</label>
+                                        <input type="text" name="form-__prefix__-title" value="__prefix__" placeholder="Введите название документа" class="form-control" maxlength="30" id="id_form-__prefix__-title">
+                                    </div>
+                                </div>
+                                <div class="delete-list" style="display: none"></div>
+                                <!-- END EMPTY FORM-->
+
+                            </div>
+                            <div class="btn-group" style="width: min-content!important; padding-bottom: 15px; padding-left: 12px">
+                                    <button type="button" class="btn btn-success" id="add_form">Добавить документ</button>
+                            </div>
+                            <!-- END DOCUMENT BLOCK -->
+
+                        <!-- SEO BLOCK -->
+                        <div class="col-md-12">
+                            <h3 class="page-header">Настройки SEO</h3>
+                            {% for field in form3 %}
+                                <div class="form-group">
+                                    <b>{{ field.label }}</b>
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+<div class="form-group" style="text-align: center">
+                                <a href="{% url 'content:main-change' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;">Отменить</a>
+                                <button type="submit" class="btn btn-success" id="btn-save" style="height: 34px; font-size: 14px;background-color: #00a65a!important;
+    border-color: #008d4c!important;">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+    </section>
+    <div>
+
+    </div>
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+{#        <script rel="stylesheet" href="{% static 'content/plugins/summernote/summernote.min.css' %}" type="text/css">#}
+{#    <script src="{% static 'content/plugins/summernote/summernote.min.js' %}"></script>#}
+            <script>
+                        CKEDITOR.replace( 'id_text' );
+                </script>
+        <script>
+                                                CKEDITOR.replace( '{{ form.text.id_for_label }}' );
+                                                CKEDITOR.replace( '{{ form.additional_text.id_for_label }}' );
+                </script>
+        <script src="{% static 'content/js/admin_main_page.js' %}"></script>
+{% endblock %}
