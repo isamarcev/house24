@@ -4,7 +4,7 @@ from content.models import About, Block, Main, Seo
 
 
 class Command(BaseCommand):
-    help = "Create instance of Main -and-> SEO, Block and About models"
+    help = "Create instance of Main -ansd-> SEO, Block and About models"
 
     def handle(self, *args, **options):
         seo_main_page = Seo.objects.create(title='Home 24 MAIN', desctiption='Write your ...', key_words='Base, Management')
