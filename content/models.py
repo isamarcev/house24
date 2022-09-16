@@ -101,7 +101,8 @@ class AboutService(models.Model):
     title = models.CharField(max_length=100, null=True)
     text = models.TextField(max_length=1000, null=True, blank=True)
     image = models.ImageField(upload_to='content/about_service/', null=True, blank=True)
-    seo = models.OneToOneField(Seo, on_delete=models.PROTECT, null=True, blank=True)
+    service_page = models.ForeignKey('ServicePage', on_delete=models.CASCADE, null=True)
+    # seo = models.OneToOneField(Seo, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -112,7 +113,7 @@ class AboutService(models.Model):
 
 
 class ServicePage(models.Model):
-    service = models.ForeignKey(AboutService, on_delete=models.PROTECT, null=True, blank=True)
+    # service = models.ForeignKey(AboutService, on_delete=models.PROTECT, null=True, blank=True)
     seo = models.OneToOneField(Seo, on_delete=models.PROTECT, null=True, blank=True)
 
 

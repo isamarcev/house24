@@ -11,6 +11,8 @@ urlpatterns = [
     # page_changes
     path('main-change/', views.MainUpdateView.as_view(), name='main-change'),
     path('about-change/', views.AboutUpdateView.as_view(), name='about-change'),
+    path('services-change/', views.ServicesUpdateView.as_view(), name='services-change'),
+    path('delete-service/<int:pk>/', views.delete_service, name='delete-service'),
     # path('-change/', views.AboutUpdateView.as_view(), name='about-change'),
 
     # delete_gallery

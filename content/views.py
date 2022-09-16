@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from . import forms
-from .models import Main, Block, Seo, About, Gallery, AdditionalGallery, Document
+from .models import *
 from django.views.generic import DetailView, UpdateView, DeleteView
 
 
@@ -21,7 +21,6 @@ class MainUpdateView(UpdateView):
 
     def get_object(self, queryset=None):
         return Main.objects.first()
-    # first
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -52,7 +51,6 @@ class MainUpdateView(UpdateView):
         else:
             return super().form_invalid(form)
 #         redirect + messeges framework прокидывать
-
 
 
 class AboutUpdateView(UpdateView):
@@ -101,10 +99,47 @@ class AboutUpdateView(UpdateView):
         return super().post(request, *args, **kwargs)
 
 
+class ServicesUpdateView(UpdateView):
+    success_url = reverse_lazy('content:services-change')
+    template_name = 'content/edit_pages/services.html'
+    formset_service = modelformset_factory(AboutService, forms.ServiceForm,
+                                      extra=0, can_delete=True, fields=('title', 'text', 'image'))
+    form_class = forms.ServicePageForm
 
-# class GalleryDeleteView(DeleteView):
-#     model = Gallery
-#     success_url = reverse_lazy
+    def get_queryset(self):
+        return ServicePage.objects.first()
+
+    def get_object(self, queryset=None):
+        return ServicePage.objects.first()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['form_seo'] = forms.SeoForm(instance=self.object.seo)
+        context['formset_service'] = self.formset_service(
+            queryset=AboutService.objects.filter(service_page=self.object.id))
+        return context
+
+    def post(self, request, *args, **kwargs):
+        object = self.get_object()
+        print(request.POST)
+        formset_service = self.formset_service(request.POST, request.FILES,
+                                               queryset=AboutService.objects.filter(service_page=object.id))
+        form_seo = forms.SeoForm(request.POST, request.FILES, instance=object.seo)
+        # form_class = self.form_class(request.POST, request.FILES, instance=object)
+        if form_seo.is_valid():
+            form_seo.save()
+        if formset_service.is_valid():
+            formset_service.save(commit=False)
+            for foo in formset_service.new_objects:
+                if foo.image:
+                    foo.service_page = object
+                    foo.save()
+            for foo in formset_service.deleted_objects:
+                foo.delete()
+            formset_service.save()
+        object.seo = form_seo.instance
+        object.save()
+        return HttpResponseRedirect(self.success_url)
 
 def delete_gallery(request, pk):
     object = Gallery.objects.get(pk=pk)
@@ -118,7 +153,11 @@ def delete_additional_gallery(request, pk):
     return HttpResponseRedirect(reverse_lazy('content:about-change'))
 
 
-
+def delete_service(request, pk):
+    pass
+    # service = AboutService.objects.get(pk=pk)
+    # service.delete()
+    # return HttpResponseRedirect(reverse_lazy('content:services-change'))
 
 
 def about(request):

@@ -67,6 +67,7 @@ class AdditionalGalleryForm(forms.ModelForm):
                                             'name':'add_gallery_image'})
         }
 
+
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = models.Document
@@ -74,3 +75,18 @@ class DocumentForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'})
         }
+
+
+class ServiceForm(forms.ModelForm):
+    class Meta:
+        model = models.AboutService
+        fields = ['title', 'text', 'image',]
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'})
+        }
+
+
+class ServicePageForm(forms.ModelForm):
+    class Meta:
+        model = models.ServicePage
+        fields = '__all__'

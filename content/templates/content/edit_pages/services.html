@@ -1,0 +1,125 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+<script src="{% static 'content/plugins/ckeditor/ckeditor.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Редактирование страницы</h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 10px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span>  Редактирование страницы</li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Редактирование страницы "Услуги"</h3>
+                </div>
+                    <div class="box-body">
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <h3 class="page-header">Услуги</h3>
+                            <!-- Services -->
+                            <div class="row" id="formset">
+                            {{ formset_service.management_form }}
+                                {% for form in formset_service %}
+                                    {% for field in form.hidden_fields %}
+                                        {{ field }}
+                                        {% endfor %}
+                                <div class="col-sm-1 col-md-4">
+                                    <h4>Услуга {{ forloop.counter }}
+                                        <a class="pull-right text-red" href="{% url 'content:delete-service' form.instance.id %}" onclick="delete_form(this.id)" style="position: absolute; right: 0; top: 0; width:20px; font-size: 12px" data-confirm="Удалить?"><i class="fa fa-trash"></i></a>
+                                    </h4>
+                                    <img src="{{ form.instance.image.url }}" height="200" width="100%" style="margin-bottom: 15px">
+                                    <div class="form-group">
+                                        <label class="control-label" for="{{ form.image.id_for_label }}">Рекомендуемый размер: (650x300)</label>
+                                        <input type="file" style="padding: 6px 12px; width: 100%; border: 1px solid #d2d6de" id="{{ form.image.id_for_label }}" name="{{ form.image.name }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="{{ form.title.id_for_label }}">Название услуги</label>
+                                        {{ form.title }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="{{ form.text.id_for_label }}">Описание услуги</label>
+                                        {{ form.text }}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                                <div class="empty_form">
+                                    <div class="col-sm-1 col-md-4">
+                                    <h4 id="service_header">Услуга #
+                                        <a class="pull-right text-red" id="form-__prefix__" onclick="delete_form(this.id)" style="position: absolute; right: 0; top: 0; width:20px; font-size: 12px" data-confirm="Удалить?"><i class="fa fa-trash"></i></a>
+                                    </h4>
+                                    <img src="{% static 'content/img/empty.jpeg' %}" height="200" width="100%" style="margin-bottom: 15px">
+                                    <div class="form-group">
+                                        <label class="control-label" for="id_form__prefix__-image">Рекомендуемый размер: (650x300)</label>
+                                        <input type="file" style="padding: 6px 12px; width: 100%; border: 1px solid #d2d6de" id="if_form__prefix__-image" name="image">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_form-__prefix__-title">Название услуги</label>
+                                        <input type="text" name="form-__prefix__-title" class="form-control" maxlength="100" id="id_form-__prefix__-title">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_form-0-text">Описание услуги</label>
+                                        <input type="text" name="form-__prefix__-text" class="form-control" maxlength="100" id="id_form-__prefix__-text">
+                                    </div>
+                                </div>
+                                </div>
+                            <!-- END INFO-->
+                        <!-- SEO BLOCK -->
+                        <div class="col-md-12">
+                            <h3 class="page-header">Настройки SEO</h3>
+                            {% for field in form_seo %}
+                                <div class="form-group">
+                                    <b>{{ field.label }}</b>
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group" style="text-align: center">
+                            <a href="{% url 'content:services-change' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;">Отменить</a>
+                            <button type="button" id="add_service" class="btn btn-success" style="height: 34px; font-size: 14px; background-color: #008d4c !important">
+                                Добавить услугу
+                            </button>
+                            <button type="submit" class="btn btn-success" id="btn-save" style="height: 34px; font-size: 14px;background-color: #00a65a!important;
+    border-color: #008d4c!important;">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+    </section>
+    <div>
+
+    </div>
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+{#        <script rel="stylesheet" href="{% static 'content/plugins/summernote/summernote.min.css' %}" type="text/css">#}
+{#    <script src="{% static 'content/plugins/summernote/summernote.min.js' %}"></script>#}
+            <script>
+                        CKEDITOR.replace( 'id_text' );
+                </script>
+        <script>
+                           {% for i in formset_service %}
+                        CKEDITOR.replace( '{{ i.text.id_for_label }}' );
+    {% endfor %}
+    </script>
+        <script src="{% static 'content/js/admin_main_page.js' %}"></script>
+{% endblock %}
