@@ -2,6 +2,8 @@ from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
+
+from crm_home.models import Tariff
 from . import forms
 from .models import *
 from django.views.generic import DetailView, UpdateView, DeleteView
@@ -106,9 +108,6 @@ class ServicesUpdateView(UpdateView):
                                       extra=0, can_delete=True, fields=('title', 'text', 'image'))
     form_class = forms.ServicePageForm
 
-    def get_queryset(self):
-        return ServicePage.objects.first()
-
     def get_object(self, queryset=None):
         return ServicePage.objects.first()
 
@@ -121,10 +120,11 @@ class ServicesUpdateView(UpdateView):
 
     def post(self, request, *args, **kwargs):
         object = self.get_object()
-        print(request.POST)
+        print(request.POST, request.FILES)
         formset_service = self.formset_service(request.POST, request.FILES,
                                                queryset=AboutService.objects.filter(service_page=object.id))
         form_seo = forms.SeoForm(request.POST, request.FILES, instance=object.seo)
+        print(formset_service.is_valid(), formset_service.errors)
         # form_class = self.form_class(request.POST, request.FILES, instance=object)
         if form_seo.is_valid():
             form_seo.save()
@@ -140,6 +140,46 @@ class ServicesUpdateView(UpdateView):
         object.seo = form_seo.instance
         object.save()
         return HttpResponseRedirect(self.success_url)
+
+
+
+class TariffUpdateView(UpdateView):
+    # queryset = Tariff.objects.all()
+    pass
+
+
+class ContactsUpdateView(UpdateView):
+    template_name = 'content/edit_pages/contacts.html'
+    form_class = forms.ContactsForm
+    success_url = reverse_lazy('content:contacts-change')
+    queryset = Contacts.objects.first()
+
+    def get_object(self, queryset=None):
+        obj = Contacts.objects.first()
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['form_seo'] = forms.SeoForm(instance=self.object.seo, prefix='seo_form')
+        return context
+
+    def post(self, request, *args, **kwargs):
+        object = self.get_object()
+        print(request.POST, request.FILES)
+        form_seo = forms.SeoForm(request.POST, request.FILES, instance=object.seo, prefix='seo_form')
+        form_class = forms.ContactsForm(request.POST, request.FILES, instance=object)
+        print(form_class.is_valid(), form_class.errors)
+        print(form_seo.is_valid(), form_seo.errors)
+        if all([form_seo.is_valid(), form_class.is_valid()]):
+            form_seo.save()
+            form_class.save(commit=False)
+            print(form_class.instance.text)
+            form_class.instance.seo = form_seo.instance
+            form_class.save()
+            return HttpResponseRedirect(self.success_url)
+        else:
+            return HttpResponse(form_class.errors, form_seo.errors)
+
 
 def delete_gallery(request, pk):
     object = Gallery.objects.get(pk=pk)

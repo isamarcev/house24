@@ -4,21 +4,39 @@ console.log(btn)
 
 $('#add_form').click(function() {
 	var form_idx = $('#id_form-TOTAL_FORMS').val();
-	console.log(form_idx)
 	$('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
 	$('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-	console.log($('#id_form-TOTAL_FORMS').val())
 });
 
 function delete_form(index) {
 	console.log(index)
-	// $('#id_' + index + '-image').css('');
 	$('#id_' + index + '-document')[0].value="";
 	$('.delete-list').append('<input type="hidden" value="on" name="' + index  + '-DELETE" id="id_' + index + '-DELETE">');
 	$('#' + index + '-form').css('display', 'none');
 	$('#' + index + '-title').css('display', 'none');
 
 }
+
+
+$('#add_service').click(function () {
+	var form_idx = $('#id_form-TOTAL_FORMS').val();
+	$('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+	$('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+	$('#id_form-'+ form_idx +'-text')
+	CKEDITOR.replace( 'form-'+ form_idx +'-text' );
+
+})
+
+
+function delete_service(index) {
+	console.log(index)
+	$('#id_' + index + '-image')[0].value="";
+	$('.delete-list').append('<input type="hidden" value="on" name="' + index  + '-DELETE" id="id_' + index + '-DELETE">');
+	$('#' + index + '-form').css('display', 'none');
+
+}
+
+
 
 var link = 'https://seeklogo.com/images/A/Adobe_PDF-logo-84B633809C-seeklogo.com.png'
 

@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 
-from content.models import About, Block, Main, Seo, ServicePage, AboutService
+from content.models import About, Block, Main, Seo, ServicePage, AboutService, Contacts
 
 
 class Command(BaseCommand):
@@ -41,3 +41,8 @@ class Command(BaseCommand):
             AboutService(title='Third page service', text='Third page service text',
                          image='url', service_page=service_page)
         ])
+
+        seo_contacts = Seo.objects.create(title='Contacts', desctiption='contacts description', key_words='contacts')
+        seo_contacts.save()
+        contacts = Contacts.objects.create(title='Contacts', seo=seo_contacts, text='COntacts text')
+        contacts.save()

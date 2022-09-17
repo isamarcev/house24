@@ -82,7 +82,8 @@ class ServiceForm(forms.ModelForm):
         model = models.AboutService
         fields = ['title', 'text', 'image',]
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'})
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': '4'}),
         }
 
 
@@ -90,3 +91,31 @@ class ServicePageForm(forms.ModelForm):
     class Meta:
         model = models.ServicePage
         fields = '__all__'
+
+
+class ContactsForm(forms.ModelForm):
+    class Meta:
+        model = models.Contacts
+        fields = ['title', 'text', 'link_comm_site', 'map', 'FIO', 'location', 'address', 'phone', 'email']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'required': 'required'}),
+            'text': forms.Textarea(attrs={'class': 'form-control', 'required': 'required'}),
+            'link_comm_site': forms.TextInput(attrs={'class': 'form-control'}),
+            'map': forms.Textarea(attrs={'class': 'form-control', 'rows': '4'}),
+            'FIO': forms.TextInput(attrs={'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'title': "Заголовок",
+            'text': "Краткий текст",
+            'link_comm_site': "Ссылка на коммерческий сайт",
+            'map': 'Код карты',
+            'FIO': "ФИО",
+            'location': "Локация",
+            'address': "Адрес",
+            'phone': "Телефон",
+            "email": "E-mail",
+        }

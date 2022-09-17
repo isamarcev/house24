@@ -1,4 +1,6 @@
-
+label {
+    font-size: 14px;
+}
 
 .content-wrapper>.content-custom {
         min-height: 250px;

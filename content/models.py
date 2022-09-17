@@ -125,13 +125,13 @@ class ServicePage(models.Model):
 class Contacts(models.Model):
     title = models.CharField(max_length=100)
     text = models.TextField(max_length=1000, null=True, blank=True)
-    link_comm_site = models.URLField()
-    map = models.URLField()
+    link_comm_site = models.URLField(null=True, blank=True)
+    map = models.CharField(max_length=1000, null=True, blank=True)
     seo = models.OneToOneField(Seo, on_delete=models.PROTECT)
     FIO = models.CharField(max_length=130, null=True)
     location = models.CharField(max_length=100, null=True)
     address = models.CharField(max_length=100, null=True)
     phone = models.CharField(max_length=20, null=True)
-    email = models.EmailField()
+    email = models.EmailField(null=True, blank=True)
 
 

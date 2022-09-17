@@ -117,7 +117,7 @@
 {#    <script src="{% static 'content/plugins/summernote/summernote.min.js' %}"></script>#}
         <script>
                            {% for i in formset_service %}
-                        CKEDITOR.replace( '{{ i.prefix }}-text' );
+                        CKEDITOR.replace( '{{ i.text.name }}' );
     {% endfor %}
     </script>
         <script src="{% static 'content/js/admin_main_page.js' %}"></script>

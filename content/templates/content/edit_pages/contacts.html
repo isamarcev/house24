@@ -1,0 +1,115 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+<script src="{% static 'content/plugins/ckeditor/ckeditor.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Редактирование страницы</h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 10px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span>  Редактирование страницы</li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Редактирование страницы "Контакты"</h3>
+                </div>
+                    <div class="box-body">
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <h3 class="page-header">Контактная информация</h3>
+                                    <div class="form-group">
+                                        {{ form.title.label_tag }}
+                                        {{ form.title }}
+                                    </div>
+                                     <div class="form-group">
+                                         {{ form.text.label_tag }}
+                                        {{ form.text }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.link_comm_site.label_tag }}
+                                        {{ form.link_comm_site }}
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <h3 class="page-header">Контакты</h3>
+                                    <div class="form-group">
+                                        {{ form.FIO.label_tag }}
+                                        {{ form.FIO }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.location.label_tag }}
+                                        {{ form.location }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.address.label_tag }}
+                                        {{ form.address }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.phone.label_tag }}
+                                        {{ form.phone }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.email.label_tag }}
+                                        {{ form.email }}
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <h3 class="page-header">Карта</h3>
+                                <div class="form-group">
+                                    {{ form.map.label_tag }}
+                                    {{ form.map }}
+                                </div>
+                            </div>
+                        <!-- SEO BLOCK -->
+                        <div class="col-md-12">
+                            <h3 class="page-header">Настройки SEO</h3>
+                            {% for field in form_seo %}
+                                <div class="form-group">
+                                    <b>{{ field.label }}</b>
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group" style="text-align: center">
+                            <a href="{% url 'content:services-change' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;">Отменить</a>
+                            <button type="submit" class="btn btn-success" id="btn-save" style="height: 34px; font-size: 14px;background-color: #00a65a!important;
+    border-color: #008d4c!important;">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+    </section>
+    <div>
+
+    </div>
+  <script>
+                        CKEDITOR.replace( 'text' );
+    </script>
+{% endblock %}
+{% block script %}
+{#        <script rel="stylesheet" href="{% static 'content/plugins/summernote/summernote.min.css' %}" type="text/css">#}
+{#    <script src="{% static 'content/plugins/summernote/summernote.min.js' %}"></script>#}
+
+        <script src="{% static 'content/js/admin_main_page.js' %}"></script>
+{% endblock %}
