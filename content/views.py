@@ -31,24 +31,16 @@ class MainUpdateView(UpdateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        print(request.FILES)
         object = self.get_object()
         form = forms.MainForm(request.POST, request.FILES, instance=object)
         form_class3 = forms.SeoForm(request.POST, instance=object.seo)
         formset = self.formset(request.POST, request.FILES, queryset=self.blocks)
-        print(formset.is_valid(), formset.errors)
         if form.is_valid():
             form.save()
             if formset.is_valid():
-                print(formset.cleaned_data)
-                # print(formset)
                 formset.save()
-            # else:
-            #     return super().form_invalid(formset)
             if form_class3.is_valid():
                 form_class3.save()
-            # else:
-            #     return super().form_invalid((form_class3))
             return super().post(request, *args, **kwargs)
         else:
             return super().form_invalid(form)
@@ -165,15 +157,11 @@ class ContactsUpdateView(UpdateView):
 
     def post(self, request, *args, **kwargs):
         object = self.get_object()
-        print(request.POST, request.FILES)
         form_seo = forms.SeoForm(request.POST, request.FILES, instance=object.seo, prefix='seo_form')
         form_class = forms.ContactsForm(request.POST, request.FILES, instance=object)
-        print(form_class.is_valid(), form_class.errors)
-        print(form_seo.is_valid(), form_seo.errors)
         if all([form_seo.is_valid(), form_class.is_valid()]):
             form_seo.save()
             form_class.save(commit=False)
-            print(form_class.instance.text)
             form_class.instance.seo = form_seo.instance
             form_class.save()
             return HttpResponseRedirect(self.success_url)

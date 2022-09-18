@@ -14,7 +14,6 @@ function delete_form(index) {
 	$('.delete-list').append('<input type="hidden" value="on" name="' + index  + '-DELETE" id="id_' + index + '-DELETE">');
 	$('#' + index + '-form').css('display', 'none');
 	$('#' + index + '-title').css('display', 'none');
-
 }
 
 

@@ -1,0 +1,165 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_home/css/crm_home.css' %}" type="text/css">
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Редактирование услуг</h1>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <form action="">
+                    <div class="col-xs-12 col-lg-7">
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab_services" role="tablist">
+                                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-services" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Услуги</button>
+                                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-units" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Единицы измерения</button>
+                            </div>
+                        </nav>
+                        <div class="tab-content" id="nav-tabContent" style="padding: 10px">
+                            <!-- SERVICES TAB -->
+                            <div class="tab-pane fade show active" id="nav-services" role="tabpanel" aria-labelledby="nav-home-tab">
+                                <div class="row">
+                                    <div id="form_set_services" class="row">
+                                    {{ formset_service.management_form }}
+                                    {% for formset in formset_service %}
+                                        {% for hidden_field in formset.hidden_fields %}
+                                            {{ hidden_field }}
+                                        {% endfor %}
+                                        <div id="{{ formset.prefix }}-form" class="row">
+                                            <div class="col-xs-12 col-sm-7">
+                                                <div class="form-group">
+                                                    {{ formset.name.label_tag }}
+                                                    {{ formset.name }}
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-5">
+                                                <div class="form-group">
+                                                    {{ formset.unit.label_tag }}
+                                                    <div class="input-group">
+                                                        {{ formset.unit }}
+                                                        <button type="button" name="{{ formset.prefix }}" onclick="delete_service(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                            <i class="fa fa-trash">
+                                                            </i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12">
+                                            {{ formset.show }}
+                                            {{ formset.show.label_tag }}
+                                        </div>
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                                <div id="empty_form_services" style="display: none;">
+                                    <div id="service-__prefix__-form" class="row">
+                                        <div class="col-xs-12 col-sm-7">
+                                        <input type="hidden" name="service-__prefix__-id" id="id_service-__prefix__-id">
+                                            <div class="form-group">
+                                                <label for="id_service-__prefix__-name">Услуга</label>
+                                                <input type="text" name="service-__prefix__-name" class="form-control" required="required" id="id_service-__prefix__-name">
+                                            </div>
+                                        </div>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <div class="form-group">
+                                            <label for="id_service-__prefix__-unit">Ед. изм.</label>
+                                            <div class="input-group">
+                                                <select name="service-__prefix__-unit" class="form-select" id="id_service-__prefix__-unit">
+                                                    <option value="">Выберите...</option>
+                                                    {% for unit in formset_service %}
+                                                        <option value="{{ unit.instance.unit.id }}">{{ unit.instance.unit.title }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <button type="button" name="service-__prefix__" onclick="delete_service(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                    <i class="fa fa-trash">
+                                                    </i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <input type="checkbox" name="service-__prefix__-show" id="id_service-__prefix__-show">
+                                        <label for="id_service-__prefix__-show">Показывать в счетчиках</label>
+                                </div>
+                                                                        </div>
+
+                            </div>
+                                <div class="delete-list-service"></div>
+                            <button type="button" id="add_service" class="btn btn-defaults btn-hover-change">Добавить</button>
+                            </div>
+                            <!-- END SERVICES TAB -->
+                            <!-- UNIT TAB -->
+                            <div class="tab-pane fade" id="nav-units" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                <div class="row" id="form_set_unit">
+                                    {{ formset_units.management_form }}
+                                    {% for unit in formset_units %}
+                                        {% for field in unit.hidden_fields %}
+                                            {{ field }}
+                                        {% endfor %}
+                                        <div class="col-xs-12" id="{{ unit.prefix }}-form">
+                                            <div class="form-group">
+                                                {{ unit.title.label_tag }}
+                                                <div class="input-group">
+                                                    {{ unit.title }}
+                                                    <button type="button"  name="{{ unit.prefix }}" onclick="delete_unit(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                        <i class="fa fa-trash">
+                                                        </i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button type="button" id="add_unit" class="btn btn-defaults btn-hover-change">Добавить</button>
+                                <div class="row" id="empty_form_unit" style="display: none" >
+                                    <div class="col-xs-12" id="unit-__prefix__-form">
+                                            <div class="form-group">
+                                                <label for="id_unit-__prefix__-title">Ед. изм.</label>
+                                                <div class="input-group">
+                                                    <input type="text" name="unit-__prefix__-title" class="form-control" id="id_unit-__prefix__-title">
+                                                    <button type="button" class="btn btn-default form-row-remove-btn" name="unit-__prefix__" onclick="delete_unit(this.name)" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                        <i class="fa fa-trash">
+                                                        </i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="delete-list-unit"></div>
+                            </div>
+                            <!-- END UNIT TAB -->
+                        </div>
+                    </div>
+                    <!-- END BLOCK  -->
+                    <div class="form-group" style="text-align: center">
+                            <a href="{% url 'crm_home:set_services' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;">Отменить</a>
+                            <button type="submit" class="btn btn-success" id="btn-save" style="height: 34px; font-size: 14px;background-color: #00a65a!important;
+    border-color: #008d4c!important;">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <div>
+    </div>
+    </div>
+{% endblock %}
+{% block script %}
+{#        <script rel="stylesheet" href="{% static 'content/plugins/summernote/summernote.min.css' %}" type="text/css">#}
+{#    <script src="{% static 'content/plugins/summernote/summernote.min.js' %}"></script>#}
+
+        <script src="{% static 'crm_home/js/crm_home.js' %}"></script>
+{% endblock %}

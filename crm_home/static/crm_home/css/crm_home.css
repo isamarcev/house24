@@ -1,0 +1,46 @@
+#nav-tab_services > .nav-link:hover {
+            color: #999;
+            border: none;
+}
+#nav-tab_services > .nav-link {
+            color: #444444;
+            font-size: 14px;
+            border-radius: 0;
+            border: none;
+}
+#nav-tab_services .active:first-child {
+            border-top: 3px solid #3c8dbc;
+            border-left: none;
+}
+#nav-tab_services .active:last-child {
+            border-top: 3px solid #3c8dbc;
+}
+#nav-tab_services .active:hover {
+            border-top: 3px solid #3c8dbc;
+            color: #444444;
+}
+
+        /*<!-- select FORM -->*/
+.form-select:focus {
+            box-shadow: none;
+}
+.form-select {
+            border-radius: 0;
+            font-size: 14px;
+            color: #555555;
+}
+
+.btn-hover-change:hover {
+    background-color: #3c8dbc;!important;
+    border-color: #367fa9;!important;
+    color: #fff;!important;
+}
+
+.btn-defaults {
+    background-color: #f4f4f4;!important;
+    color: #444;!important;
+    border-color: #ddd;!important;
+    border-radius: 2px;!important;
+    font-size: 14px;
+    transition: 0s;
+}
