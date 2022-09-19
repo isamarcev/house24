@@ -1,0 +1,154 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{% static 'crm_home/css/crm_tariff.css' %}">
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Тариф: {{ form_tariff.instance.name }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 10px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_home:tariffs' %}" style="color: #444; text-decoration: none">> <span style="color: #ccc; margin-right: 5px" >></span> Тарифы</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Новый тариф</li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <form method="post">
+                {% csrf_token %}
+                <div class="box">
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12 col-lg-7">
+                                <div class="form-group">
+                                    {{ form_tariff.name.label_tag }}
+                                    {{ form_tariff.name }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form_tariff.describe.label_tag }}
+                                    {{ form_tariff.describe }}
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-lg-7">
+                                <div id="formset_tariff_services">
+                                    {{ services_formset.management_form }}
+                                    {% for service in services_formset %}
+                                        {% if service %}
+                                            {% for field in service.hidden_fields %}
+                                                {{ field }}
+                                            {% endfor %}
+
+                                            <div class="row" id="{{ service.prefix }}-form">
+                                        <input type="hidden" name="{{ service.prefix }}-id" id="id_{{ service.prefix }}-id" value="{{ service.instance.id }}">
+                                        <div class="col-xs-6 col-md-4">
+                                            <label for="id_{{ service.prefix }}-service">Услуга</label>
+                                            {{ service.service }}
+{#                                            <select name="{{ service.prefix }}-service" id="id_{{ service.prefix }}-service" class="form-select">#}
+{#                                            <option value="" selected="">Выберите...</option>#}
+{#                                                {% for service in services %}#}
+{#                                                    <option value="{{ service.id }}">{{ service.name }}</option>#}
+{#                                                {% endfor %}#}
+{#                                            </select>#}
+
+                                        </div>
+                                        <div class="col-xs-6 col-md-3">
+                                            <label for="id_{{ service.prefix }}-service">Цена</label>
+                                            {{ service.price }}
+{#                                            <input type="text" class="form-control" id="id_{{ service.prefix }}-price" name="{{ service.prefix }}-price">#}
+                                        </div>
+                                        <div class="col-xs-6 col-md-2">
+                                            <label for="">Валюта</label>
+                                            <input type="text" disabled class="form-control disabled" value="грн">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3">
+                                            <div class="form-group">
+                                                <label for="">Ед.изм.</label>
+                                                <div class="input-group">
+                                                    <select class="form-select disabled" disabled>
+                                                        <option value="" id="service_unit">Выберите...</option>
+                                                    </select>
+                                                    <button type="button" name="{{ service.prefix }}" onclick="delete_service(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                </div>
+                                <div id="empty_form" style="display: none">
+                                    <div class="row" id="service_update-__prefix__-form">
+                                        <input type="hidden" name="service_update-__prefix__-id" id="id_service_update-__prefix__-id">
+                                        <div class="col-xs-6 col-md-4">
+                                            <label for="id_service_update-__prefix__-service">Услуга</label>
+                                            <select name="service_update-__prefix__-service" id="id_service_update-__prefix__-service" class="form-select">
+                                            <option value="" selected="">Выберите...</option>
+                                                {% for service in services %}
+                                                    <option value="{{ service.id }}">{{ service.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-xs-6 col-md-3">
+                                            <label for="id_service_update-__prefix__-service">Цена</label>
+                                            <input type="text" class="form-control" id="id_service_update-__prefix__-price" name="service_update-__prefix__-price">
+                                        </div>
+                                        <div class="col-xs-6 col-md-2">
+                                            <label for="">Валюта</label>
+                                            <input type="text" disabled class="form-control disabled" value="грн">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3">
+                                            <div class="form-group">
+                                                <label for="">Ед.изм.</label>
+                                                <div class="input-group">
+                                                    <select class="form-select disabled" disabled>
+                                                        <option value="" id="service_unit">Выберите...</option>
+                                                    </select>
+                                                    <button type="button" name="service_update-__prefix__" onclick="delete_service(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="deleted_tariff_services">
+
+                                </div>
+                                <button type="button" id="add_service_update" class="btn btn-defaults btn-hover-change">Добавить услугу</button>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-group" style="text-align: center">
+                            <a href="{% url 'crm_home:tariffs' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;border-radius: 3px;">Отменить</a>
+                            <button type="submit" class="btn btn-success" id="btn-save" >Сохранить</button>
+                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+        <script src="{% static 'crm_home/js/crm_tariff.js' %}"></script>
+{% endblock %}

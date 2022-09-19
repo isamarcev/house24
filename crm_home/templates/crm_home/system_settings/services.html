@@ -18,7 +18,8 @@
     <section class="content content-custom" >
         <div class="row">
             <div class="col-sm-12">
-                <form action="">
+                <form method="post" >
+                {% csrf_token %}
                     <div class="col-xs-12 col-lg-7">
                         <nav>
                             <div class="nav nav-tabs" id="nav-tab_services" role="tablist">
@@ -41,6 +42,13 @@
                                                 <div class="form-group">
                                                     {{ formset.name.label_tag }}
                                                     {{ formset.name }}
+                                                    {% if formset.errors.name %}
+                                                    {% for field in formset.errors.name %}
+                                                        <div class="error-content">
+                                                            {{ field }}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-xs-12 col-sm-5">
@@ -69,7 +77,7 @@
                                         <input type="hidden" name="service-__prefix__-id" id="id_service-__prefix__-id">
                                             <div class="form-group">
                                                 <label for="id_service-__prefix__-name">Услуга</label>
-                                                <input type="text" name="service-__prefix__-name" class="form-control" required="required" id="id_service-__prefix__-name">
+                                                <input type="text" name="service-__prefix__-name" class="form-control" id="id_service-__prefix__-name">
                                             </div>
                                         </div>
                                     <div class="col-xs-12 col-sm-5">
@@ -78,8 +86,8 @@
                                             <div class="input-group">
                                                 <select name="service-__prefix__-unit" class="form-select" id="id_service-__prefix__-unit">
                                                     <option value="">Выберите...</option>
-                                                    {% for unit in formset_service %}
-                                                        <option value="{{ unit.instance.unit.id }}">{{ unit.instance.unit.title }}</option>
+                                                    {% for unit in formset_units %}
+                                                        <option value="{{ unit.instance.id }}">{{ unit.instance.title }}</option>
                                                     {% endfor %}
                                                 </select>
                                                 <button type="button" name="service-__prefix__" onclick="delete_service(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">

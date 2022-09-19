@@ -112,12 +112,9 @@ class ServicesUpdateView(UpdateView):
 
     def post(self, request, *args, **kwargs):
         object = self.get_object()
-        print(request.POST, request.FILES)
         formset_service = self.formset_service(request.POST, request.FILES,
                                                queryset=AboutService.objects.filter(service_page=object.id))
         form_seo = forms.SeoForm(request.POST, request.FILES, instance=object.seo)
-        print(formset_service.is_valid(), formset_service.errors)
-        # form_class = self.form_class(request.POST, request.FILES, instance=object)
         if form_seo.is_valid():
             form_seo.save()
         if formset_service.is_valid():

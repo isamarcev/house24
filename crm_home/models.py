@@ -10,15 +10,16 @@ class Unit(models.Model):
 
 class Service(models.Model):
     name = models.CharField(max_length=100)
-    show = models.BooleanField(null=True)
-    unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
+    show = models.BooleanField(null=True, blank=True)
+    unit = models.ForeignKey(Unit, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
 class Tariff(models.Model):
-    name = models.CharField(max_length=100, default='Test')
+    name = models.CharField(max_length=100, error_messages=
+                            {'required': 'Это поле обязательно к заполнению и не может быть пустым.'})
     describe = models.TextField(max_length=2000, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -27,14 +28,16 @@ class Tariff(models.Model):
 
 
 class TariffService(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    tariff = models.ForeignKey(Tariff, on_delete=models.CASCADE)
-    price = models.DecimalField(decimal_places=2, max_digits=10)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True)
+    tariff = models.ForeignKey(Tariff, on_delete=models.CASCADE, null=True, blank=True)
+    price = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True, default=0)
 
     class Meta:
         verbose_name_plural = "Тарифы Услуги"
         verbose_name = "Тариф Услуга"
 
+    # def clean_price(self):
+    #     new_price = self.cleaned
 
 def get_next_counter_number():
     """ Getting next number of counter """

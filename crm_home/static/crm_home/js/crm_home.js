@@ -19,6 +19,7 @@ function delete_service(name) {
 	console.log(name)
 	const result = confirm('Удалить?')
 		if (result) {
+			$('#id_' + name + '-name').removeAttr('value').removeAttr('required')
 			$('.delete-list-service').append('<input type="hidden" value="on" name="' + name  + '-DELETE" id="id_' + name + '-DELETE">');
 			$('#' + name + '-form').css('display', 'none');
 		}
@@ -30,7 +31,7 @@ function delete_unit(index) {
 	const result = confirm('Удалить?')
 	console.log(result)
 		if (result) {
-			$('.delete-list-unit').append('<input type="hidden" value="on" name="' + name  + '-DELETE" id="id_' + name + '-DELETE">');
+			$('.delete-list-unit').append('<input type="hidden" value="on" name="' + index  + '-DELETE" id="id_' + index + '-DELETE">');
 			$('#' + index + '-form').css('display', 'none');
 		}
 		else {
