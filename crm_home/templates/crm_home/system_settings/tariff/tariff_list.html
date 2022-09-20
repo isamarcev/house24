@@ -55,11 +55,19 @@
                                   </thead>
                                   <tbody>
                                     {% for object in object_list %}
-                                        <tr data-href="{% url 'crm_home:tariff_detail' object.id %}">
-                                                <td>{{ object.name }}</td>
-                                                <td>{{ object.describe }}</td>
-                                                <td>{{ object.updated_at|date:"d-m-Y - G:i " }}</td>
-                                                <td></td>
+                                        <tr data-href="{% url 'crm_home:tariff_detail' object.id %}" id="instance-{{ object.id }}">
+                                                <td class="td-height">{{ object.name }}</td>
+                                                <td class="td-height">{{ object.describe }}</td>
+                                                <td class="td-height">{{ object.updated_at|date:"d-m-Y - G:i " }}</td>
+                                                <td class="td-height" >
+                                                    <div class="btn-group pull-right" style="display: inline-block!important;">
+                                                        <a class="btn btn-default btn-sm" href="/admin/tariff/create?tariff_id=100" title="Копировать" data-toggle="tooltip">
+                                                            <i class="fa fa-clone"></i></a>
+                                                        <a class="btn btn-default btn-sm" href="{% url 'crm_home:tariff_update' object.id %}" title="Редактировать" data-toggle="tooltip">
+                                                            <i class="fa fa-pencil"></i></a>
+                                                        <a class="btn btn-default btn-sm btn-delete " title="Удалить" href="#" id="{{ object.id }}"  data-toggle="tooltip" data-pjax="0" >
+                                                            <i class="fa fa-trash " ></i></a></div>
+                                                </td>
                                         </tr>
                                     {% endfor %}
 
@@ -79,6 +87,26 @@
 {% endblock %}
 {% block script %}
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <!-- AJAX -->
+    <script>
+        function delete_tariff(id) {
+            $.ajax({
+                url:`{% url 'crm_home:delete_tariff' %}`,
+                type: 'get',
+                data: {'id': id},
+                success: (data) => {
+                    console.log(data)
+                    if (data.success) {
+                        var row = $('#instance-' + id)
+                        row.css('display', 'none')
+                    } else {
+                        alert('Something wrong.')
+                    }
+                }
+            })
+        }
+    </script>
+
         <script src="{% static 'crm_home/js/crm_tariff.js' %}"></script>
     <script>
         $(document).ready( function () {
@@ -95,4 +123,6 @@
         );
     } );
     </script>
+
+
 {% endblock %}

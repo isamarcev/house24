@@ -18,7 +18,7 @@ class ServiceForm(forms.ModelForm):
         }
         widgets = {
             'name': forms.TextInput(attrs=({'class': 'form-control', 'required': 'required'})),
-            "unit": forms.Select(attrs={'class': 'form-select'})
+            "unit": forms.Select(attrs={'class': 'form-select '})
         }
 
     # def clean_name(self):
@@ -60,7 +60,21 @@ class TariffServiceForm(forms.ModelForm):
         fields = ['price', 'service',]
         exclude = ['id',]
         widgets = {
-            'service': forms.Select(attrs={'class': 'form-select'}),
+            'service': forms.Select(attrs={'class': 'form-select select-choose'}),
             'price': forms.TextInput(attrs={'class': 'form-control'})
 
         }
+        error_messages = {
+            'price': {'null': 'Введите цену за услугу.',
+                      'blank': 'Введите цену за услугу.',
+                        'invalid': 'Поле должно быть числом.'
+                      }
+        }
+
+    def clean_price(self):
+        new_price = self.cleaned_data['price']
+        service = self.cleaned_data['service']
+        if service:
+            if new_price is None:
+                raise ValidationError('Поле не может быть пустым!')
+        return new_price

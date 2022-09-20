@@ -1,7 +1,9 @@
 from django.forms import modelformset_factory
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.views.generic.base import View
+
 from . import forms
 from .models import *
 from django.views.generic import DetailView, UpdateView, DeleteView, FormView, ListView, CreateView
@@ -61,26 +63,24 @@ class TariffCreateVIew(CreateView):
     services_formset = modelformset_factory(TariffService, forms.TariffServiceForm, fields=('service', 'price',),
                                             can_delete=True, extra=0)
     def get_context_data(self, **kwargs):
+        data = {'service-TOTAL_FORMS': '0',
+                'service-INITIAL_FORMS': '0',
+                }
         context = {'form_tariff': forms.TariffForm(),
-                   'services_formset': self.services_formset(prefix='service'),
+                   'services_formset': self.services_formset(prefix='service', data=data),
                    'services': Service.objects.all().select_related('unit')}
         return context
 
     def post(self, request, *args, **kwargs):
         services_formset = self.services_formset(request.POST, prefix='service')
         form_tariff = forms.TariffForm(request.POST)
-        print(form_tariff.is_valid(), form_tariff.errors)
-        print(services_formset.is_valid(), services_formset.errors)
-        print(request.POST)
         if all([form_tariff.is_valid(), services_formset.is_valid()]):
             form_tariff.save()
             services_formset.save(commit=False)
-
             for form in services_formset:
                 if form.instance.service:
                     form.instance.tariff = form_tariff.instance
                     form.instance.save()
-            # services_formset.save()
             return HttpResponseRedirect(reverse_lazy('crm_home:tariffs'))
         return render(request, self.template_name, context={'services_formset': services_formset,
                                                             'form_tariff': form_tariff,
@@ -95,7 +95,7 @@ class TariffUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {'form_tariff': forms.TariffForm(instance=self.object),
-                   'services_formset': self.services_formset(queryset=TariffService.objects.filter(tariff=self.object),
+                   'services_formset': self.services_formset(queryset=TariffService.objects.filter(tariff=self.object).select_related('service__unit'),
                                                              prefix='service_update'),
                    'services': Service.objects.all().select_related('unit')}
         return context
@@ -105,22 +105,42 @@ class TariffUpdateView(UpdateView):
         services_formset = self.services_formset(request.POST, queryset=TariffService.objects.filter(tariff=obj),
                                                  prefix='service_update')
         form_tariff = forms.TariffForm(request.POST, instance=obj)
-        print(form_tariff.is_valid(), form_tariff.errors)
-        print(services_formset.is_valid(), services_formset.errors, services_formset)
-        print(request.POST)
-
         if all([form_tariff.is_valid(), services_formset.is_valid()]):
             form_tariff.save()
             services_formset.save(commit=False)
             for form in services_formset.deleted_objects:
                 form.delete()
+            for form in services_formset.changed_objects:
+                form[0].save()
             for form in services_formset.new_objects:
                 if form.service:
                     form.tariff = form_tariff.instance
                     form.save()
-            # services_formset.save()
             return HttpResponseRedirect(reverse_lazy('crm_home:tariffs'))
         return render(request, self.template_name, context={'services_formset': services_formset,
                                                             'form_tariff': form_tariff,
                                                             'services': Service.objects.all().select_related('unit')})
+
+
+def get_unit_for_service(request):
+    if request.GET:
+        print(request.GET.get('id'))
+        x = request.GET.get('id')
+        unit = Service.objects.get(pk=x).unit.title
+        return JsonResponse({'unit': unit}, status=200)
+
+
+# class TariffDeleteView(DeleteView):
+def delete_tariff(request):
+    if request.GET:
+        try:
+            pk = request.GET.get('id')
+            tariff = Tariff.objects.get(pk=pk)
+            tariff_services = TariffService.objects.filter(tariff=tariff)
+            for tariff_and_service in tariff_services:
+                tariff_and_service.delete()
+            tariff.delete()
+            return JsonResponse({'success': 'success'}, status=200)
+        except:
+            return JsonResponse({'error': 'error'}, status=500)
 

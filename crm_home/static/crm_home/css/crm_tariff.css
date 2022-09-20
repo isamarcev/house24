@@ -55,8 +55,9 @@ table {
     cursor: not-allowed;
 }
 
-.table-bordered>tbody>tr>td {
-    border: 1px solid #f4f4f4;
+#tariff > tbody > tr > td  {
+    border: 1px solid #f4f4f4!important;
+    height: 80px!important;
 }
 
 .btn-tariff {
@@ -122,6 +123,23 @@ select .form-select .disabled {
 }
 #services_table #tariff_table {
     border: 1px solid #f4f4f4;
+
+}
+.td-height {
+    height: 80px!important;
+}
+
+.error-content {
+    color: #d75353;
+    font-weight: bold;
+    font-size: 12px;
+    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+}
+
+.btn-sm:hover {
+    border-color: #adadad!important;
+    color: #333!important;
+    background-color: #e7e7e7!important;
 
 }
 

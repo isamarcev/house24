@@ -27,3 +27,35 @@ function delete_service(index) {
 		}
 }
 
+$('.select-choose').change(function () {
+	var textOption = $(this).find('option:selected').text()
+	if (textOption === '---------') {
+		$(`.`+this.id).text('Выберите...')
+	} else {
+		console.log(this.id)
+		return get_unit(this.value[0], this.id)
+	}
+})
+
+function changeUnit(self) {
+	var textOption = $(self).find('option:selected').text()
+	if (textOption === 'Выберите...') {
+		$(`.`+self.id).text('Выберите...')
+	} else {
+		console.log(self.id)
+		return get_unit(self.value[0], self.id)
+	}
+}
+
+
+
+
+$('.btn-delete').click(function (event) {
+	$('#'+ 'instance-'+ this.id).removeAttr('data-href')
+	const result = confirm('Вы уверены, что хотите удалить этот элемент?')
+	console.log(result)
+	if (result) {
+		delete_tariff(this.id)
+	}
+	event.stopPropagation()
+})

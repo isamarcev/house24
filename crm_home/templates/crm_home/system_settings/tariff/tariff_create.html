@@ -46,6 +46,50 @@
                             <div class="col-xs-12 col-lg-7">
                                 <div id="formset_tariff_services">
                                     {{ services_formset.management_form }}
+                                    {% for form in services_formset %}
+                                        {% if form %}
+                                        {% for hidden in form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                        <div class="row" id="{{ form.prefix }}-form">
+{#                                        <input type="hidden" name="{{ form.prefix }}-id" id="id_{{ form.prefix }}-id" value="{{ form.instance.id }}">#}
+                                        <div class="col-xs-6 col-md-4">
+                                            <label for="id_{{ form.prefix }}-service">Услуга</label>
+                                            {{ form.service }}
+                                        </div>
+                                        <div class="col-xs-6 col-md-3">
+                                            <label for="id_{{ form.prefix }}-service">Цена</label>
+                                            {{ form.price }}
+                                             {% if form.errors.price %}
+                                                    {% for field in form.errors.price %}
+                                                        <div class="error-content">
+                                                            {{ field }}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+{#                                            <input type="text" class="form-control" id="id_{{ service.prefix }}-price" name="{{ service.prefix }}-price">#}
+                                        </div>
+                                        <div class="col-xs-6 col-md-2">
+                                            <label for="">Валюта</label>
+                                            <input type="text" disabled class="form-control disabled" value="грн">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3">
+                                            <div class="form-group">
+                                                <label for="">Ед.изм.</label>
+                                                <div class="input-group">
+                                                    <select class="form-select disabled" disabled>
+                                                        <option value="" class="id_{{ form.prefix }}-service">{{ form.instance.service.unit.title }}</option>
+                                                    </select>
+                                                    <button type="button" name="{{ form.prefix }}" onclick="delete_service(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                                 <div id="empty_form" style="display: none">
                                     <div class="row" id="service-__prefix__-form">
@@ -62,6 +106,14 @@
                                         <div class="col-xs-6 col-md-3">
                                             <label for="id_service-__prefix__-service">Цена</label>
                                             <input type="text" class="form-control" id="id_service-__prefix__-price" name="service-__prefix__-price">
+                                            {% if service.errors.price %}
+                                                    {% for field in service.errors.price %}
+                                                        <div class="error-content">
+                                                            {{ field }}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+
                                         </div>
                                         <div class="col-xs-6 col-md-2">
                                             <label for="">Валюта</label>
