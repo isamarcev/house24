@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic.base import View
 
+from users.forms import RoleForm
+from users.models import Role
 from . import forms
 from .models import *
 from django.views.generic import DetailView, UpdateView, DeleteView, FormView, ListView, CreateView
@@ -130,7 +132,6 @@ def get_unit_for_service(request):
         return JsonResponse({'unit': unit}, status=200)
 
 
-# class TariffDeleteView(DeleteView):
 def delete_tariff(request):
     if request.GET:
         try:
@@ -144,3 +145,21 @@ def delete_tariff(request):
         except:
             return JsonResponse({'error': 'error'}, status=500)
 
+
+class RolesUpdateView(FormView):
+    queryset = Role.objects.all()
+    template_name = 'crm_home/system_settings/roles/roles.html'
+    roles_formset = modelformset_factory(Role, RoleForm, extra=0)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'roles_formset': self.roles_formset(queryset=self.queryset)
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        roles_formset = self.roles_formset(request.POST, queryset=self.queryset)
+        if roles_formset.is_valid():
+            roles_formset.save()
+            return HttpResponseRedirect(reverse_lazy('crm_home:roles'))
+        return render(request, self.template_name, context={'roles_formset': roles_formset})

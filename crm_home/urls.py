@@ -14,6 +14,8 @@ urlpatterns = [
     path('get-unit-for-service/', views.get_unit_for_service, name='unit_for_service'),
 
     # roles
-    path('roles/update/<int:pk>/', views.RolesUpdateView.as_view(), name='tariff_update'),
+    path('roles/update/', views.RolesUpdateView.as_view(), name='roles'),
+
+    # users
 
 ]

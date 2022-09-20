@@ -6,15 +6,20 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 
 from users.forms import LoginUserForm, RegisterUserForm
+from users.models import CustomUser
 
 
 class LoginUser(LoginView):
     form_class = LoginUserForm
     template_name = 'users/login_user.html'
     success_url = '/'
+
+
+class UsersListView(ListView):
+    model = CustomUser
 
 
 
