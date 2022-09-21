@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.exceptions import ValidationError
 
 from . import models
-from .models import Role
+from .models import Role, CustomUser
 
 
 class RegisterUserForm(UserCreationForm):
@@ -24,6 +25,62 @@ class LoginUserForm(AuthenticationForm):
                                                                             'placeholder': 'Email или ID'}))
     password = forms.CharField(label='Password Input', widget=forms.PasswordInput(attrs={'class': 'form-input',
                                                                                          'placeholder': 'Пароль'}))
+
+class BaseModelForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(BaseModelForm, self).__init__(*args, **kwargs)
+
+
+class CustomUserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label_suffix='',
+                               label='Пароль')
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label_suffix='',
+                               label='Повторить пароль')
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='', label='Имя')
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='',
+                                label='Фамилия')
+    # role = forms.ModelChoiceField(queryset=Role.objects.all().values_list('id', 'name'),
+    #                               )
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
+        exclude = ['id', 'date_joined',]
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'role': forms.Select(attrs={'class': 'form-select'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'})
+
+        }
+        labels = {
+            'status': "Статус",
+            'role': "Роль",
+            'phone': "Телефон",
+            'email': 'Email(логин)'
+        }
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise ValidationError(
+                'Пароли не совпадают. Попробуйте снова'
+            )
+        return password2
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
+
+
+
+
+
+
 
 class RoleForm(forms.ModelForm):
     class Meta:

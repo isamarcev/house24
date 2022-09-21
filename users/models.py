@@ -3,28 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from home24 import settings
 from django.apps import apps
 
-# from houses.models import Flat
-
-# Flat = apps.get_model('houses.')
-
-
-class CustomUser(AbstractUser):
-    photo = models.ImageField(upload_to='users/', blank=True, null=True)
-    birthday = models.DateField(auto_now_add=True)
-    father_name = models.CharField(max_length=30, help_text='Отчество')
-    phone = models.CharField(max_length=20)
-    viber = models.CharField(max_length=20, null=True, blank=True)
-    telegram = models.CharField(max_length=20, null=True, blank=True)
-    status_state = [('Активен', 'Активен'), ('Новый', 'Новый'), ('Отключен','Отключен')]
-    status = models.CharField(choices=status_state, default=status_state[0][0], max_length=20)
-    username = models.CharField(max_length=100, verbose_name="User ID", unique=True, help_text='Required',
-                                error_messages={"unique": "A user with that UserID already exists"})
-    about = models.TextField(max_length=1000, null=True, blank=True)
-    role = models.ForeignKey('Role', on_delete=models.PROTECT, null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.first_name} {self.last_name} {self.username}'
-
 
 class Role(models.Model):
     name = models.CharField(max_length=50)
@@ -47,6 +25,25 @@ class Role(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CustomUser(AbstractUser):
+    photo = models.ImageField(upload_to='users/', blank=True, null=True)
+    birthday = models.DateField(auto_now_add=True)
+    father_name = models.CharField(max_length=30, help_text='Отчество', null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    viber = models.CharField(max_length=20, null=True, blank=True)
+    telegram = models.CharField(max_length=20, null=True, blank=True)
+    status_state = [('Активен', 'Активен'), ('Новый', 'Новый'), ('Отключен','Отключен')]
+    status = models.CharField(choices=status_state, default=status_state[1][0], max_length=20)
+    username = models.CharField(max_length=100, verbose_name="User ID", unique=True, help_text='Required',
+                                error_messages={"unique": "A user with that UserID already exists"},
+                                blank=True, null=True)
+    about = models.TextField(max_length=1000, null=True, blank=True)
+    role = models.ForeignKey('Role', on_delete=models.PROTECT, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name} {self.username}'
 
 
 class Message(models.Model):
