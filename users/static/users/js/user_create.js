@@ -52,8 +52,9 @@ for (var y = 0; y < passwords.length; ++y) {
             this.closest('.form-group').classList.add('has-error');
         } else {
             this.closest('.form-group').classList.remove('has-error');
-            this.closest('.form-group').add('has-success');
+            this.closest('.form-group').classList.add('has-success');
         }
     });
 }
-// $("input[type='text']").blur.parent().addClass('has-success')
+
+

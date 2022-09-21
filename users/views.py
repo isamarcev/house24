@@ -1,15 +1,16 @@
 from django.contrib.auth import logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
-
+from django.db.models import Q
 # Create your views here.
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views import View
+from django.views.generic import CreateView, ListView, DetailView, UpdateView
 
 from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm
-from users.models import CustomUser
+from users.models import CustomUser, Role
 
 
 class LoginUser(LoginView):
@@ -20,6 +21,41 @@ class LoginUser(LoginView):
 
 class UsersListView(ListView):
     model = CustomUser
+    queryset = CustomUser.objects.all().order_by('id')
+    context_object_name = 'users'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['roles'] = Role.objects.all()
+        users1 = CustomUser.objects.filter(Q(first_name__icontains='') | Q(last_name__icontains="мыаршмы"))
+        print(users1, 'fsadf')
+        print(context)
+        return context
+
+
+class AjaxUsersListView(View):
+        @staticmethod
+        def get(request, *args, **kwargs):
+            user = request.GET['user']
+            role_name = request.GET['role']
+            phone = request.GET['phone']
+            email = request.GET['email']
+            status_value = request.GET['status']
+            users = CustomUser.objects.filter(Q(first_name__icontains=user) | Q(last_name__icontains=user),
+                                              Q(role__name__icontains=role_name), Q(phone__contains=phone),
+                                              Q(email__icontains=email), Q(status__contains=status_value)).order_by('id')
+            user_list = []
+            for user in users:
+                instance = {
+                    'id': user.id,
+                    'user': f'{user.first_name} {user.last_name}',
+                    'role': str(user.role.name).title(),
+                    'phone': user.phone,
+                    'email': user.email,
+                    'status': user.status
+                }
+                user_list.append(instance)
+            return JsonResponse({'users': user_list})
 
 
 class UserCreateView(CreateView):
@@ -33,22 +69,11 @@ class UserCreateView(CreateView):
         kwargs['label_suffix'] = ''
         return kwargs
 
-    def post(self, request, *args, **kwargs):
-        print(request.POST)
-        form = self.form_class(request.POST)
-        print(form.is_valid(), form.errors)
-        return super().post(self, request, *args, **kwargs)
+
+class UserDetailView(DetailView):
+    model = CustomUser
 
 
-
-# class RegisterUser(CreateView):
-#     form_class = RegisterUserForm
-#     template_name = 'users/register.html'
-#     success_url = '/'
-
-#
-# def logouts(requerst):
-#         logout(requerst)
-#         return redirect('/')
-
+class UserUpdateView(UpdateView):
+    pass
 

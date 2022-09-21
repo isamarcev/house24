@@ -31,7 +31,7 @@ class CustomUser(AbstractUser):
     photo = models.ImageField(upload_to='users/', blank=True, null=True)
     birthday = models.DateField(auto_now_add=True)
     father_name = models.CharField(max_length=30, help_text='Отчество', null=True, blank=True)
-    phone = models.CharField(max_length=20, null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True, blank=True, default='')
     viber = models.CharField(max_length=20, null=True, blank=True)
     telegram = models.CharField(max_length=20, null=True, blank=True)
     status_state = [('Активен', 'Активен'), ('Новый', 'Новый'), ('Отключен','Отключен')]
@@ -43,7 +43,7 @@ class CustomUser(AbstractUser):
     role = models.ForeignKey('Role', on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} {self.username}'
+        return f'{self.first_name} {self.last_name}'
 
 
 class Message(models.Model):

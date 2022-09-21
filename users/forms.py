@@ -77,11 +77,6 @@ class CustomUserForm(forms.ModelForm):
         return user
 
 
-
-
-
-
-
 class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
@@ -125,3 +120,9 @@ class RoleForm(forms.ModelForm):
             'users': forms.CheckboxInput,
             'requisites': forms.CheckboxInput,
         }
+
+
+class SearchUserForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', ]
