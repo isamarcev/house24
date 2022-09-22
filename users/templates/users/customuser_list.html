@@ -191,12 +191,11 @@
                     $('#users tbody').empty();
                     if (data.users.length === 0) {
                         console.log('Hello')
-                        {#$('#users tbody').empty();#}
                         $('#empty').css('display', 'block');
                     } else {
                         let rows = "";
                         $(data.users).each(function (index, value) {
-                            rows +=  "<tr data-href='/users/users/detail/" + value.id + "/' id='instance-" + value.id + "' class='odd' style='background-color: rgb(249, 249, 249);'><td>" + (index + 1) + "</td><td class='td-height'>" + value.user + "</td><td class='td-height'>"+ value.role + "</td><td class='td-height'>" + value.phone + "</td><td class='td-height'>"+ value.email + "</td><td style='width: 5%'><small class='label'>" + value.status + "</small></td><td style='width: 10%'><div class='btn-group pull-right' style='display: inline-block!important;'><a class='btn btn-default btn-sm' href='#' title='Копировать'><i class='fa fa-clone'></i></a><a class='btn btn-default btn-sm' href='/users/update/" + value.id + "/' title='Редактировать'><i class='fa fa-pencil'></i></a><a class='btn btn-default btn-sm btn-delete ' title='Удалить' href='#' id='" + value.id + "'><i class='fa fa-trash '></i></a></div></td></tr>"
+                            rows +=  "<tr data-href='/users/detail/" + value.id + "/' id='instance-" + value.id + "' class='odd' style='background-color: rgb(249, 249, 249);'><td>" + (index + 1) + "</td><td class='td-height'>" + value.user + "</td><td class='td-height'>"+ value.role + "</td><td class='td-height'>" + value.phone + "</td><td class='td-height'>"+ value.email + "</td><td style='width: 5%'><small class='label'>" + value.status + "</small></td><td style='width: 10%'><div class='btn-group pull-right' style='display: inline-block!important;'><a class='btn btn-default btn-sm' href='#' title='Копировать'><i class='fa fa-clone'></i></a><a class='btn btn-default btn-sm' href='/users/update/" + value.id + "/' title='Редактировать'><i class='fa fa-pencil'></i></a><a class='btn btn-default btn-sm btn-delete ' title='Удалить' href='#' id='" + value.id + "'><i class='fa fa-trash '></i></a></div></td></tr>"
                         })
                         $('#users tbody').append(rows);
                         $('tr[data-href]').on("click", function() {

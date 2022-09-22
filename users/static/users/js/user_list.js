@@ -1,9 +1,9 @@
 
-document.getElementById('user').addEventListener('blur', ajax_request);
-document.getElementById('role').addEventListener('blur', ajax_request);
-document.getElementById('phone').addEventListener('blur', ajax_request);
-document.getElementById('email').addEventListener('blur', ajax_request);
-document.getElementById('status').addEventListener('blur', ajax_request);
+document.getElementById('user').addEventListener('change', ajax_request);
+document.getElementById('role').addEventListener('change', ajax_request);
+document.getElementById('phone').addEventListener('change', ajax_request);
+document.getElementById('email').addEventListener('change', ajax_request);
+document.getElementById('status').addEventListener('change', ajax_request);
 
 
 $('tr[data-href]').on("click", function() {
@@ -16,6 +16,6 @@ document.getElementById('reset').addEventListener('click', function () {
     document.getElementById('phone').value = '';
     document.getElementById('email').value = '';
     document.getElementById('status').value = '';
-    var event = new Event("blur");
+    var event = new Event("change");
     document.getElementById('status').dispatchEvent(event);
 })

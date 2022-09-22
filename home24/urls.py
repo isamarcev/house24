@@ -12,9 +12,6 @@ urlpatterns = [
 
     path('users/', include('users.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
-    # path('users/', include('users.urls')),
-    # path('cabinet/', include('users.urls')),
-    # path('cabinet/', include('users.urls')),
 
 ]
 

@@ -77,6 +77,13 @@
                                             <div class="help-block">Значение «Пароль» должно содержать минимум 6 символов.</div>
                                         </div>
                                     </div>
+                                {% if form.errors.password %}
+                                            <div class="errorlist-password" style="color: #dd4b39">
+                                            {% for field in form.errors.password %}
+                                                {{ field }}
+                                            {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     <div class="form-group">
                                         {{ form.password2.label_tag }}
                                             {{ form.password2 }}

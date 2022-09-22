@@ -6,11 +6,11 @@ urlpatterns = [
     path('accounts/login/', views.LoginUser.as_view(), name='login'),
     path('accounts/admin-login/', views.LoginUser.as_view(), name='admin-login'),
 
-    path('users/', views.UsersListView.as_view(), name='users'),
-    path('users/create/', views.UserCreateView.as_view(), name='user_create'),
-    path('users/update/<int:pk>/', views.UserUpdateView.as_view(), name='user_update'),
-    path('users/detail/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
-    path('users/ajax-user-list/', views.AjaxUsersListView.as_view(), name='ajax-users'),
+    path('', views.UsersListView.as_view(), name='users'),
+    path('create/', views.UserCreateView.as_view(), name='user_create'),
+    path('update/<int:pk>/', views.UserUpdateView.as_view(), name='user_update'),
+    path('detail/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
+    path('ajax-user-list/', views.AjaxUsersListView.as_view(), name='ajax-users'),
 
     # path('accounts/login/', views.LoginUser.as_view(), name='login'),
 
