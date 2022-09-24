@@ -10,8 +10,31 @@
 {% block css_after %}
     <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="{% static 'crm_home/css/crm_tariff.css' %}">
+
 {% endblock %}
 {% block content %}
+
+
+    <!-- MESSAGE FROM BACKEND-->
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>
+            <script src="{% static 'users/js/jquery.toast.js' %}"></script>
+            <script>
+                var MyToast =  $.toast({
+                    heading: 'Success',
+                    text: '{{ message }}',
+                    showHideTransition: 'slide',
+                    icon: 'success',
+                    position: 'top-left'
+                })
+            </script>
+        {% endif %}
+
+    {% endfor %}
+    <!-- ENDMESSAGE FROM BACKEND-->
+
+
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
         <h1 style="color: #444; font-size: 24px">Тарифы
         </h1>

@@ -1,13 +1,15 @@
 from django.contrib.auth import logout
+from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 # Create your views here.
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView, DetailView, UpdateView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 
 from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm
 from users.models import CustomUser, Role
@@ -56,11 +58,13 @@ class AjaxUsersListView(View):
         return JsonResponse({'users': user_list})
 
 
-class UserCreateView(CreateView):
+class UserCreateView(SuccessMessageMixin, CreateView):
     model = CustomUser
     form_class = CustomUserForm
     context_object_name = 'users'
     success_url = reverse_lazy('users:users')
+    success_message = "%(first_name)s was created successfully"
+
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -77,6 +81,8 @@ class UserUpdateView(UpdateView):
     form_class = CustomUserForm
     context_object_name = 'users'
     success_url = reverse_lazy('users:users')
+    template_name = 'users/customuser_update_form.html'
+
 
 
     def get_form_kwargs(self):
@@ -93,5 +99,12 @@ class UserUpdateView(UpdateView):
             form_class.save()
             return HttpResponseRedirect(reverse_lazy('users:users'))
         return render(request, self.template_name, self.get_context_data())
+
+
+def delete_user(request, pk):
+    user = CustomUser.objects.get(pk=pk)
+    if not user.is_superuser:
+        user.delete()
+        return HttpResponseRedirect(reverse_lazy('users:users'))
 
 

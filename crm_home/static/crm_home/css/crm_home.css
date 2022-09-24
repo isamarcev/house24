@@ -50,3 +50,13 @@
     font-size: 16px;
     font-weight: bold;
 }
+
+
+.cannot-remove-btn {
+    box-shadow: none!important;
+    opacity: .65!important;
+}
+
+.cannot-remove-btn:hover {
+    cursor: not-allowed!important;
+}

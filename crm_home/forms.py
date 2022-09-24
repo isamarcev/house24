@@ -78,3 +78,28 @@ class TariffServiceForm(forms.ModelForm):
             if new_price is None:
                 raise ValidationError('Поле не может быть пустым!')
         return new_price
+
+
+class RequisitesForm(forms.ModelForm):
+    class Meta:
+        model = Requisites
+        fields = ['title', 'info']
+        labels = {
+            'title': "Название компании",
+            'info': "Информация"
+        }
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'info': forms.Textarea(attrs={'class': 'form-control', 'rows': '4', 'style': 'resize: none;'})
+        }
+
+
+class PaymentStateForm(forms.ModelForm):
+    title = forms.CharField(label_suffix='', label="Название", widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-select'}),
+                             label_suffix='', label="Приход/расход", choices=[("Приход", "Приход"), ("Расход", "Расход")])
+
+    class Meta:
+        model = PaymentState
+        fields = ['title', 'type']

@@ -16,6 +16,13 @@ urlpatterns = [
     # roles
     path('roles/update/', views.RolesUpdateView.as_view(), name='roles'),
 
-    # users
+    # requisites
+    path('requisites/', views.RequisitesUpdateView.as_view(), name='requisites'),
+
+    #payment state
+    path('payment-states/', views.PaymentStateListView.as_view(), name='payment_states'),
+    path('payment-states/create/', views.PaymentStateCreateView.as_view(), name='payment_state_create'),
+    path('payment-states/update/<int:pk>/', views.PaymentStateUpdateView.as_view(), name='payment_state_update'),
+    path('payment-states/delete/', views.delete_payment_state, name='payment_state_delete'),
 
 ]

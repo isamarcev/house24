@@ -1,0 +1,66 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_home/css/payment.css' %}">
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Новая статья
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 10px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_home:payment_states' %}" style="color: #444; text-decoration: none">> <span style="color: #ccc; margin-right: 5px" >></span> Статьи приходов/расходов</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Новая статья</li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <form method="post">
+                {% csrf_token %}
+                <div class="box">
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12 col-lg-7">
+                                <div class="form-group">
+                                    {{ form.title.label_tag }}
+                                    {{ form.title }}
+                                    <div class="help-block" id='name-error' style="display: none">
+                                        Необходимо заполнить «Название».
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form.type.label_tag }}
+                                    {{ form.type }}
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-group" style="text-align: right">
+                            <a href="{% url 'crm_home:payment_states' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;border-radius: 3px;">Отменить</a>
+                            <button type="submit" class="btn btn-success" id="btn-save" >Сохранить</button>
+                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+        <script src="{% static 'crm_home/js/payment.js' %}"></script>
+{% endblock %}

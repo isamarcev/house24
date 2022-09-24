@@ -9,8 +9,30 @@
 {% endblock %}
 {% block css_after %}
     <link rel="stylesheet" href="{% static 'crm_home/css/crm_home.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'users/css/jquery.toast.css' %}" type="text/css">
+
 {% endblock %}
 {% block content %}
+
+    <!-- MESSAGE FROM BACKEND-->
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>
+            <script src="{% static 'users/js/jquery.toast.js' %}"></script>
+            <script>
+                var MyToast =  $.toast({
+                    heading: 'Success',
+                    text: '{{ message }}',
+                    showHideTransition: 'slide',
+                    icon: 'success',
+                    position: 'top-left'
+                })
+            </script>
+        {% endif %}
+
+    {% endfor %}
+    <!-- ENDMESSAGE FROM BACKEND-->
+
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
         <h1 style="color: #444; font-size: 24px">Редактирование услуг</h1>
     </section>
@@ -56,10 +78,17 @@
                                                     {{ formset.unit.label_tag }}
                                                     <div class="input-group">
                                                         {{ formset.unit }}
-                                                        <button type="button" name="{{ formset.prefix }}" onclick="delete_service(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                        {% if formset.instance.invoiceservice_set.all %}
+                                                        <button type="button" name="{{ formset.prefix }}" onclick="cannotDeleteService()" class="btn btn-default cannot-remove-btn" >
                                                             <i class="fa fa-trash">
                                                             </i>
                                                         </button>
+                                                            {% else %}
+                                                            <button type="button" name="{{ formset.prefix }}" onclick="delete_service(this.name)" class="btn btn-default form-row-remove-btn" >
+                                                            <i class="fa fa-trash">
+                                                            </i>
+                                                        </button>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                             </div>
@@ -71,6 +100,7 @@
                                     {% endfor %}
                                     </div>
                                 </div>
+                            <!-- EMPTY FORM -->
                                 <div id="empty_form_services" style="display: none;">
                                     <div id="service-__prefix__-form" class="row">
                                         <div class="col-xs-12 col-sm-7">
@@ -121,10 +151,18 @@
                                                 {{ unit.title.label_tag }}
                                                 <div class="input-group">
                                                     {{ unit.title }}
-                                                    <button type="button"  name="{{ unit.prefix }}" onclick="delete_unit(this.name)" class="btn btn-default form-row-remove-btn" no-delete-msg="Эта услуга используется в квитанциях. Удаление невозможно.">
+                                                        {% if unit.instance.service_set.all %}
+                                                   <button type="button" name="{{ unit.instance.title }}" onclick="cannotDelete(this)" class="btn btn-default cannot-remove-btn" >
                                                         <i class="fa fa-trash">
                                                         </i>
                                                     </button>
+                                                            {% else %}
+
+                                                            <button type="button"  name="{{ unit.instance.title }}" onclick="delete_unit(this.name)" class="btn btn-default remove-btn">
+                                                        <i class="fa fa-trash">
+                                                        </i>
+                                                    </button>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>

@@ -19,3 +19,12 @@ document.getElementById('reset').addEventListener('click', function () {
     var event = new Event("change");
     document.getElementById('status').dispatchEvent(event);
 })
+
+$('.btn-delete').on('click', function (event){
+    var result = confirm('Вы действительно хотите удалить пользователя?')
+    if (!result) {
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        return false
+    }
+})

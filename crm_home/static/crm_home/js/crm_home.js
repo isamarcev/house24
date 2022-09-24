@@ -38,3 +38,12 @@ function delete_unit(index) {
 
 		}
 }
+
+
+function cannotDelete() {
+	alert("Эта единица измерения используется в услугах. Удаление невозможно.")
+}
+
+function cannotDeleteService() {
+	alert("Эта услуга используется в услугах. Удаление невозможно.")
+}

@@ -37,8 +37,11 @@ class PersonalAccount(models.Model):
 
 def get_next_invoice():
     ''' Getiing next number of invoice '''
-    number = Invoice.objects.order_by('number')[-1].number
-    x = str(int(number) + 1).zfill(10)
+    try:
+        number = Invoice.objects.order_by('number')[-1].number
+        x = str(int(number) + 1).zfill(10)
+    except ValueError:
+        x = str(0).zfill(10)
     return x
 
 

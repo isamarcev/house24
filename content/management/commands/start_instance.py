@@ -1,6 +1,7 @@
 from django.core.management import BaseCommand
 
 from content.models import About, Block, Main, Seo, ServicePage, AboutService, Contacts
+from crm_home.models import Requisites
 from users.models import Role
 
 
@@ -54,3 +55,5 @@ class Command(BaseCommand):
             Role(name='Сантехник'),
             Role(name='Электрик'),
         ])
+
+        requisites = Requisites.objects.create(title='ABC oj', info='Hello world')

@@ -1,0 +1,77 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Платежные реквизиты
+{% endblock %}
+{% block css %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_home/css/crm_home.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'users/css/jquery.toast.css' %}" type="text/css">
+
+{% endblock %}
+{% block content %}
+
+    <!-- MESSAGE FROM BACKEND-->
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>
+            <script src="{% static 'users/js/jquery.toast.js' %}"></script>
+            <script>
+                var MyToast =  $.toast({
+                    heading: 'Success',
+                    text: '{{ message }}',
+                    showHideTransition: 'slide',
+                    icon: 'success',
+                    position: 'top-left'
+                })
+            </script>
+        {% endif %}
+
+    {% endfor %}
+    <!-- ENDMESSAGE FROM BACKEND-->
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Платежные реквизиты</h1>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <form method="post" style="padding: 10px; " >
+                {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-7" style="padding: 10px 20px; margin-bottom: 10px">
+                            <div style="border-bottom: 1px solid #cccccc;">
+                                <div class="form-group">
+                                    {{ form.title.label_tag }}
+                                    {{ form.title }}
+                                </div>
+                                <div class="form-group" style="margin-bottom: 30px;  ">
+                                    {{ form.info.label_tag }}
+                                    {{ form.info }}
+                                </div>
+                                </div>
+                        </div>
+                    </div>
+                    <!-- END BLOCK  -->
+                    <div class="form-group" style="text-align: center">
+                            <a href="{% url 'crm_home:requisites' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;">Отменить</a>
+                            <button type="submit" class="btn btn-success" id="btn-save" style="height: 34px; font-size: 14px;background-color: #00a65a!important;
+    border-color: #008d4c!important;">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <div>
+    </div>
+    </div>
+{% endblock %}
+{% block script %}
+
+        <script src="{% static 'crm_home/js/crm_home.js' %}"></script>
+{% endblock %}

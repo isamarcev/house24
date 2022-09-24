@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
@@ -11,16 +13,17 @@ from .models import *
 from django.views.generic import DetailView, UpdateView, DeleteView, FormView, ListView, CreateView
 
 
-class ServiceSettings(FormView):
+class ServiceSettings(FormView, SuccessMessageMixin):
     formset_service = modelformset_factory(Service, forms.ServiceForm,
                                            extra=0, can_delete=True, fields=('name', 'show', 'unit'))
     template_name = 'crm_home/system_settings/services.html'
-    queryset = Service.objects.all()
+    queryset = Service.objects.all().prefetch_related('invoiceservice_set').select_related('unit')
     formset_units = modelformset_factory(Unit, forms.UnitForm, extra=0, can_delete=True, fields=('title',))
 
     def get_context_data(self, **kwargs):
         context = {'formset_service': self.formset_service(queryset=self.queryset, prefix='service'),
-                   'formset_units': self.formset_units(queryset=Unit.objects.all(), prefix='unit')}
+                   'formset_units': self.formset_units(
+                       queryset=Unit.objects.all().prefetch_related('service_set').all(), prefix='unit')}
         return context
 
     def post(self, request, *args, **kwargs):
@@ -38,7 +41,9 @@ class ServiceSettings(FormView):
             for form_unit in formset_units.deleted_objects:
                 form_unit.delete()
             formset_units.save()
+            messages.success(request, 'Выполнено успешно.')
             return HttpResponseRedirect(reverse_lazy('crm_home:set_services'))
+        messages.error(request, 'Неправильно заполнены поля')
         return render(request, self.template_name, context={'formset_service': formset_service,
                                                             'formset_units': formset_units})
 
@@ -163,3 +168,61 @@ class RolesUpdateView(FormView):
             roles_formset.save()
             return HttpResponseRedirect(reverse_lazy('crm_home:roles'))
         return render(request, self.template_name, context={'roles_formset': roles_formset})
+
+
+
+class RequisitesUpdateView(UpdateView):
+    model = Requisites
+    form_class = forms.RequisitesForm
+    def get_object(self, queryset=None):
+        return Requisites.objects.first()
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['label_suffix'] = ''
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        form_class = self.form_class(request.POST, instance=obj)
+        if form_class.is_valid():
+            messages.success(request, 'Выполнено успешно.')
+            form_class.save()
+            return HttpResponseRedirect(reverse_lazy('crm_home:requisites'))
+
+
+class PaymentStateCreateView(CreateView):
+    success_url = reverse_lazy('crm_home:payment_states')
+    model = PaymentState
+    form_class = forms.PaymentStateForm
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(self, request, *args, **kwargs)
+        messages.success(request, 'Успешно выполнено')
+        return response
+
+
+class PaymentStateListView(ListView):
+    queryset = PaymentState.objects.all().order_by('id')
+
+
+class PaymentStateUpdateView(UpdateView):
+    success_url = reverse_lazy('crm_home:payment_states')
+    model = PaymentState
+    form_class = forms.PaymentStateForm
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(self, request, *args, **kwargs)
+        messages.success(request, 'Успешно выполнено')
+        return response
+
+def delete_payment_state(request):
+    if request.GET:
+        try:
+            pk = request.GET.get('id')
+            state = PaymentState.objects.get(pk=pk)
+            print(state)
+            state.delete()
+            return JsonResponse({'success': 'success'}, status=200)
+        except:
+            return JsonResponse({'error': 'error'}, status=500)
