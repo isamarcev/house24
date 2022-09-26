@@ -7,17 +7,8 @@ from .models import Role, CustomUser
 
 
 class RegisterUserForm(UserCreationForm):
-    # email = forms.EmailField(label='Електронная почта', widget=forms.EmailInput(attrs={'class':'form-input'}))
-    # username = forms.CharField(label='Login', widget=forms.TextInput(attrs={'class': 'form-input'}))
-    # last_name = forms.CharField(label='Last Name', widget=forms.TextInput(attrs={'class':'form-input'}))
-    # first_name = forms.CharField(label='First Name', widget=forms.TextInput(attrs={'class':'form-input'}))
-    # sex = forms.ChoiceField(choices=([('m', 'male'), ('f', 'female')]))
     password1 = forms.CharField(label='Password Input', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
     password2 = forms.CharField(label='Password repeat', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
-
-    # class Meta:
-    #     model = models.CustomUser
-    #     fields = ['email', 'username', 'last_name', 'first_name', 'sex']
 
 
 class LoginUserForm(AuthenticationForm):
@@ -40,8 +31,6 @@ class CustomUserForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='', label='Имя')
     last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='',
                                 label='Фамилия')
-    # role = forms.ModelChoiceField(queryset=Role.objects.all().values_list('id', 'name'),
-    #                               )
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'password', 'password2', 'role', 'email', 'phone', 'status']

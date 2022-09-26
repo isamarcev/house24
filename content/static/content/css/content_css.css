@@ -2,6 +2,14 @@ label {
     font-size: 14px;
 }
 
+.btn-success {
+    background-color: #00a65a;
+    border-color: #008d4c;
+    font-size: 14px;
+    border-radius: 3px;
+    line-height: 1.42857143;
+}
+
 .content-wrapper>.content-custom {
         min-height: 250px;
     /*padding: 15px!important;*/

@@ -131,7 +131,6 @@ class TariffUpdateView(UpdateView):
 
 def get_unit_for_service(request):
     if request.GET:
-        print(request.GET.get('id'))
         x = request.GET.get('id')
         unit = Service.objects.get(pk=x).unit.title
         return JsonResponse({'unit': unit}, status=200)

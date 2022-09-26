@@ -58,13 +58,11 @@ class AjaxUsersListView(View):
         return JsonResponse({'users': user_list})
 
 
-class UserCreateView(SuccessMessageMixin, CreateView):
+class UserCreateView(CreateView):
     model = CustomUser
     form_class = CustomUserForm
     context_object_name = 'users'
     success_url = reverse_lazy('users:users')
-    success_message = "%(first_name)s was created successfully"
-
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

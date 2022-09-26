@@ -1,7 +1,7 @@
 {% extends 'houses/layout/base_houses.html' %}
 {% load static %}
 {% block title %}
-    Пользователи
+    Дома
 {% endblock %}
 {% block css %}
 
@@ -9,17 +9,38 @@
 {% endblock %}
 {% block css_after %}
     <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="{% static 'users/css/user_list.css' %}">
+    <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
+    <link rel="stylesheet" href="{% static 'users/css/jquery.toast.css' %}" type="text/css">
+
 {% endblock %}
 {% block content %}
+
+    <!-- MESSAGE FROM BACKEND-->
+{% for message in messages %}
+        {% if message.tags == 'success' %}
+            <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>
+            <script src="{% static 'users/js/jquery.toast.js' %}"></script>
+            <script>
+                var MyToast =  $.toast({
+                    heading: 'Success',
+                    text: '{{ message }}',
+                    showHideTransition: 'slide',
+                    icon: 'success',
+                    position: 'top-left'
+                })
+            </script>
+        {% endif %}
+    {% endfor %}
+        <!-- MESSAGE FROM BACKEND-->
+
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
-        <h1 style="color: #444; font-size: 24px">Пользователи
+        <h1 style="color: #444; font-size: 24px">Дома
         </h1>
         <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
         margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
         top: 15px!important; right: 15px!important; border-radius: 2px!important;">
             <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
-            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Пользователи</li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Дома</li>
         </ul>
     </section>
 
@@ -28,7 +49,7 @@
     <section class="content" style="padding-top: 15px">
     <div class="row">
         <div class="col-sm-12" style="text-align: right; padding: 0 15px">
-            <a class="btn btn-success" href="{% url 'users:user_create' %}" style="width: auto">Создать пользователя</a>
+            <a class="btn btn-success" href="{% url 'houses:house_create' %}" style="width: auto">Добавить дом</a>
         </div>
     </div>
     </section>
@@ -46,91 +67,45 @@
                 </div>
                 </div>
                     <div class="box-body" style="padding: 0">
-                        <table id="users" style="margin: 0; width: 100%" class="table table-bordered table-hover table-striped linkedRow">
+                        <table id="houses" style="margin: 0; width: 100%" class="table table-bordered table-hover table-striped linkedRow">
                              <thead>
                                   <tr>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: min-content" >
                                           #
                                       </th>
-                                      <th  tabindex="0" aria-controls="users" rowspan="1" colspan="1">
-                                          Пользователь
+                                      <th  tabindex="0"  rowspan="1" colspan="1">
+                                          Название
                                       </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1"  style="width: 15%">
-                                          Роль
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 30%">
+                                          Адрес
                                       </th>
-                                      <th  tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
-                                          Телефон
-                                      </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1">
-                                          Email(логин)
-                                      </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
-                                          Статус
-                                      </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
-                                      </th>
+                                      <th></th>
                                   </tr>
                                     <tr>
                                             <th></th>
-                                            <th><input type="text" id="user" class="form-control" ></th>
-                                            <th>
-                                                <select name="roles" id="role" class="form-select-sm" style="font-size: 16px">
-                                                    <option value=""></option>
-                                                    {% for role in roles %}
-                                                        <option value="{{ role.name }}">{{ role.name }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                            <th class="sort">
+                                                <input type="text" id="house" class="form-control" >
                                             </th>
-                                            <th><input type="text" id="phone" class="form-control"></th>
-                                            <th><input type="text" id="email" class="form-control"></th>
-                                            <th>
-                                                <select name="roles" id="status" class="form-select-sm" style="font-size: 16px">
-                                                    <option value=""></option>
-                                                    <option value="Активен">Активен</option>
-                                                    <option value="Новый">Новый</option>
-                                                    <option value="Отключен">Отключен</option>
-
-                                                </select>
+                                            <th class="sort">
+                                                <input type="text" id="address" class="form-control">
                                             </th>
                                             <th></th>
                                         </tr>
                                   </thead>
                                   <tbody>
-                                    {% for object in users %}
-                                        <tr data-href="{% url 'users:user_detail' object.id %}" id="instance-{{ object.id }}">
+                                    {% for object in object_list %}
+                                        <tr data-href="{% url 'houses:house_detail' object.id %}" id="instance-{{ object.id }}">
                                             <td>{{ forloop.counter }}</td>
-                                            <td class="td-height">{{ object.first_name }} {{ object.last_name }}</td>
-                                            <td class="td-height">{{ object.role }}</td>
-                                            <td class="td-height">
-                                                {% if object.phone %}
-                                                    {{ object.phone }}
-                                                    {% else %}
-                                                    Не указан
-                                                {% endif %}
-                                            </td>
-                                            <td class="td-height">{{ object.email }}</td>
-
-                                            <td style="width: 5%">
-                                            {% if object.status == "Активен" %}
-                                                <small class="label label-success">{{ object.status }}</small>
-                                            {% elif object.status == "Новый" %}
-                                                <small class="label label-warning">{{ object.status }}</small>
-                                            {% else %}
-                                                <small class="label label-danger">{{ object.status }}</small>
-                                            {% endif %}
-                                            </td>
-
+                                            <td class="td-height">{{ object.title }}</td>
+                                            <td class="td-height">{{ object.address }}</td>
                                             <td style="width: 10%">
                                                 <div class="btn-group pull-right" >
-                                                    <a class="btn btn-default btn-sm" href="#" title="Копировать" data-toggle="tooltip">
-                                                        <i class="fa fa-clone"></i></a>
-                                                    <a class="btn btn-default btn-sm" href="{% url 'users:user_update' object.id %}" title="Редактировать" data-toggle="tooltip">
+                                                    <a class="btn btn-default btn-sm" href="{% url 'houses:house_update' object.id %}" title="Редактировать" data-toggle="tooltip">
                                                         <i class="fa fa-pencil"></i></a>
-                                                    <a class="btn btn-default btn-sm btn-delete " title="Удалить" href="{% url 'users:user_delete' object.id %}" name="{{ object.first_name }} {{ object.last_name }}" data-toggle="tooltip" data-pjax="0" >
+                                                    <a class="btn btn-default btn-sm btn-delete " id="{{ object.id }}" title="Удалить" data-toggle="tooltip" data-pjax="0" >
                                                         <i class="fa fa-trash " ></i></a>
                                                 </div>
                                             </td>
-
                                         </tr>
                                     {% endfor %}
                                   </tbody>
@@ -153,79 +128,46 @@
 
     <script>
         $(document).ready( function CreateTable() {
-        $('#users').DataTable(
+        var table = $('#houses').DataTable(
             {
+
                 "order": [],
                 "bInfo": false,
+                "bSortCellsTop": true,
                 "bPaginate": false,
-                "bFilter": false,
+                dom: 't',
                 "aoColumnDefs": [
-                    { 'bSortable': false, 'aTargets': [0, 1 , 2, 3, 4, 5, 6] }
+                    { 'bSortable': false, 'targets': [0, 3] }
                     ]
             }
         );
+        $('#house').on('keyup click', function () {
+            table.columns([1]).search($(this).val()).draw();
+        });
+        $('#address').on('keyup click', function () {
+            table.columns([2]).search($(this).val()).draw();
+        })
     } );
     </script>
     <!-- AJAX -->
     <script>
-        function ajax_request() {
-            const user = document.getElementById('user').value;
-            const role = document.getElementById('role').value;
-            const phone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const status = document.getElementById('status').value;
-
-
+        function delete_house(id) {
             $.ajax({
-                url:`{% url 'users:ajax-users' %}`,
+                url:`{% url 'houses:delete_house' %}`,
                 type: 'get',
-                data: {
-                    'user': user,
-                    'role': role,
-                    'phone': phone,
-                    'email': email,
-                    'status': status
-                },
+                data: {'id': id},
                 success: (data) => {
-                    console.log(data);
-                    $('#users tbody').empty();
-                    if (data.users.length === 0) {
-                        console.log('Hello')
-                        $('#empty').css('display', 'block');
+                    console.log(data)
+                    if (data.success) {
+                        var row = $('#instance-' + id)
+                        row.css('display', 'none')
                     } else {
-                        let rows = "";
-                        $(data.users).each(function (index, value) {
-                            rows +=  "<tr data-href='/users/detail/" + value.id + "/' id='instance-" + value.id + "' class='odd' style='background-color: rgb(249, 249, 249);'><td>" + (index + 1) + "</td><td class='td-height'>" + value.user + "</td><td class='td-height'>"+ value.role + "</td><td class='td-height'>" + value.phone + "</td><td class='td-height'>"+ value.email + "</td><td style='width: 5%'><small class='label'>" + value.status + "</small></td><td style='width: 10%'><div class='btn-group pull-right' ><a class='btn btn-default btn-sm' href='#' title='Копировать'><i class='fa fa-clone'></i></a><a class='btn btn-default btn-sm' href='/users/update/" + value.id + "/' title='Редактировать'><i class='fa fa-pencil'></i></a><a class='btn btn-default btn-sm btn-delete ' title='Удалить' href='/users/delete/" + value.id + "/' id='" + value.id + "'><i class='fa fa-trash '></i></a></div></td></tr>"
-                        })
-                        $('#users tbody').append(rows);
-                        $('tr[data-href]').on("click", function() {
-                            document.location = $(this).data('href');
-                        });
-                        let labels = document.getElementsByClassName('label');
-                        for (let y of labels) {
-                            if (y.textContent === 'Активен') {
-                                y.classList.add('label-success')
-                            } else if (y.textContent === 'Новый'){
-                                y.classList.add('label-warning')
-                            } else {
-                                y.classList.add('label-danger')
-                            }
-                        }
-                        $('#empty').css('display', 'none');
-                        $('.btn-delete').on('click', function (event){
-                                var result = confirm('Вы действительно хотите удалить пользователя?')
-                                if (!result) {
-                                    event.preventDefault()
-                                    event.stopImmediatePropagation()
-                                    return false
-                                }
-                        })
+                        alert('Something wrong.')
                     }
-                    },
-                error: (error) => {
-                    console.log("Errors !!!= "+error);
                 }
             })
+        }
+
         }
     </script>
 
@@ -234,6 +176,6 @@
         $('.odd').css('background-color', '#f9f9f9')
     })
     </script>
-            <script src="{% static 'users/js/user_list.js' %}"></script>
+            <script src="{% static 'houses/js/houses.js' %}"></script>
 
 {% endblock %}

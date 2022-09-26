@@ -6,16 +6,14 @@ from users.models import CustomUser
 
 
 class House(models.Model):
-    title = models.CharField(max_length=100, verbose_name='Название ЖК')
-    address = models.CharField(max_length=100, verbose_name='Адресс дома')
-    image_1 = models.ImageField(upload_to='house/', null=True)
-    image_2 = models.ImageField(upload_to='house/', null=True)
-    image_3 = models.ImageField(upload_to='house/', null=True)
-    image_4 = models.ImageField(upload_to='house/', null=True)
-    image_5 = models.ImageField(upload_to='house/', null=True)
-    section = models.ForeignKey('Section', on_delete=models.PROTECT, null=True, blank=True)
-    floor = models.ForeignKey('Floor', on_delete=models.PROTECT, null=True, blank=True)
-    users = models.ManyToManyField(CustomUser, null=True, blank=True)
+    title = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
+    image_1 = models.ImageField(upload_to='house/', null=True, blank=True)
+    image_2 = models.ImageField(upload_to='house/', null=True, blank=True)
+    image_3 = models.ImageField(upload_to='house/', null=True, blank=True)
+    image_4 = models.ImageField(upload_to='house/', null=True, blank=True)
+    image_5 = models.ImageField(upload_to='house/', null=True, blank=True)
+    users = models.ManyToManyField(CustomUser)
 
     class Meta:
         verbose_name_plural = 'Дома'
@@ -26,18 +24,21 @@ class House(models.Model):
 
 
 class Section(models.Model):
-    title = models.CharField(max_length=20)
+    title = models.CharField(max_length=20, null=True, blank=True)
+    house = models.ForeignKey(House, on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name_plural = 'Секции'
         verbose_name = 'Секция'
 
     def __str__(self):
-        return self.title
+        return f'{self.title} {self.house}'
 
 
 class Floor(models.Model):
-    title = models.CharField(max_length=20)
+    title = models.CharField(max_length=20, null=True, blank=True)
+    house = models.ForeignKey(House, on_delete=models.CASCADE, null=True)
+
 
     class Meta:
         verbose_name_plural = 'Этажи'
