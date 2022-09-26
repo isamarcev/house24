@@ -157,17 +157,14 @@
                 type: 'get',
                 data: {'id': id},
                 success: (data) => {
-                    console.log(data)
                     if (data.success) {
-                        var row = $('#instance-' + id)
-                        row.css('display', 'none')
-                    } else {
-                        alert('Something wrong.')
+                        $('#instance-' + id).css('display', 'none')
                     }
+                },
+                errors: (errors) => {
+                    console.log(errors)
                 }
             })
-        }
-
         }
     </script>
 

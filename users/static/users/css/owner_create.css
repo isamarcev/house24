@@ -1,0 +1,233 @@
+.btn-primary {
+    background-color: #3c8dbc;
+    border-color: #367fa9;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.btn-primary:hover {
+    background-color: #367fa9;   
+}
+
+.btn-primary:focus {
+    box-shadow: none;
+    background-color: #367fa9;
+
+}
+
+.btn-success {
+    background-color: #00a65a;
+    border-color: #008d4c;
+    font-size: 14px;
+    border-radius: 3px;
+    line-height: 1.42857143;
+
+}
+
+.btn-default {
+    font-size: 14px!important;
+}
+
+.btn-default:hover {
+    border: 1px solid #a29d9a!important;
+    border-radius: 3px;
+}
+
+.form-select {
+    border-radius: 3px;
+    font-size: 14px;
+    color: #555555;
+    padding: 6px 12px;
+}
+
+.form-select:focus {
+    box-shadow: none;
+}
+
+.form-control {
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+}
+
+
+
+.form-control:focus {
+    color: #555;
+
+}
+
+.has-success label{
+    color: #00a65a!important;
+}
+
+.has-success input{
+    border-color: #00a65a;
+    box-shadow: none;
+}
+
+.help-block {
+    font-size: 14px;
+    color: #dd4b39;
+    display: none;
+}
+
+.has-success select{
+    border-color: #00a65a;
+}
+
+.has-error label{
+    color: #dd4b39!important;
+}
+
+.has-error input{
+    border-color: #dd4b39;
+}
+
+#password2 {
+    width: 100%;
+}
+
+.has-error .help-block{
+   display: block;
+}
+
+
+
+
+.label-success {
+    background-color: #00a65a!important;
+    color: white;
+    padding: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+.label-warning {
+    background-color: #f39c12 !important;
+    color: white;
+    padding: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+.label-danger {
+    background-color: #dd4b39 !important;
+    color: white;
+    padding: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+#users {
+    font-size: 14px;
+}
+
+#users tbody td {
+    height: 80px;
+    vertical-align: middle;
+    padding: 0 10px;
+}
+
+tr[data-href]:hover {
+    cursor: pointer;
+}
+
+.user-label {
+    font-size: 14px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+
+.btn-tariff {
+    background-color: #3c8dbc;
+    border-color: #367fa9;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #fff;
+    border-radius: 3px;
+}
+
+.btn-tariff:hover {
+    background-color: #367fa9;
+    color: #fff;
+    border-color: #367fa9;
+}
+
+.form-select-sm {
+    padding: 6px 12px;
+    background-color: #FFFFFF;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    color: #555
+}
+
+.btn-date {
+border-radius: 0;
+    background-color: #fff;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    color: #555;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+.btn-date:hover {
+    border: 1px solid #ccc;
+
+}
+/*.form-select-sm:focus-visible {*/
+/*    padding: 6px 12px;*/
+/*    background-color: #FFFFFF;*/
+/*    border-radius: 3px;*/
+/*    border: 1px solid #ccc;*/
+/*    color: #555*/
+/*}*/
+
+#role > option:hover {
+    background-color: red!important;
+}
+
+.userAvatar img {
+    margin: 0 15px 15px 0;
+    display: block;
+    max-width: 100%;
+    height: 160px;
+    width: 160px;
+    object-fit: cover;
+}
+
+input[type=file] {
+    line-height: 1.42!important;
+    font-size: 14px;
+}
+
+.pull-left {
+    float: left;
+}
+
+.img-circle {
+    border-radius: 50%;
+}
+
+label {
+    margin-bottom: 5px!important;
+}
+
+/*.box {*/
+/*    box-shadow: none;*/
+/*}*/
+

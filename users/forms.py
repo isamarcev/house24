@@ -75,28 +75,6 @@ class CustomUserForm(forms.ModelForm):
         return password2
 
 
-    # def save(self, commit=True):
-    #     print('save')
-    #     print(self.cleaned_data, self.instance, self.instance.password)
-    #     if len(self.cleaned_data.get('password')) == 0:
-    #         del self.cleaned_data['password']
-    #         self.instance.first_name = self.cleaned_data['first_name']
-    #         print('after delete')
-    #         print(self.cleaned_data)
-    #         user = super().save(commit=False)
-    #         print(user)
-    #         del user.password
-    #         user.save()
-    #         return user
-    #     print('cleaned data')
-    #     user = super().save(commit=False)
-    #     user.set_password(self.cleaned_data["password"])
-    #     print(user)
-    #     if commit:
-    #         user.save()
-    #     return user
-
-
 class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
@@ -146,3 +124,68 @@ class SearchUserForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['first_name', ]
+
+
+class OwnerUserForm(forms.ModelForm):
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label_suffix='',
+                                label='Повторить пароль', required=False)
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label_suffix='',
+                               label='Пароль', required=False)
+
+    class Meta:
+        model = CustomUser
+        fields = ['photo', 'first_name', 'last_name', 'father_name', 'birthday', 'phone', 'viber', 'telegram', 'email', 'status',
+                  'username', 'about', 'password', 'password2', ]
+        widgets = {
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'father_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'birthday': forms.DateInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'viber': forms.TextInput(attrs={'class': 'form-control'}),
+            'telegram': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'about': forms.Textarea(attrs={'class': 'form-control', 'rows': '13', 'style': 'resize: none;'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'})
+        }
+        labels = {
+            'photo': 'Сменить изображение',
+            'last_name': 'Фамилия',
+            'first_name': 'Имя',
+            'father_name': 'Отчество',
+            'birthday': 'Дата рождения',
+            'phone': "Телефон",
+            'viber': "Viber",
+            'telegram': "Telegram",
+            'email': 'Email(логин)',
+            'status': "Статус",
+            'username': 'ID',
+            'about': 'О владельце (заметки)'
+
+
+        }
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if not self.instance:
+            if len(password) == 0:
+                raise ValidationError(
+                    'Поле не может быть пустым!'
+                )
+        if len(password) > 0 and len(password) < 8:
+            print('go')
+            raise ValidationError(
+                'Пароль не может быть меньше 8 символов.'
+            )
+        return password
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            print('Ne sovpada')
+            raise ValidationError(
+                'Пароли не совпадают. Попробуйте снова'
+            )
+        return password2

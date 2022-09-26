@@ -65,14 +65,14 @@ function delete_floor(index) {
 }
 
 
-let elemtnts = document.querySelectorAll("input[type='text']")
+let elemtnts = document.querySelectorAll("#house_form input[type='text']")
 for (var i = 0; i < elemtnts.length; ++i) {
     elemtnts[i].addEventListener('blur', function(e) {
         this.parentNode.classList.add('has-success');
     });
 }
 
-let files = document.querySelectorAll("input[type='file']")
+let files = document.querySelectorAll("#house_form input[type='file']")
 for (var s = 0; s < files.length; ++s) {
     files[s].addEventListener('blur', function(e) {
         this.parentNode.classList.add('has-success');

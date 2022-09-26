@@ -128,17 +128,10 @@ class HouseUpdateView(UpdateView):
                                            queryset=Floor.objects.filter(house=self.object))
         users_formset = self.user_formset(request.POST, prefix='users',
                                           queryset=CustomUser.objects.filter(house=self.object))
-        print(users_formset.is_valid(), users_formset.errors)
-
         if form_class.is_valid():
             form_class.save(commit=False)
             if users_formset.is_valid():
                 users_formset.save(commit=False)
-                print(users_formset.cleaned_data)
-                print(users_formset.new_objects)
-                print(users_formset.deleted_objects)
-                print(users_formset.changed_objects)
-
                 for obj in users_formset.cleaned_data:
                     if len(obj) == 0:
                         del obj
@@ -147,20 +140,6 @@ class HouseUpdateView(UpdateView):
                     elif obj['name'] != obj['id']:
                         form_class.instance.users.remove(obj['id'])
                         form_class.instance.users.add(obj['name'])
-
-                    # form_class.instance.users.remove(obj['id'])
-                    # user = obj'name')
-                # for user in users_formset.deleted_objects:
-                #     form_class.instance.users.remove(user)
-                # for user in users_formset.new_objects:
-                #     use = user.cleaned_data.get('name')
-                #     form_class.instance.users.add(use)
-                # for user in users_formset.deleted_objects:
-                #     form_class.instance.users.remove(user)
-                # for user in users_formset.changed_objects:
-                #     # form_class.instance.users.remove(user[0])
-                #     form_class.instance.users.add(user[0])
-
             form_class.save()
             if section_formset.is_valid():
                 section_formset.save(commit=False)
@@ -197,7 +176,7 @@ class HouseUpdateView(UpdateView):
                 'form': form_class,
                 'section_formset': section_formset,
                 'floor_formset': floor_formset,
-                # 'users_formset': users_formset,
+                'users_formset': users_formset,
                 'users': CustomUser.objects.filter(role=True).select_related('role')
             })
 

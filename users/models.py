@@ -29,7 +29,7 @@ class Role(models.Model):
 
 class CustomUser(AbstractUser):
     photo = models.ImageField(upload_to='users/', blank=True, null=True)
-    birthday = models.DateField(auto_now_add=True)
+    birthday = models.DateField(null=True, blank=True)
     father_name = models.CharField(max_length=30, help_text='Отчество', null=True, blank=True, default='')
     phone = models.CharField(max_length=20, null=True, blank=True, default='')
     viber = models.CharField(max_length=20, null=True, blank=True)
@@ -37,7 +37,7 @@ class CustomUser(AbstractUser):
     status_state = [('Активен', 'Активен'), ('Новый', 'Новый'), ('Отключен','Отключен')]
     status = models.CharField(choices=status_state, default=status_state[1][0], max_length=20)
     username = models.CharField(max_length=100, verbose_name="User ID", unique=True, help_text='Required',
-                                error_messages={"unique": "A user with that UserID already exists"},
+                                error_messages={"unique": "Пользователь с таким ID уже существует."},
                                 blank=True, null=True)
     about = models.TextField(max_length=1000, null=True, blank=True)
     role = models.ForeignKey('Role', on_delete=models.PROTECT, null=True, blank=True)

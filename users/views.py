@@ -11,7 +11,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 
-from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm
+from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm, OwnerUserForm
 from users.models import CustomUser, Role
 
 
@@ -23,7 +23,7 @@ class LoginUser(LoginView):
 
 class UsersListView(ListView):
     model = CustomUser
-    queryset = CustomUser.objects.all().order_by('id').select_related('role')
+    queryset = CustomUser.objects.filter(role=True).order_by('id').select_related('role')
     context_object_name = 'users'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -81,8 +81,6 @@ class UserUpdateView(UpdateView):
     success_url = reverse_lazy('users:users')
     template_name = 'users/customuser_update_form.html'
 
-
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['label_suffix'] = ''
@@ -104,5 +102,62 @@ def delete_user(request, pk):
     if not user.is_superuser:
         user.delete()
         return HttpResponseRedirect(reverse_lazy('users:users'))
+
+
+class OwnerListView(ListView):
+    model = CustomUser
+    paginate_by = 50
+    context_object_name = 'users'
+    queryset = CustomUser.objects.filter(role=None).prefetch_related('house_set',
+                                                                      'flat_set__house__personalaccount_set')
+    template_name = 'users/owners_list.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        return context
+
+
+class OwnerCreateView(CreateView):
+    model = CustomUser
+    form_class = OwnerUserForm
+    context_object_name = 'users'
+    success_url = reverse_lazy('users:owner_list')
+    template_name = 'users/owner_create_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['label_suffix'] = ''
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        return super().post(self, request, *args, **kwargs)
+
+
+class OwnerUpdateView(UpdateView):
+    model = CustomUser
+    form_class = OwnerUserForm
+    context_object_name = 'users'
+    success_url = reverse_lazy('users:owner_list')
+    template_name = 'users/owner_update_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['label_suffix'] = ''
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST, instance=self.get_object())
+        if form_class.is_valid():
+            form_class.save(commit=False)
+            if len(request.POST.get('password')) == 0:
+                del form_class.instance.password
+            form_class.save()
+            return HttpResponseRedirect(reverse_lazy('users:users'))
+        return render(request, self.template_name, self.get_context_data())
+
+
+class OwnerDetailView(DetailView):
+    pass
+
 
 
