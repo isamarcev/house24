@@ -193,3 +193,17 @@ def get_role(request):
     role = CustomUser.objects.get(pk=pk).role.name
     return JsonResponse({'role': role}, status=200)
 
+
+class FlatsListView(ListView):
+    model = Flat
+    template_name = 'houses/flat/flat_list.html'
+
+    def get_queryset(self):
+        queryset = self.model.objects.all().select_related('personal_account__section', 'floor', 'owner')
+        return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['houses'] = House.objects.all()
+        return context
+

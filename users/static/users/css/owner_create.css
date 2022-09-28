@@ -72,6 +72,11 @@
     box-shadow: none;
 }
 
+.has-success button {
+    border-color: #00a65a;
+    color: #00a65a;
+}
+
 .help-block {
     font-size: 14px;
     color: #dd4b39;
@@ -133,13 +138,22 @@
 }
 
 #users tbody td {
-    height: 80px;
+    /*height: 80px;*/
     vertical-align: middle;
     padding: 0 10px;
 }
 
 tr[data-href]:hover {
     cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    font-size: 14px;
+    color: #3c8dbc;
+}
+a:hover {
+    color: #72afd2;
 }
 
 .user-label {

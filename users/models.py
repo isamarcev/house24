@@ -32,8 +32,8 @@ class CustomUser(AbstractUser):
     birthday = models.DateField(null=True, blank=True)
     father_name = models.CharField(max_length=30, help_text='Отчество', null=True, blank=True, default='')
     phone = models.CharField(max_length=20, null=True, blank=True, default='')
-    viber = models.CharField(max_length=20, null=True, blank=True)
-    telegram = models.CharField(max_length=20, null=True, blank=True)
+    viber = models.CharField(max_length=20, null=True, blank=True, default='')
+    telegram = models.CharField(max_length=20, null=True, blank=True, default='')
     status_state = [('Активен', 'Активен'), ('Новый', 'Новый'), ('Отключен','Отключен')]
     status = models.CharField(choices=status_state, default=status_state[1][0], max_length=20)
     username = models.CharField(max_length=100, verbose_name="User ID", unique=True, help_text='Required',

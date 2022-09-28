@@ -1,0 +1,164 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Профиль владельца
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{% static 'users/css/owner_create.css' %}">
+{% endblock %}
+{% block content %}
+
+
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Пользователь
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'users:owner_list' %}" style="color: #444; text-decoration: none">> <span style="color: #ccc; margin-right: 5px" >></span> Владельцы квартир </a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Профиль владельца </li>
+
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                <div class="box-header" style="position: relative; height: 42px">
+                        <a class="btn btn-tariff" href="{% url 'users:owner_update' object.id %}" style="height: 30px; position: absolute; top: 5px; right: 8px;">Редактировать профиль</a>
+                    </a>
+                </div>
+                    <div class="box-body">
+                    <div class="userAvatar" >
+                        {% if object.photo %}
+                            <img src="{{ object.photo.url }}" style="margin: 0 15px 15px 0;display: block;max-width: 100%;height: 160px;width: 160px; border-radius: 50%;object-fit: cover;" alt="">
+                        {% else %}
+                            <img src="{% static 'content/img/empty.jpeg' %}" style="margin: 0 15px 15px 0;display: block;max-width: 100%;height: 160px;width: 160px;border-radius: 50%;object-fit: cover;" alt="">
+                        {% endif %}
+                    </div>
+
+                    <div class="col-sm-12 col-lg-12">
+                        <table class="table table-bordered table-striped table-view" >
+                    <tbody>
+                        <tr>
+                            <td class="user-label" style="width:50%">Статус</td>
+                            <td>
+                                {% if object.status == "Активен" %}
+                                                <small class="label label-success">{{ object.status }}</small>
+                                            {% elif object.status == "Новый" %}
+                                                <small class="label label-warning">{{ object.status }}</small>
+                                            {% else %}
+                                                <small class="label label-danger">{{ object.status }}</small>
+                                            {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">ID</td>
+                            <td>{{ object.username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Фамилия</td>
+                            <td>{{ object.last_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Имя</td>
+                            <td>{{ object.first_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Отчество</td>
+                            <td>{{ object.father_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Дата рождения</td>
+                            <td>{{ object.birthday|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">О владельце (заметки)</td>
+                            <td>{{ object.about }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Телефон</td>
+                            <td>{{ object.phone }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Viber</td>
+                            <td>{{ object.viber }}</td>
+                        </tr>
+                         <tr>
+                            <td class="user-label">Telegram</td>
+                            <td>{{ object.telegram }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Email(логин)</td>
+                            <td>{{ object.email }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                    </div>
+                    <div class="col-sm-12">
+                        <table id="users" style="margin: 0;" class="table table-bordered table-hover table-striped linkedRow">
+                             <thead>
+                                  <tr>
+                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                          #
+                                      </th>
+                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Дом
+                                      </th>
+                                      <th tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Секция
+                                      </th>
+                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1" >
+                                          Квартира
+                                      </th>
+                                      <th tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Лицевой счет
+                                      </th>
+                                  </tr>
+                             </thead>
+                            <tbody>
+                                {% for flat in object.flat_set.all %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="{% url 'houses:house_detail' flat.house.id %}">
+                                        {{ flat.house }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {{ flat.section.title }}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'houses:flat_detail' flat.id %}">
+                                        {{ flat.number }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'crm_accounting:account_detail' flat.personal_account.id %}">
+                                            {{ flat.personal_account }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+        <script src="{% static 'users/js/user_create.js' %}"></script>
+{% endblock %}

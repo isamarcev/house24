@@ -9,7 +9,8 @@
 {% endblock %}
 {% block css_after %}
     <link rel="stylesheet" href="{% static 'users/css/owner_create.css' %}">
-<link  href="{% static 'users/dist/datepicker.css' %}" rel="stylesheet">
+{#<link  href="{% static 'users/dist/datepicker.css' %}" rel="stylesheet">#}
+        <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.css">
 
 {% endblock %}
 {% block content %}
@@ -82,9 +83,7 @@
                                         {{ form.birthday.label_tag }}
                                         <div class="input-group" style="position: relative">
                                             {{ form.birthday }}
-                                                <button type="button" onclick="event.preventDefault()" class="btn btn-date" id="btn-date">
-                                                    <i class="fa fa-calendar"></i>
-                                                </button>
+
                                         </div>
                                     </div>
                                 </div>
@@ -180,10 +179,17 @@
   </script>
 {% endblock %}
 {% block script %}
-    <script src="{% static 'users/dist/datepicker.js' %}"></script>
+{#    <script src="{% static 'users/dist/datepicker.js' %}"></script>#}
 
-    <script>
-            $("#id_birthday").datepicker();
+   <script>
+    $(function () {
+        $("#id_birthday").datepicker({
+                showOn: "both",
+            });
+        $('.ui-datepicker-trigger').html("<i class='fa fa-calendar'></i>").addClass('btn btn-date')
+
+    })
+
     </script>
     <script src="{% static 'users/js/owner_create.js' %}">
     </script>

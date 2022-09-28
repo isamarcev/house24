@@ -11,6 +11,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 
+from houses.models import House
 from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm, OwnerUserForm
 from users.models import CustomUser, Role
 
@@ -106,14 +107,15 @@ def delete_user(request, pk):
 
 class OwnerListView(ListView):
     model = CustomUser
-    paginate_by = 50
     context_object_name = 'users'
     queryset = CustomUser.objects.filter(role=None).prefetch_related('house_set',
-                                                                      'flat_set__house__personalaccount_set')
+                                                                      'flat_set__house__personalaccount_set',
+                                                                     'flat_set__personal_account').order_by('date_joined')
     template_name = 'users/owners_list.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
+        context['houses'] = House.objects.all()
         return context
 
 
@@ -130,6 +132,9 @@ class OwnerCreateView(CreateView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST, request.FILES)
+        if form_class.is_valid():
+            messages.success(request, 'Владелец успешно добавлен')
         return super().post(self, request, *args, **kwargs)
 
 
@@ -146,18 +151,24 @@ class OwnerUpdateView(UpdateView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        form_class = self.form_class(request.POST, instance=self.get_object())
+        form_class = self.form_class(request.POST, request.FILES, instance=self.get_object())
         if form_class.is_valid():
             form_class.save(commit=False)
             if len(request.POST.get('password')) == 0:
                 del form_class.instance.password
             form_class.save()
-            return HttpResponseRedirect(reverse_lazy('users:users'))
+            messages.success(request, 'Владелец успешно обновлен')
+            return HttpResponseRedirect(reverse_lazy('users:owner_list'))
         return render(request, self.template_name, self.get_context_data())
 
 
 class OwnerDetailView(DetailView):
-    pass
+    model = CustomUser
+    template_name = 'users/owner_detail.html'
+
+    def get_queryset(self):
+        return CustomUser.objects.all().prefetch_related('flat_set__house__personalaccount_set')
+
 
 
 

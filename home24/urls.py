@@ -8,6 +8,7 @@ urlpatterns = [
     path('samartsev/', admin.site.urls),
     path('', include('content.urls')),
     path('admin/', include('houses.urls')),
+    path('crm-accounting/', include('crm_accounting.urls')),
     path('system-settings/', include('crm_home.urls')),
 
     path('users/', include('users.urls')),

@@ -5,16 +5,13 @@ label {
 .btn-success {
     background-color: #00a65a;
     border-color: #008d4c;
-    font-size: 14px;
-    border-radius: 3px;
+    font-size: 14px!important;
+    border-radius: 3px!important;
     line-height: 1.42857143;
 }
 
 .content-wrapper>.content-custom {
-        min-height: 250px;
-    /*padding: 15px!important;*/
-    /*margin-right: auto;*/
-    /*margin-left: auto;*/
+    min-height: 250px;
     margin: 15px!important;
     padding: 0!important;
     background-color: #fff;

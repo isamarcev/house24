@@ -1,7 +1,7 @@
 {% extends 'houses/layout/base_houses.html' %}
 {% load static %}
 {% block title %}
-    Пользователи
+    Владельцы квартир
 {% endblock %}
 {% block css %}
 
@@ -9,17 +9,40 @@
 {% endblock %}
 {% block css_after %}
     <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="{% static 'users/css/user_list.css' %}">
+    <link rel="stylesheet" href="{% static 'users/css/owner_list.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+            <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.css">
+
+    <link rel="stylesheet" href="{% static 'users/css/jquery.toast.css' %}" type="text/css">
+
+
 {% endblock %}
 {% block content %}
+     {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>
+            <script src="{% static 'users/js/jquery.toast.js' %}"></script>
+            <script>
+                var MyToast =  $.toast({
+                    heading: 'Success',
+                    text: '{{ message }}',
+                    showHideTransition: 'slide',
+                    icon: 'success',
+                    position: 'top-left'
+                })
+            </script>
+        {% endif %}
+    {% endfor %}
+        <!-- MESSAGE FROM BACKEND-->
+
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
-        <h1 style="color: #444; font-size: 24px">Пользователи
+        <h1 style="color: #444; font-size: 24px">Владельцы квартир
         </h1>
         <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
         margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
         top: 15px!important; right: 15px!important; border-radius: 2px!important;">
             <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
-            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Пользователи</li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Владельцы квартир</li>
         </ul>
     </section>
 
@@ -28,7 +51,16 @@
     <section class="content" style="padding-top: 15px">
     <div class="row">
         <div class="col-sm-12" style="text-align: right; padding: 0 15px">
-            <a class="btn btn-success" href="{% url 'users:user_create' %}" style="width: auto">Создать пользователя</a>
+            <div class="dropdown">
+              <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Выберите действие
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="{% url 'users:owner_create' %}">Добавить владельца квартиры</a>
+                <a class="dropdown-item" href="#">Отправить сообщение должникам</a>
+                <a class="dropdown-item" href="#">Отправить приглашение</a>
+              </div>
+            </div>
         </div>
     </div>
     </section>
@@ -46,60 +78,65 @@
                 </div>
                 </div>
                     <div class="box-body" style="padding: 0">
-                        <table id="users" style="margin: 0; width: 100%" class="table table-bordered table-hover table-striped linkedRow">
+                        <table id="users" style="margin: 0;" class="table table-bordered table-hover table-striped linkedRow">
                              <thead>
                                   <tr>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                      <th tabindex="0" style="width: 110px; min-width: 110px" aria-controls="users" rowspan="1" colspan="1" >
                                           ID
                                       </th>
-                                      <th  tabindex="0" aria-controls="users" rowspan="1" colspan="1">
+                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
                                           ФИО
                                       </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1"  style="width: 15%">
+                                      <th tabindex="0" style="width: 140px; min-width: 140px;" aria-controls="users" rowspan="1" colspan="1">
                                           Телефон
                                       </th>
-                                      <th  tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                      <th  tabindex="0" style="width: 140px; min-width: 140px;" aria-controls="users" rowspan="1" colspan="1" >
                                           Email
                                       </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1">
+                                      <th tabindex="0" style="min-width: 250px;" aria-controls="users" rowspan="1" colspan="1">
                                           Дом
                                       </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                      <th tabindex="0" style="min-width: 280px!important;" aria-controls="users" rowspan="1" colspan="1" >
                                           Квартира
                                       </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" style="width: 110px; min-width: 110px" >
                                           Добавлен
                                       </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" style="width: 110px; min-width: 110px">
                                           Статус
                                       </th>
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                      <th tabindex="0" aria-controls="users" rowspan="1" style="width: 80px; min-width: 80px" colspan="1" >
                                           Есть долг
                                       </th>
-
-                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" style="width: content-box">
                                       </th>
                                   </tr>
                                     <tr>
-                                            <th></th>
+                                            <th><input type="text" id="username" class="form-control" ></th>
                                             <th><input type="text" id="user" class="form-control" ></th>
+                                            <th><input type="text" id="phone" class="form-control">  </th>                                          </th>
+                                            <th><input type="text" id="email" class="form-control"></th>
                                             <th>
-                                                <select name="roles" id="role" class="form-select-sm" style="font-size: 16px">
+                                                <select name="house" id="house" class="form-select-sm" style="font-size: 16px">
                                                     <option value=""></option>
-                                                    {% for role in roles %}
-                                                        <option value="{{ role.name }}">{{ role.name }}</option>
+                                                    {% for house in houses %}
+                                                        <option value="{{ house }}">{{ house }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </th>
-                                            <th><input type="text" id="phone" class="form-control"></th>
-                                            <th><input type="text" id="email" class="form-control"></th>
                                             <th>
-                                                <select name="roles" id="status" class="form-select-sm" style="font-size: 16px">
+                                                <input type="text" id="flat" class="form-control">
+                                            </th>
+                                            <th><input type="text" id="date_joined" class="form-control"></th>
+                                            <th><select name="status" id="status" class="form-select-sm" style="font-size: 16px">
                                                     <option value=""></option>
                                                     <option value="Активен">Активен</option>
                                                     <option value="Новый">Новый</option>
                                                     <option value="Отключен">Отключен</option>
-
+                                                </select></th>
+                                            <th><select name="roles" id="dolg" class="form-select-sm" style="font-size: 16px">
+                                                    <option value=""></option>
+                                                    <option value="Да">Да</option>
                                                 </select>
                                             </th>
                                             <th></th>
@@ -122,17 +159,26 @@
                                             </td>
                                             <td class="td-height">
                                                 {% if object.house_set %}
-                                                    {% for house in object.house_set.all %}
-                                                        {{ house.title }}
+                                                    {% for flat in object.flat_set.all|slice:"0:-1" %}
+                                                        <a href="{% url 'houses:house_detail' flat.house.id %}">{{ flat.house }}</a>
                                                     {% endfor %}
-                                                    {% for house in object.house_set.all|slice:"-1" %}
-                                                        {{ house.title }}
-                                                    {% endfor %}
-
+{#                                                    {% for house in object.house_set.last %}#}
+{#                                                        {{ house.title }}#}
+{#                                                    {% endfor %}#}
                                                 {% endif %}
                                             </td>
 
-                                            <td style="width: 5%">
+                                            <td>
+                                                {% for flat in object.flat_set.all %}
+                                                    <a href="#">{{ flat }}</a>
+                                                {% endfor %}
+                                            </td>
+
+                                            <td>
+                                                {{ object.date_joined|date:"m.d.Y" }}
+                                            </td>
+
+                                            <td>
                                             {% if object.status == "Активен" %}
                                                 <small class="label label-success">{{ object.status }}</small>
                                             {% elif object.status == "Новый" %}
@@ -142,15 +188,26 @@
                                             {% endif %}
                                             </td>
 
+                                            <td>
+                                                {% for flat in object.flat_set.all %}
+                                                    {% if flat.personal_account.balance < 0 %}
+                                                        Да
+                                                   {% else %}
+                                                        n
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                            </td>
+
                                             <td style="width: 10%">
                                                 <div class="btn-group pull-right" >
                                                     <a class="btn btn-default btn-sm" href="#" title="Копировать" data-toggle="tooltip">
-                                                        <i class="fa fa-clone"></i></a>
+                                                        <i class="fa fa-envelope"></i></a>
                                                     <a class="btn btn-default btn-sm" href="{% url 'users:owner_update' object.id %}" title="Редактировать" data-toggle="tooltip">
                                                         <i class="fa fa-pencil"></i></a>
-{#                                                    <a class="btn btn-default btn-sm btn-delete " title="Удалить" href="{% url 'users:user_delete' object.id %}" name="{{ object.first_name }} {{ object.last_name }}" data-toggle="tooltip" data-pjax="0" >#}
+                                                    <a class="btn btn-default btn-sm btn-delete " title="Удалить" href="{% url 'users:user_delete' object.id %}" name="{{ object.first_name }} {{ object.last_name }}" data-toggle="tooltip" data-pjax="0" >
                                                         <i class="fa fa-trash " ></i>
-{#                                                    </a>#}
+                                                    </a>
                                                 </div>
                                             </td>
 
@@ -158,9 +215,15 @@
                                     {% endfor %}
                                   </tbody>
                         </table>
-                        <div class="empty" id="empty" style="height: 40px; padding: 10px 20px; display: none; background-color: #f9f9f9">Ничего не найдено.</div>
+{#                        <div class="empty" id="empty" style="height: 40px; padding: 10px 20px; display: none; background-color: #f9f9f9">Ничего не найдено.</div>#}
+                        <div class="box-footer clearfix" style="padding: 10px">
 
+                        </div>
                     </div>
+                <div class="box-footer" style="padding: 10px; font-size: 14px">
+                <div>Количество владельцев: <span class="text-bold">{{ object_list.count }}</span></div>
+            </div>
+
                 </div>
             </div>
         </div>
@@ -176,88 +239,64 @@
 
     <script>
         $(document).ready( function CreateTable() {
-        $('#users').DataTable(
+        var table = $('#users').DataTable(
             {
                 "order": [],
                 "bInfo": false,
                 "bPaginate": false,
+                "bSortCellsTop": true,
                 "scrollX": true,
-                "bFilter": false,
+                dom: 't',
                 "aoColumnDefs": [
-                    { 'bSortable': false, 'aTargets': [0, 1 , 2, 3, 4, 5, 6] }
+                    { 'bSortable': false, 'aTargets': [0, 2, 3, 4, 5, 7, 8, 9] }
                     ]
             }
         );
+        $('#username').on('keyup click', function () {
+            table.columns([0]).search($(this).val()).draw();
+        });
+        $('#user').on('keyup click', function () {
+            table.columns([1]).search($(this).val()).draw();
+        });
+        $('#phone').on('keyup click', function () {
+            table.columns([2]).search($(this).val()).draw();
+        });
+        $('#email').on('keyup click', function () {
+            table.columns([3]).search($(this).val()).draw();
+        });
+        $('#house').on('keyup click', function () {
+            table.columns([4]).search($(this).val()).draw();
+        });
+        $('#flat').on('keyup click', function () {
+            table.columns([5]).search($(this).val()).draw();
+        });
+        $('#date_joined').on('keyup click', function () {
+            table.columns([6]).search($(this).val()).draw();
+        });
+        $('#status').on('keyup click', function () {
+            table.columns([7]).search($(this).val()).draw();
+        });
+        $('#dolg').on('keyup click', function () {
+            table.columns([8]).search($(this).val()).draw();
+        });
+
+
     } );
     </script>
-    <!-- AJAX -->
-    <script>
-        function ajax_request() {
-            const user = document.getElementById('user').value;
-            const role = document.getElementById('role').value;
-            const phone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const status = document.getElementById('status').value;
-
-
-            $.ajax({
-                url:`{% url 'users:ajax-users' %}`,
-                type: 'get',
-                data: {
-                    'user': user,
-                    'role': role,
-                    'phone': phone,
-                    'email': email,
-                    'status': status
-                },
-                success: (data) => {
-                    console.log(data);
-                    $('#users tbody').empty();
-                    if (data.users.length === 0) {
-                        console.log('Hello')
-                        $('#empty').css('display', 'block');
-                    } else {
-                        let rows = "";
-                        $(data.users).each(function (index, value) {
-                            rows +=  "<tr data-href='/users/detail/" + value.id + "/' id='instance-" + value.id + "' class='odd' style='background-color: rgb(249, 249, 249);'><td>" + (index + 1) + "</td><td class='td-height'>" + value.user + "</td><td class='td-height'>"+ value.role + "</td><td class='td-height'>" + value.phone + "</td><td class='td-height'>"+ value.email + "</td><td style='width: 5%'><small class='label'>" + value.status + "</small></td><td style='width: 10%'><div class='btn-group pull-right' ><a class='btn btn-default btn-sm' href='#' title='Копировать'><i class='fa fa-clone'></i></a><a class='btn btn-default btn-sm' href='/users/update/" + value.id + "/' title='Редактировать'><i class='fa fa-pencil'></i></a><a class='btn btn-default btn-sm btn-delete ' title='Удалить' href='/users/delete/" + value.id + "/' id='" + value.id + "'><i class='fa fa-trash '></i></a></div></td></tr>"
-                        })
-                        $('#users tbody').append(rows);
-                        $('tr[data-href]').on("click", function() {
-                            document.location = $(this).data('href');
-                        });
-                        let labels = document.getElementsByClassName('label');
-                        for (let y of labels) {
-                            if (y.textContent === 'Активен') {
-                                y.classList.add('label-success')
-                            } else if (y.textContent === 'Новый'){
-                                y.classList.add('label-warning')
-                            } else {
-                                y.classList.add('label-danger')
-                            }
-                        }
-                        $('#empty').css('display', 'none');
-                        $('.btn-delete').on('click', function (event){
-                                var result = confirm('Вы действительно хотите удалить пользователя?')
-                                if (!result) {
-                                    event.preventDefault()
-                                    event.stopImmediatePropagation()
-                                    return false
-                                }
-                        })
-                    }
-                    },
-                error: (error) => {
-                    console.log("Errors !!!= "+error);
-                }
-            })
-        }
-    </script>
-
     <script>
     $(document).ready( function () {
         $('.odd').css('background-color', '#f9f9f9')
+        $('.sorting').css('color', '#3c8dbc')
     })
     </script>
-            <script src="{% static 'users/js/user_list.js' %}"></script>
+{#        <script src="{% static 'users/dist/datepicker.js' %}"></script>#}
+    <script>
+            $("#date_joined").datepicker({
+            dateFormat: "mm.dd.yy",
+
+});
+    </script>
+
+            <script src="{% static 'users/js/owner_list.js' %}"></script>
 
 {% endblock %}

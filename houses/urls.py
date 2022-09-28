@@ -14,6 +14,10 @@ urlpatterns = [
     path('houses/create/get-role/', views.get_role, name='get_role'),
 
 
+    # flats
+    path('flats/', views.FlatsListView.as_view(), name='flat_list'),
+    path('flats/create/', views.FlatsListView.as_view(), name='flat_create'),
+    path('flats/detail/<int:pk>/', views.HousesDetail.as_view(), name='flat_detail'),
 
     # path('create/', views.HousesListView.as_view(), name='house_create'),
 

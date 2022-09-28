@@ -17,9 +17,10 @@ urlpatterns = [
     # owners
     path('owner/', views.OwnerListView.as_view(), name='owner_list'),
     path('owner/create/', views.OwnerCreateView.as_view(), name='owner_create'),
-    path('owner/upadate/<int:pk>/', views.OwnerUpdateView.as_view(), name='owner_update'),
+    path('owner/update/<int:pk>/', views.OwnerUpdateView.as_view(), name='owner_update'),
     path('owner/detail/<int:pk>/', views.OwnerDetailView.as_view(), name='owner_detail'),
     path('owner/delete/', views.OwnerListView.as_view(), name='owner_delete'),
+
 
     # path('accounts/login/', views.LoginUser.as_view(), name='login'),
 

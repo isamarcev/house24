@@ -188,7 +188,7 @@
              </li>
 
             <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'houses:flat_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-key"></i>
                      <p>Квартиры</p>
                  </a>
@@ -296,13 +296,13 @@
                     </a>
                   </li>
                     <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'crm_home:requisites' %}" class="nav-link">
                       <i class="fa fa-credit-card"></i>
                       <p>Платежные реквизиты</p>
                     </a>
                   </li>
                     <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'crm_home:payment_states' %}" class="nav-link">
                       <i class="fa fa-list-ol"></i>
                       <p>Статьи платежей</p>
                     </a>

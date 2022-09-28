@@ -34,7 +34,11 @@ $(document).ready(function(){
 let elemtnts = document.querySelectorAll("input[type='text']")
 for (var i = 0; i < elemtnts.length; ++i) {
     elemtnts[i].addEventListener('blur', function(e) {
-        this.parentNode.classList.add('has-success');
+        if (this.id === "id_birthday") {
+            this.parentNode.parentNode.classList.add('has-success');
+        } else {
+            this.parentNode.classList.add('has-success');
+        }
     });
 }
 
@@ -43,16 +47,18 @@ areas.addEventListener('blur', function(e) {
         this.parentNode.classList.add('has-success');
     });
 
-// let btnDate = document.getElementById('btn-date')
-// btnDate.addEventListener('click', function (e) {
-//     var event = new Event('click')
-//     var foc = new Event('focus')
-//     document.getElementById('id_birthday').dispatchEvent(event)
-//     document.getElementById('id_birthday').dispatchEvent(foc)
-    // $('#id_birthday').click();
-    // $('#id_birthday').click();
+let btnDate = document.getElementById('btn-date')
+btnDate.addEventListener('click', function (e) {
+    var event = new Event('click')
+    var foc = new Event('focus')
+    // document.getElementById('id_birthday').dispatchEvent(event)
+    $('#id_birthday').focus()
+    $('#id_birthday').click()
 
-// })
+    // $('#datepicker').click();
+    // $('#id_birthday').click();
+    // $('#id_birthday').click();
+})
 
 let selects = document.querySelectorAll("select")
 for (var x = 0; x < selects.length; ++x) {

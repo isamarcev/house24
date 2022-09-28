@@ -1,7 +1,7 @@
 {% extends 'houses/layout/base_houses.html' %}
 {% load static %}
 {% block title %}
-    Дома
+    Квартиры
 {% endblock %}
 {% block css %}
 
@@ -34,13 +34,13 @@
         <!-- MESSAGE FROM BACKEND-->
 
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
-        <h1 style="color: #444; font-size: 24px">Дома
+        <h1 style="color: #444; font-size: 24px">Квартиры
         </h1>
         <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
         margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
         top: 15px!important; right: 15px!important; border-radius: 2px!important;">
             <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
-            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Дома</li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Квартиры </li>
         </ul>
     </section>
 
@@ -49,7 +49,7 @@
     <section class="content" style="padding-top: 15px">
     <div class="row">
         <div class="col-sm-12" style="text-align: right; padding: 0 15px">
-            <a class="btn btn-success" href="{% url 'houses:house_create' %}" style="width: auto">Добавить дом</a>
+            <a class="btn btn-success" href="{% url 'houses:flat_create' %}" style="width: auto">Добавить квартиру</a>
         </div>
     </div>
     </section>
@@ -67,37 +67,77 @@
                 </div>
                 </div>
                     <div class="box-body" style="padding: 0">
-                        <table id="houses" style="margin: 0; width: 100%" class="table table-bordered table-hover table-striped linkedRow">
+                        <table id="flats" style="margin: 0; width: 100%" class="table table-bordered table-hover table-striped linkedRow">
                              <thead>
                                   <tr>
-                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: min-content" >
-                                          #
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 10%; color: rgb(60, 141, 188);" >
+                                          № квартиры
                                       </th>
                                       <th  tabindex="0"  rowspan="1" colspan="1" style="color: rgb(60, 141, 188);">
-                                          Название
+                                          Дом
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="color: rgb(60, 141, 188);">
+                                          Секция
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="color: rgb(60, 141, 188);">
+                                          Этаж
                                       </th>
                                       <th  tabindex="0" rowspan="1" colspan="1"  style="width: 30%; color: rgb(60, 141, 188);">
-                                          Адрес
+                                          Владелец
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style=";">
+                                          Остаток (грн)
                                       </th>
                                       <th></th>
                                   </tr>
                                     <tr>
-                                            <th></th>
-                                            <th class="sort">
-                                                <input type="text" id="house" class="form-control" >
+                                            <th>
+                                                <input type="text" id="flat" class="form-control" >
                                             </th>
                                             <th class="sort">
-                                                <input type="text" id="address" class="form-control">
+                                                <select name="house" id="house" class="form-select">
+                                                    <option value=""></option>
+                                                    {% for house in houses %}
+                                                        <option value="{{ house.id }}">{{ house.title }}</option>
+                                                    {% endfor %}
+                                                </select>
                                             </th>
-                                            <th></th>
+                                            <th class="sort">
+                                                <select name="section" id="section" class="form-select">
+                                                    <option value="">Выберите дом...</option>
+                                                </select>
+                                            </th>
+                                            <th class="sort">
+                                                <select name="floor" id="floor" class="form-select">
+                                                    <option value="">Выберите дом</option>
+                                                </select>
+                                            </th>
+                                            <th class="sort">
+                                                <input type="text" id="o" class="form-control">
+                                            </th>
+                                            <th class="sort">
+                                                <input type="text" id="owner" class="form-control">
+                                            </th>
+                                            <th class="sort">
+                                            </th>
+
                                         </tr>
                                   </thead>
                                   <tbody>
                                     {% for object in object_list %}
                                         <tr data-href="{% url 'houses:house_detail' object.id %}" id="instance-{{ object.id }}">
-                                            <td>{{ forloop.counter }}</td>
-                                            <td class="td-height">{{ object.title }}</td>
-                                            <td class="td-height">{{ object.address }}</td>
+                                            <td>{{ object.number }}</td>
+                                            <td class="td-height">{{ object.house }}</td>
+                                            <td class="td-height">{{ object.section }}</td>
+                                            <td class="td-height">{{ object.floor }}</td>
+                                            <td class="td-height">{{ object.owner }}</td>
+                                            <td class="td-height">
+                                                {% if object.personal_account  %}
+                                                {{ object.personal_account.balance }}
+                                                {% else %}
+                                                    (Нет счета)
+                                                {% endif %}
+                                            </td>
                                             <td style="width: 10%">
                                                 <div class="btn-group pull-right" >
                                                     <a class="btn btn-default btn-sm" href="{% url 'houses:house_update' object.id %}" title="Редактировать" data-toggle="tooltip">
@@ -110,7 +150,6 @@
                                     {% endfor %}
                                   </tbody>
                         </table>
-                        <div class="empty" id="empty" style="height: 40px; padding: 10px 20px; display: none; background-color: #f9f9f9">Ничего не найдено.</div>
 
                     </div>
                 </div>
@@ -128,7 +167,7 @@
 
     <script>
         $(document).ready( function CreateTable() {
-        var table = $('#houses').DataTable(
+        $('#flats').DataTable(
             {
 
                 "order": [],
@@ -137,19 +176,19 @@
                 "bPaginate": false,
                 dom: 't',
                 "language": {
-    "zeroRecords": "Ничего не найдено"
-  },
+                    "zeroRecords": "Ничего не найдено"
+                  },
                 "aoColumnDefs": [
-                    { 'bSortable': false, 'targets': [0, 3] }
+                    { 'bSortable': false, 'targets': [5, 6] }
                     ]
             }
         );
-        $('#house').on('keyup click', function () {
-            table.columns([1]).search($(this).val()).draw();
-        });
-        $('#address').on('keyup click', function () {
-            table.columns([2]).search($(this).val()).draw();
-        })
+        {#$('#house').on('keyup click', function () {#}
+        {#    table.columns([1]).search($(this).val()).draw();#}
+        {#d } );#}
+        {#$('#address').on('keyup click', function () {#}
+        {#    table.columns([2]).search($(this).val()).draw();#}
+        {#3 })#}
     } );
     </script>
     <!-- AJAX -->

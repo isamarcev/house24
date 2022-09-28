@@ -20,7 +20,7 @@ class PersonalAccount(models.Model):
     account_number = models.IntegerField(default=get_next_account, unique=True)
     house = models.ForeignKey("houses.House", on_delete=models.CASCADE, null=True, blank=True)
     section = models.ForeignKey('houses.Section', on_delete=models.SET_NULL, null=True, blank=True)
-    flat = models.ForeignKey('houses.Flat', on_delete=models.SET_NULL, null=True)
+    # flat = models.ForeignKey('houses.Flat', on_delete=models.SET_NULL, null=True)
     status_choice = [('active', "Активен"), ('nonactive', "Неактивен")]
     status = models.CharField(choices=status_choice, null=True, blank=True, max_length=20)
     balance = models.DecimalField(decimal_places=2, max_digits=10)
@@ -32,7 +32,7 @@ class PersonalAccount(models.Model):
         verbose_name = "Персональный счет"
 
     def __str__(self):
-        return self.account_number
+        return str(self.account_number)
 
 
 def get_next_invoice():

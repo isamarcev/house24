@@ -32,7 +32,7 @@ class Section(models.Model):
         verbose_name = 'Секция'
 
     def __str__(self):
-        return f'{self.title} {self.house}'
+        return f'{self.title}'
 
 
 class Floor(models.Model):
@@ -63,4 +63,4 @@ class Flat(models.Model):
         verbose_name = 'Квартира'
 
     def __str__(self):
-        return self.number
+        return f'№{self.number}, {self.house}'
