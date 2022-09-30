@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
+
 from .models import *
 
 
@@ -10,7 +12,6 @@ class HouseForm(forms.ModelForm):
     image_3 = forms.ImageField(label_suffix='', label='Изображение #3. Развер: (248х160)', required=False)
     image_4 = forms.ImageField(label_suffix='', label='Изображение #4. Развер: (248х160)', required=False)
     image_5 = forms.ImageField(label_suffix='', label='Изображение #5. Развер: (248х160)', required=False)
-    # users = forms.ModelChoiceField(required=False, queryset=CustomUser.objects.filter(role=True))
 
     class Meta:
         model = House
@@ -43,5 +44,49 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['name', ]
+
+
+class FlatForm(forms.ModelForm):
+    house = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='Выберите...',
+                                   widget=forms.Select(attrs={'class': 'form-select'}), label='Дом')
+    owner = forms.ModelChoiceField(queryset=CustomUser.objects.all(), empty_label='Выберите...',
+                                   widget=forms.Select(attrs={'class': 'form-select'}), label='Владелец')
+    tariff = forms.ModelChoiceField(queryset=Tariff.objects.all(), empty_label='Выберите...',
+                                   widget=forms.Select(attrs={'class': 'form-select'}), label='Тариф')
+
+    class Meta:
+        model = Flat
+        fields = ['number', 'area', 'house', 'section', 'floor', 'owner', 'tariff']
+        labels = {
+            'number': "Номер квартиры",
+            'area': "Площадь (кв.м.)",
+            'section': "Секция",
+            'floor': "Этаж",
+        }
+        widgets = {
+            'number': forms.TextInput(attrs={'class': 'form-control'}),
+            'area': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+
+
+
+class PersonalAccountForm(forms.ModelForm):
+    account_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
+                                     label='Лицевой счет', required=False)
+
+    class Meta:
+        model = PersonalAccount
+        fields = ['account_number']
+
+    def clean_account_number(self):
+        account = self.cleaned_data.get('account_number')
+        if account == '':
+            return account
+        if not account.isdigit():
+            raise ValidationError(
+                "Лицевой счет должен состоять из цифр."
+            )
+        return account
 
 

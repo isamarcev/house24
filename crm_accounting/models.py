@@ -4,28 +4,32 @@ from crm_home.models import Tariff, Service, Unit, PaymentState
 from home24 import settings
 
 
-def get_next_account():
+def get_next_account(count=None):
     """ Getiing next number of account """
-    try:
-        number = PersonalAccount.objects.order_by('-account_number')[0]
-    except IndexError:
-        return str(1).zfill(11)
-    print(number, print(number.account_number))
-    x = str(int(number) + 1).zfill(11)
-    print(x)
-    return x
+    if not count:
+        try:
+            number = PersonalAccount.objects.order_by('-account_number')[0]
+            return str(int(number.account_number) + 1).zfill(11)
+        except IndexError:
+            return str(1).zfill(11)
+    else:
+        numbers = PersonalAccount.objects.order_by('-account_number')[0]
+        account_list = []
+        for number in range(1, count):
+            account_list.append(str(int(numbers.account_number) + number).zfill(11))
+        return account_list
 
 
 class PersonalAccount(models.Model):
-    account_number = models.IntegerField(default=get_next_account, unique=True)
+    account_number = models.CharField(default=get_next_account, unique=True, max_length=14)
     house = models.ForeignKey("houses.House", on_delete=models.CASCADE, null=True, blank=True)
     section = models.ForeignKey('houses.Section', on_delete=models.SET_NULL, null=True, blank=True)
-    # flat = models.ForeignKey('houses.Flat', on_delete=models.SET_NULL, null=True)
+    flat = models.ForeignKey('houses.Flat', on_delete=models.SET_NULL, null=True)
     status_choice = [('active', "Активен"), ('nonactive', "Неактивен")]
     status = models.CharField(choices=status_choice, null=True, blank=True, max_length=20)
-    balance = models.DecimalField(decimal_places=2, max_digits=10)
-    owner = models.CharField(max_length=128, null=True, blank=True)
-    phone = models.CharField(max_length=50)
+    balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT,null=True, blank=True)
+    # phone = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Персональные счета"

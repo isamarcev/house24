@@ -4,9 +4,12 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, CreateView, DetailView
 from django.contrib import messages
+from psycopg2 import IntegrityError
+
+from crm_accounting.models import get_next_account
 
 from users.models import Role
-from .forms import SectionForm, FloorForm, HouseForm, UserForm
+from .forms import SectionForm, FloorForm, HouseForm, UserForm, FlatForm, PersonalAccountForm
 from .models import *
 
 
@@ -199,11 +202,91 @@ class FlatsListView(ListView):
     template_name = 'houses/flat/flat_list.html'
 
     def get_queryset(self):
-        queryset = self.model.objects.all().select_related('personal_account__section', 'floor', 'owner')
+        queryset = self.model.objects.all().select_related('personal_account__section', 'floor', 'owner').order_by('-id')
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
         context['houses'] = House.objects.all()
         return context
+
+
+class FlatCreate(CreateView):
+    model = Flat
+    form_class = FlatForm
+    template_name = 'houses/flat/flat_form.html'
+    success_url = reverse_lazy('houses:flat_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['label_suffix'] = ''
+        return kwargs
+
+    def get(self, request, *args, **kwargs):
+        print(request, args, kwargs)
+        return super().get(self, request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['account'] = PersonalAccountForm
+        return context
+
+    def post(self, request, *args, **kwargs):
+        print(request.POST)
+        form_class = self.form_class(request.POST)
+        account_form = PersonalAccountForm(request.POST)
+        if form_class.is_valid():
+            form_class.save(commit=False)
+            if account_form.is_valid():
+                account = PersonalAccount.objects.filter(account_number__exact=request.POST['account_number'])
+                if account.exists():
+                    if not account.first().flat:
+                        account.first().flat = form_class.instance
+                        form_class.instance.personal_account = account.first()
+                        messages.success(request, 'Квартира успешно создана')
+                    else:
+                        form_class.save()
+                    return HttpResponseRedirect(reverse_lazy('houses:flat_list'))
+                else:
+                    account_form.save(commit=False)
+                    form_class.save()
+                    if account_form.instance.account_number:
+                        account_form.instance.flat = form_class.instance
+                        account_form.instance.house = form_class.instance.house
+                        account_form.instance.section = form_class.instance.section
+                        account_form.instance.owner = form_class.instance.owner
+                        account_form.save()
+                        form_class.instance.personal_account = account_form.instance
+            form_class.save()
+            messages.success(request, 'Квартира успешно создана')
+            return HttpResponseRedirect(reverse_lazy('houses:flat_list'))
+        else:
+            content = {'form': form_class, 'account': account_form}
+            return render(request, self.template_name, content)
+
+def get_account_list(request):
+    account_list = get_next_account(3)
+    return JsonResponse({'data': account_list})
+
+def get_sections_and_floors(request):
+    house = request.GET.get('house')
+    sections_list = Section.objects.filter(house_id=house)
+    sections = []
+    for i in sections_list:
+        section = {
+            'id': i.id,
+            'title': i.title
+        }
+        sections.append(section)
+    floors_list = Floor.objects.filter(house_id=house)
+    floors = []
+    for i in floors_list:
+        floor = {
+            'id': i.id,
+            'title': i.title
+        }
+        floors.append(floor)
+    return JsonResponse({'sectionist': sections, 'floors': floors})
+
+
 

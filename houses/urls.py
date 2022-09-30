@@ -16,7 +16,10 @@ urlpatterns = [
 
     # flats
     path('flats/', views.FlatsListView.as_view(), name='flat_list'),
-    path('flats/create/', views.FlatsListView.as_view(), name='flat_create'),
+    path('flats/create/', views.FlatCreate.as_view(), name='flat_create'),
+    path('flats/detail/<int:pk>/', views.FlatCreate.as_view(), name='flat_detail'),
+    path('get-account-list/', views.get_account_list, name='get_account_list'),
+    path('get-sections-and-floors/', views.get_sections_and_floors, name='get_section_and_floor'),
     path('flats/detail/<int:pk>/', views.HousesDetail.as_view(), name='flat_detail'),
 
     # path('create/', views.HousesListView.as_view(), name='house_create'),
