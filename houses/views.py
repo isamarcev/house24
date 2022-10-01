@@ -211,6 +211,22 @@ class FlatsListView(ListView):
         return context
 
 
+def create_or_add_next(self, request, form_class):
+    if 'save_and_add' in request.POST:
+        print('render')
+        return render(request, self.template_name, context={'form': self.form_class(
+                                                                initial={'number': (int(form_class.instance.number) + 1),
+                                                                         'area': form_class.instance.area,
+                                                                         'house': form_class.instance.house,
+                                                                         'section': form_class.instance.section,
+                                                                         'floor': form_class.instance.floor,
+                                                                         'tariff': form_class.instance.tariff, }),
+                                                            'account': PersonalAccountForm})
+    else:
+        print(request.POST['save_and_add'])
+        return HttpResponseRedirect(self.success_url)
+
+
 class FlatCreate(CreateView):
     model = Flat
     form_class = FlatForm
@@ -232,8 +248,8 @@ class FlatCreate(CreateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
         form_class = self.form_class(request.POST)
+        print(request.POST)
         account_form = PersonalAccountForm(request.POST)
         if form_class.is_valid():
             form_class.save(commit=False)
@@ -246,7 +262,7 @@ class FlatCreate(CreateView):
                         messages.success(request, 'Квартира успешно создана')
                     else:
                         form_class.save()
-                    return HttpResponseRedirect(reverse_lazy('houses:flat_list'))
+                    return create_or_add_next(self, request, form_class)
                 else:
                     account_form.save(commit=False)
                     form_class.save()
@@ -259,7 +275,7 @@ class FlatCreate(CreateView):
                         form_class.instance.personal_account = account_form.instance
             form_class.save()
             messages.success(request, 'Квартира успешно создана')
-            return HttpResponseRedirect(reverse_lazy('houses:flat_list'))
+            return create_or_add_next(self, request, form_class)
         else:
             content = {'form': form_class, 'account': account_form}
             return render(request, self.template_name, content)
