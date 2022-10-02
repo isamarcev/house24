@@ -92,7 +92,7 @@
                                   </tr>
                                     <tr>
                                             <th>
-                                                <input type="text" id="flat" class="form-control" >
+                                                <input type="text" id="number" class="form-control" >
                                             </th>
                                             <th class="sort">
                                                 <select name="house" id="house" class="form-select">
@@ -124,30 +124,30 @@
                                         </tr>
                                   </thead>
                                   <tbody>
-                                    {% for object in object_list %}
-                                        <tr data-href="{% url 'houses:house_detail' object.id %}" id="instance-{{ object.id }}">
-                                            <td>{{ object.number }}</td>
-                                            <td class="td-height">{{ object.house }}</td>
-                                            <td class="td-height">{{ object.section }}</td>
-                                            <td class="td-height">{{ object.floor }}</td>
-                                            <td class="td-height">{{ object.owner }}</td>
-                                            <td class="td-height">
-                                                {% if object.personal_account  %}
-                                                {{ object.personal_account.balance }}
-                                                {% else %}
-                                                    (Нет счета)
-                                                {% endif %}
-                                            </td>
-                                            <td style="width: 10%">
-                                                <div class="btn-group pull-right" >
-                                                    <a class="btn btn-default btn-sm" href="{% url 'houses:house_update' object.id %}" title="Редактировать" data-toggle="tooltip">
-                                                        <i class="fa fa-pencil"></i></a>
-                                                    <a class="btn btn-default btn-sm btn-delete " id="{{ object.id }}" title="Удалить" data-toggle="tooltip" data-pjax="0" >
-                                                        <i class="fa fa-trash " ></i></a>
-                                                </div>
-                                            </td>
+{#                                    {% for object in object_list %}#}
+{#                                        <tr data-href="{% url 'houses:house_detail' object.id %}" id="instance-{{ object.id }}">#}
+{#                                            <td>{{ object.number }}</td>#}
+{#                                            <td class="td-height">{{ object.house }}</td>#}
+{#                                            <td class="td-height">{{ object.section }}</td>#}
+{#                                            <td class="td-height">{{ object.floor }}</td>#}
+{#                                            <td class="td-height">{{ object.owner }}</td>#}
+{#                                            <td class="td-height">#}
+{#                                                {% if object.personal_account  %}#}
+{#                                                {{ object.personal_account.balance }}#}
+{#                                                {% else %}#}
+{#                                                    (Нет счета)#}
+{#                                                {% endif %}#}
+{#                                            </td>#}
+{#                                            <td style="width: 10%">#}
+{#                                                <div class="btn-group pull-right" >#}
+{#                                                    <a class="btn btn-default btn-sm" href="{% url 'houses:house_update' object.id %}" title="Редактировать" data-toggle="tooltip">#}
+{#                                                        <i class="fa fa-pencil"></i></a>#}
+{#                                                    <a class="btn btn-default btn-sm btn-delete " id="{{ object.id }}" title="Удалить" data-toggle="tooltip" data-pjax="0" >#}
+{#                                                        <i class="fa fa-trash " ></i></a>#}
+{#                                                </div>#}
+{#                                            </td>#}
                                         </tr>
-                                    {% endfor %}
+{#                                    {% endfor %}#}
                                   </tbody>
                         </table>
 
@@ -167,28 +167,87 @@
 
     <script>
         $(document).ready( function CreateTable() {
-        $('#flats').DataTable(
+        var table = $('#flats').DataTable(
             {
-
                 "order": [],
-                "bInfo": false,
+                {#"bInfo": false,#}
                 "bSortCellsTop": true,
-                "bPaginate": false,
-                dom: 't',
+                {#"bPaginate": false,#}
+                "bFilter": false,
+                 "iDisplayLength": 25,
+                "lengthChange": false,
+                {#dom: 'lrt',#}
+
+                {#dom: 't',#}
                 "language": {
-                    "zeroRecords": "Ничего не найдено"
+                    "zeroRecords": "Ничего не найдено",
+                    "info": "Количество квартир:  _MAX_"
                   },
                 "aoColumnDefs": [
-                    { 'bSortable': false, 'targets': [5, 6] }
-                    ]
+                    { 'bSortable': false, 'targets': [5, 6, ] },
+                    {'targets': 5, createdCell:function (td, cellData, rowData, row, col) {
+                        if (parseFloat(td) < 0) {
+                            $(td).css('color', 'red');
+                        } else if ((parseFloat(rowData[5]) > 0)){
+                            $(td).css('color', '#00a65a');
+                        }
+                        }}
+                    ],
+                processing: true,
+                serverSide: true,
+                sAjaxSource: "{% url 'houses:get_ajax' %}",
+                columns: [
+                    {name: "number", data: 0},
+                    {name: "house", data: 1},
+                    {name: "section", data: 2},
+                    {name: "floor", data: 3},
+                    {name: "owner", data: 4},
+                    {name: "personal_account", data: null, render: function (data, type, row){
+                            {#console.log(data[5])#}
+                            if (row[5]) {
+                                this.data = row[5]
+                            } else {
+                                this.data = "(Нет счета)"
+                            }
+                            {#console.log(data)#}
+                            {#console.log(row[5])#}
+                            return this.data
+                        }
+                    },
+                    {name: 'link', data: null, render: function (data, type, row){
+                        var url = 'admin/flats/detail/'
+                            {#console.log(data)#}
+                            {#console.log(row)#}
+                            {#console.log(this)#}
+                            {#console.log(($(this).parents('tr')))#}
+                            return '<div class="btn-group pull-right" >'+
+                                                    '<a class="btn btn-default btn-sm" href="'+url+'/'+row[6]+'" title="Редактировать" data-toggle="tooltip">'+
+                                                        '<i class="fa fa-pencil"></i></a>'+
+                                                    '<a class="btn btn-default btn-sm btn-delete " id="'+row[6]+'" title="Удалить" data-toggle="tooltip" data-pjax="0" >'+
+                                                        '<i class="fa fa-trash " ></i></a></div>'
+                        }}
+                        {#    function (data, type, row) {#}
+                        {#    return console.log(data)#}
+                            {#console.log(row)#}
+                    {#{}#}
+                ],
+                "createdRow": function( row, data, dataIndex ) {
+                    var url = 'admin/flats/detail/'+data[6]
+                    {#console.log(row)#}
+                    {#console.log(data)#}
+                    {#console.log(dataIndex)#}
+                    $(row).attr( 'data-gref', url );
+                    $(row).on("click", function() {
+                        document.location = $(this).data('href');
+                        });
             }
-        );
-        {#$('#house').on('keyup click', function () {#}
-        {#    table.columns([1]).search($(this).val()).draw();#}
-        {#d } );#}
-        {#$('#address').on('keyup click', function () {#}
-        {#    table.columns([2]).search($(this).val()).draw();#}
-        {#3 })#}
+            });
+        $('#house').on('keyup click', function () {
+            table.columns([1]).search($(this).val()).draw();
+        } );
+        $('#number').on('keyup click', function () {
+            table.columns([0]).search($(this).val()).draw();
+        })
     } );
     </script>
     <!-- AJAX -->

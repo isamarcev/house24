@@ -69,8 +69,6 @@ class FlatForm(forms.ModelForm):
         }
 
 
-
-
 class PersonalAccountForm(forms.ModelForm):
     account_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
                                      label='Лицевой счет', required=False)
@@ -81,8 +79,6 @@ class PersonalAccountForm(forms.ModelForm):
 
     def clean_account_number(self):
         account = self.cleaned_data.get('account_number')
-        if account == '':
-            return account
         if not account.isdigit():
             raise ValidationError(
                 "Лицевой счет должен состоять из цифр."

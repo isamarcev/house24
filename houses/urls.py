@@ -22,6 +22,8 @@ urlpatterns = [
     path('get-sections-and-floors/', views.get_sections_and_floors, name='get_section_and_floor'),
     path('flats/detail/<int:pk>/', views.HousesDetail.as_view(), name='flat_detail'),
 
+    path('ajax-data-table/', views.FlatsListViewAjax.as_view(), name='get_ajax'),
+
     # path('create/', views.HousesListView.as_view(), name='house_create'),
 
     # path('about-us/', views.about, name='about'),

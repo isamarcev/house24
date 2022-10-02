@@ -4,6 +4,8 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, CreateView, DetailView
 from django.contrib import messages
+from django_datatables_view.base_datatable_view import BaseDatatableView
+from django_serverside_datatable.views import ServerSideDatatableView
 from psycopg2 import IntegrityError
 
 from crm_accounting.models import get_next_account
@@ -211,19 +213,23 @@ class FlatsListView(ListView):
         return context
 
 
+class FlatsListViewAjax(BaseDatatableView):
+    model = Flat
+    columns = ['number', 'house', 'section', 'floor', 'owner', 'personal_account.balance', 'id']
+    order_columns = ['number', 'house', 'section', 'floor', 'owner', 'personal_account', 'id']
+
+
+def ajax_server_side(request):
+    print(request)
+    print(request.GET)
+    return JsonResponse({'success': 'success'})
+
+
 def create_or_add_next(self, request, form_class):
-    if 'save_and_add' in request.POST:
-        print('render')
-        return render(request, self.template_name, context={'form': self.form_class(
-                                                                initial={'number': (int(form_class.instance.number) + 1),
-                                                                         'area': form_class.instance.area,
-                                                                         'house': form_class.instance.house,
-                                                                         'section': form_class.instance.section,
-                                                                         'floor': form_class.instance.floor,
-                                                                         'tariff': form_class.instance.tariff, }),
-                                                            'account': PersonalAccountForm})
+    if 'save_and_add' in request.POST.keys():
+        address = f'{self.success_url}create/?flat_id={form_class.instance.id}'
+        return HttpResponseRedirect(address)
     else:
-        print(request.POST['save_and_add'])
         return HttpResponseRedirect(self.success_url)
 
 
@@ -239,7 +245,16 @@ class FlatCreate(CreateView):
         return kwargs
 
     def get(self, request, *args, **kwargs):
-        print(request, args, kwargs)
+        flat_id = request.GET.get('flat_id')
+        if flat_id:
+            flat = Flat.objects.get(id=flat_id)
+            self.initial = {
+                'number': flat.number+1,
+                'area': flat.area,
+                'house': flat.house,
+                'tariff': flat.tariff,
+
+            }
         return super().get(self, request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -249,7 +264,6 @@ class FlatCreate(CreateView):
 
     def post(self, request, *args, **kwargs):
         form_class = self.form_class(request.POST)
-        print(request.POST)
         account_form = PersonalAccountForm(request.POST)
         if form_class.is_valid():
             form_class.save(commit=False)
@@ -283,6 +297,8 @@ class FlatCreate(CreateView):
 def get_account_list(request):
     account_list = get_next_account(3)
     return JsonResponse({'data': account_list})
+
+
 
 def get_sections_and_floors(request):
     house = request.GET.get('house')
