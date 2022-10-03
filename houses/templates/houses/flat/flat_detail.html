@@ -1,0 +1,145 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    {{ object.title }}
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">{{ object.title }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'houses:house_list' %}" style="color: #444; text-decoration: none"> <span style="color: #ccc; margin-right: 5px" >></span> Дома </a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> {{ object.title }} </li>
+
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                <div class="box-header" style="position: relative; height: 42px">
+                        <a class="btn btn-tariff" href="{% url 'houses:house_update' object.id %}" style="height: 30px; position: absolute; top: 5px; right: 8px;">Редактировать дом</a>
+                    </a>
+                </div>
+                    <div class="box-body row">
+                    <div class="col-sm-12 col-lg-4">
+                        <table class="table table-bordered table-striped table-view" >
+                    <tbody>
+                        <tr>
+                            <td class="user-label">Название</td>
+                            <td>{{ object.title }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Адресс</td>
+                            <td>{{ object.address }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Секций</td>
+                            {% if object.section_set %}
+                                <td>{{ object.section_set.count }}</td>
+                                {% else %}
+                                <td></td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="user-label">Этажей</td>
+                            <td>
+                                {% if object.floor_set %}
+                                    {{ object.floor_set.count }}
+                                {% else %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Пользователи</td>
+                            <td>
+                                {% if users %}
+                                    {% for user in users %}
+                                        <p>
+                                            <strong>
+                                                {{ user.role.name }}:
+                                            </strong>
+                                            <a href="{% url 'users:user_detail' user.id %}">{{ user.first_name }} {{ user.last_name }}</a>
+                                        </p>
+                                    {% endfor %}
+                                    {% else %}
+                                    <p>Пользователей нет</p>
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                    </div>
+
+                    <!-- IMAGES PREVIEW -->
+                        <div class="col-xs-12 col-lg-8">
+                            <div class="row">
+                                <div class="col-xs-12 col-md-6">
+                                    {% if object.image_1 %}
+                                        <img src="{{ object.image_1.url }}" class="largeImg" alt="">
+                                    {% else %}
+                                        <img src="{% static 'content/img/empty.jpeg' %}" class="largeImg" alt="">
+                                    {% endif %}
+                                </div>
+                                <div class="col-xs-12 col-md-6">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if object.image_2 %}
+                                                <img src="{{ object.image_2.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if object.image_3 %}
+                                                <img src="{{ object.image_3.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if object.image_4 %}
+                                                <img src="{{ object.image_4.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if object.image_5 %}
+                                                <img src="{{ object.image_5.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- END IMAGES PREVIEW -->
+
+
+        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+        <script src="{% static 'houses/js/houses.js' %}"></script>
+{% endblock %}

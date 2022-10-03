@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.forms import modelformset_factory, inlineformset_factory, formset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -202,14 +203,12 @@ def get_role(request):
 class FlatsListView(ListView):
     model = Flat
     template_name = 'houses/flat/flat_list.html'
-
-    def get_queryset(self):
-        queryset = self.model.objects.all().select_related('personal_account__section', 'floor', 'owner').order_by('-id')
-        return queryset
+    queryset = None
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data()
+        context = dict()
         context['houses'] = House.objects.all()
+        context['owner'] = CustomUser.objects.all()
         return context
 
 
@@ -217,6 +216,36 @@ class FlatsListViewAjax(BaseDatatableView):
     model = Flat
     columns = ['number', 'house', 'section', 'floor', 'owner', 'personal_account.balance', 'id']
     order_columns = ['number', 'house', 'section', 'floor', 'owner', 'personal_account', 'id']
+
+
+    def get_initial_queryset(self):
+        return self.model.objects.all().select_related('floor', 'section', 'house', 'owner', 'personal_account')
+
+
+    def filter_queryset(self, qs):
+        number = self.request.GET.get('number')
+        house = self.request.GET.get('house')
+        section = self.request.GET.get('section')
+        floor = self.request.GET.get('floor')
+        owner = self.request.GET.get('owner')
+        dolg = self.request.GET.get('dolg')
+        if number:
+            qs = qs.filter(number__icontains=number)
+        if house:
+            qs = qs.filter(house=house)
+        if section:
+            qs = qs.filter(section=section)
+        if floor:
+            qs = qs.filter(floor=floor)
+        if owner:
+            qs = qs.filter(owner=owner)
+        if dolg:
+            if dolg == 'false':
+                qs = qs.filter(personal_account__balance__gte=0)
+            elif dolg == 'true':
+                qs = qs.filter(personal_account__balance__lt=0)
+        return qs
+
 
 
 def ajax_server_side(request):
