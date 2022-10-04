@@ -17,11 +17,12 @@ urlpatterns = [
     # flats
     path('flats/', views.FlatsListView.as_view(), name='flat_list'),
     path('flats/create/', views.FlatCreate.as_view(), name='flat_create'),
-    path('flats/detail/<int:pk>/', views.FlatCreate.as_view(), name='flat_detail'),
+    path('flats/detail/<int:pk>/', views.FlatDetailView.as_view(), name='flat_detail'),
+    path('flats/update/<int:pk>/', views.FlatUpdateView.as_view(), name='flat_update'),
     path('get-account-list/', views.get_account_list, name='get_account_list'),
     path('get-sections-and-floors/', views.get_sections_and_floors, name='get_section_and_floor'),
     path('flats/detail/<int:pk>/', views.HousesDetail.as_view(), name='flat_detail'),
-
+    path('flats/delete/', views.delete_flat, name="delete_flat"),
     path('ajax-data-table/', views.FlatsListViewAjax.as_view(), name='get_ajax'),
 
     # path('create/', views.HousesListView.as_view(), name='house_create'),

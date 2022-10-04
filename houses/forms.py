@@ -49,12 +49,13 @@ class UserForm(forms.ModelForm):
 class FlatForm(forms.ModelForm):
     house = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='Выберите...',
                                    widget=forms.Select(attrs={'class': 'form-select'}), label='Дом')
-    owner = forms.ModelChoiceField(queryset=CustomUser.objects.all(), empty_label='Выберите...',
+    owner = forms.ModelChoiceField(queryset=CustomUser.objects.filter(role=None), empty_label='Выберите...',
                                    widget=forms.Select(attrs={'class': 'form-select'}), label='Владелец')
     tariff = forms.ModelChoiceField(queryset=Tariff.objects.all(), empty_label='Выберите...',
                                    widget=forms.Select(attrs={'class': 'form-select'}), label='Тариф')
 
     class Meta:
+
         model = Flat
         fields = ['number', 'area', 'house', 'section', 'floor', 'owner', 'tariff']
         labels = {
@@ -80,9 +81,12 @@ class PersonalAccountForm(forms.ModelForm):
     def clean_account_number(self):
         account = self.cleaned_data.get('account_number')
         if not account.isdigit():
-            raise ValidationError(
-                "Лицевой счет должен состоять из цифр."
-            )
+            if account == '':
+                pass
+            else:
+                raise ValidationError(
+                    "Лицевой счет должен состоять из цифр."
+                )
         return account
 
 

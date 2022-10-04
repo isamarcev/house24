@@ -1,7 +1,7 @@
 {% extends 'houses/layout/base_houses.html' %}
 {% load static %}
 {% block title %}
-    {{ object.title }}
+    Квартира №{{ object.number }}, {{ object.house }}
 {% endblock %}
 {% block css %}
 
@@ -13,15 +13,14 @@
 {% endblock %}
 {% block content %}
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
-        <h1 style="color: #444; font-size: 24px">{{ object.title }}
+        <h1 style="color: #444; font-size: 24px">Квартира №{{ object.number }}, {{ object.house }}
         </h1>
         <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
         margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
         top: 15px!important; right: 15px!important; border-radius: 2px!important;">
             <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
-            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'houses:house_list' %}" style="color: #444; text-decoration: none"> <span style="color: #ccc; margin-right: 5px" >></span> Дома </a></li>
-            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> {{ object.title }} </li>
-
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'houses:flat_list' %}" style="color: #444; text-decoration: none"> <span style="color: #ccc; margin-right: 5px" >></span> Квартиры </a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Квартира №{{ object.number }}, {{ object.house }} </li>
         </ul>
     </section>
     <!-- content -->
@@ -31,108 +30,85 @@
             <div class="col-sm-12">
                 <div class="box">
                 <div class="box-header" style="position: relative; height: 42px">
-                        <a class="btn btn-tariff" href="{% url 'houses:house_update' object.id %}" style="height: 30px; position: absolute; top: 5px; right: 8px;">Редактировать дом</a>
-                    </a>
+                    <h3 class="box-title">Просмотр квартиры</h3>
+                    <div class="box-tools">
+                            <a style="height: 31px" href="{% url 'crm_accounting:transaction_account_create' %}?flat_id={{ object.id }}" class="btn btn-default btn-sm">
+                    <span class="hidden-xs"><i class="fa fa-dollar"></i> Принять платеж</span>
+                </a>
+                <a style="height: 31px" href="{% url 'crm_accounting:create_invoice_for_flat' %}?flat_id={{ object.id }}" class="btn btn-default btn-sm">
+                    <span class="hidden-xs"><i class="fa fa-files-o"></i> Оформить квитанцию</span>
+                </a>
+                        <a href="{% url 'houses:flat_update' object.id %}" class="btn btn-tariff btn-sm">
+                <span class="hidden-xs">Редактировать квартиру</span>
+            </a>
+        </div>
                 </div>
                     <div class="box-body row">
-                    <div class="col-sm-12 col-lg-4">
+                    <div class="col-sm-12 col-lg-12">
                         <table class="table table-bordered table-striped table-view" >
                     <tbody>
                         <tr>
-                            <td class="user-label">Название</td>
-                            <td>{{ object.title }}</td>
-                        </tr>
-                        <tr>
-                            <td class="user-label">Адресс</td>
-                            <td>{{ object.address }}</td>
-                        </tr>
-                        <tr>
-                            <td class="user-label">Секций</td>
-                            {% if object.section_set %}
-                                <td>{{ object.section_set.count }}</td>
-                                {% else %}
-                                <td></td>
+                            <td class="user-label">Лицевой счет</td>
+                            {% if object.personal_account %}
+                                <td>
+                                    <a class="link-list" href="{% url 'crm_accounting:account_detail' object.personal_account.id %}">
+                                        {{ object.personal_account }}
+                                    </a>
+                                </td>
+                            {% else %}
+                                <td>Не указано</td>
                             {% endif %}
                         </tr>
                         <tr>
-                            <td class="user-label">Этажей</td>
-                            <td>
-                                {% if object.floor_set %}
-                                    {{ object.floor_set.count }}
+                            <td class="user-label">Номер квартиры</td>
+                            <td>{{ object.number }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Площадь</td>
+                            {% if object.area %}
+                                <td>{{ object.area }}м<sup>2</sup></td>
                                 {% else %}
-                                {% endif %}
+                                <td>Не указано</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="user-label">Дом</td>
+                            <td><a class="link-list" href="{% url 'houses:house_detail' object.house.id %}">{{ object.house }}</a></td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Секция</td>
+                            <td>{{ object.section }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Этаж</td>
+                            <td>
+                                {{ object.floor }}
                             </td>
                         </tr>
                         <tr>
-                            <td class="user-label">Пользователи</td>
+                            <td class="user-label">Владелец</td>
                             <td>
-                                {% if users %}
-                                    {% for user in users %}
-                                        <p>
-                                            <strong>
-                                                {{ user.role.name }}:
-                                            </strong>
-                                            <a href="{% url 'users:user_detail' user.id %}">{{ user.first_name }} {{ user.last_name }}</a>
-                                        </p>
-                                    {% endfor %}
+                                <a class="link-list" href="{% url 'users:owner_detail' object.owner.id %}">{{ object.owner }}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Тариф</td>
+                            <td>
+                                {% if object.tariff %}
+                                    {{ object.tariff }}
                                     {% else %}
-                                    <p>Пользователей нет</p>
+                                    Не указано
                                 {% endif %}
-
                             </td>
                         </tr>
                     </tbody>
                 </table>
+                    <div>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:counter_data' object.id %}">Посмотреть показания счетчиков</a></p>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:transaction_account_detail' %}/?account={{ object.personal_account.id }}">Посмотреть приходы</a></p>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:invoices_for_flat' object.id %}">Посмотреть квитанции</a></p>
+                </div>
                     </div>
-
-                    <!-- IMAGES PREVIEW -->
-                        <div class="col-xs-12 col-lg-8">
-                            <div class="row">
-                                <div class="col-xs-12 col-md-6">
-                                    {% if object.image_1 %}
-                                        <img src="{{ object.image_1.url }}" class="largeImg" alt="">
-                                    {% else %}
-                                        <img src="{% static 'content/img/empty.jpeg' %}" class="largeImg" alt="">
-                                    {% endif %}
-                                </div>
-                                <div class="col-xs-12 col-md-6">
-                                    <div class="row">
-                                        <div class="col-xs-12 col-md-6 ">
-                                            {% if object.image_2 %}
-                                                <img src="{{ object.image_2.url }}" class="smallImg" alt="">
-                                            {% else %}
-                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-xs-12 col-md-6 ">
-                                            {% if object.image_3 %}
-                                                <img src="{{ object.image_3.url }}" class="smallImg" alt="">
-                                            {% else %}
-                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-xs-12 col-md-6 ">
-                                            {% if object.image_4 %}
-                                                <img src="{{ object.image_4.url }}" class="smallImg" alt="">
-                                            {% else %}
-                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-xs-12 col-md-6 ">
-                                            {% if object.image_5 %}
-                                                <img src="{{ object.image_5.url }}" class="smallImg" alt="">
-                                            {% else %}
-                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <!-- END IMAGES PREVIEW -->
-
-
         </div>
                     </div>
                 </div>
@@ -141,5 +117,4 @@
     </section>
 {% endblock %}
 {% block script %}
-        <script src="{% static 'houses/js/houses.js' %}"></script>
 {% endblock %}

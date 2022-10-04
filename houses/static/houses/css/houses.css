@@ -191,3 +191,9 @@ table.dataTable tbody tr:hover {
     color: #fff;
     border-color: #367fa9;
 }
+
+.box-header>.box-tools {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+}

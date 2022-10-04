@@ -149,3 +149,15 @@ form h3 {
 #form_set a {
     cursor: pointer!important;
 }
+
+
+.link-list {
+    color: #3c8dbc;
+    text-decoration: none;
+}
+
+.link-list:hover, .link-list:active, .link-list:focus {
+    outline: none;
+    text-decoration: none;
+    color: #72afd2;
+}

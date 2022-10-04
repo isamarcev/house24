@@ -143,9 +143,11 @@
                                         </a>
                                     </td>
                                     <td>
+                                        {% if flat.personal_account %}
                                         <a href="{% url 'crm_accounting:account_detail' flat.personal_account.id %}">
                                             {{ flat.personal_account }}
                                         </a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}

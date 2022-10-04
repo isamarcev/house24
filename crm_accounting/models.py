@@ -24,11 +24,11 @@ class PersonalAccount(models.Model):
     account_number = models.CharField(default=get_next_account, unique=True, max_length=14)
     house = models.ForeignKey("houses.House", on_delete=models.CASCADE, null=True, blank=True)
     section = models.ForeignKey('houses.Section', on_delete=models.SET_NULL, null=True, blank=True)
-    flat = models.ForeignKey('houses.Flat', on_delete=models.SET_NULL, null=True)
+    flat = models.ForeignKey('houses.Flat', on_delete=models.SET_NULL, null=True, blank=True)
     status_choice = [('active', "Активен"), ('nonactive', "Неактивен")]
     status = models.CharField(choices=status_choice, null=True, blank=True, max_length=20)
     balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
-    owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT,null=True, blank=True)
+    # owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT, null=True, blank=True)
     # phone = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:

@@ -56,14 +56,15 @@
 
     <!-- content -->
     <section class="content content-custom" >
+    {% csrf_token %}
         <div class="row">
             <div class="col-sm-12">
                 <div class="box">
-                <div class="box-header" style="text-align: right;">
+                <div class="box-header" style="text-align: right; height: 45px">
                     <div class="box-tools" >
-                    <a id="reset" class="btn btn-default">
+                    <button  type="button" id="reset" class="btn btn-default">
                         <span class="hidden-xs">Очистить</span>
-                    </a>
+                    </button>
                 </div>
                 </div>
                     <div class="box-body" style="padding: 0">
@@ -152,6 +153,34 @@
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
     <script>
+        function delete_flat(event, elem) {
+            const result = confirm('Вы уверены, что хотите удалить этоу квартиру?')
+            if (result) {
+                var csrf = $("input[name=csrfmiddlewaretoken]").val();
+                let qwer = elem.closest('tr[data-href]')
+                qwer.removeAttribute('data-href')
+                $.ajax({
+                    url: '{% url 'houses:delete_flat' %}',
+                    type: 'post',
+                    data: {
+                        'flat': elem.id,
+                        csrfmiddlewaretoken: csrf,
+                    },
+                    success: (data) => {
+                        if (data.success === 'success') {
+                            $('#reset').click()
+                        }
+                    },
+                    errors: (errors) => {
+                    console.log(errors)
+                }
+            })}
+            event.stopPropagation()
+
+        }
+    </script>
+
+    <script>
         $(document).ready( function CreateTable() {
         var table = $('#flats').DataTable(
             {
@@ -212,38 +241,38 @@
                         }
                     },
                     {name: 'link', data: null, render: function (data, type, row){
-                        var url = 'admin/flats/detail/'
+                        var url = 'update'
                             return '<div class="btn-group pull-right" >'+
-                                                    '<a class="btn btn-default btn-sm" href="'+url+'/'+row[6]+'" title="Редактировать" data-toggle="tooltip">'+
-                                                        '<i class="fa fa-pencil"></i></a>'+
-                                                    '<a class="btn btn-default btn-sm btn-delete " id="'+row[6]+'" title="Удалить" data-toggle="tooltip" data-pjax="0" >'+
-                                                        '<i class="fa fa-trash " ></i></a></div>'
+                                '<a class="btn btn-default btn-sm" href="'+url+'/'+row[6]+'" title="Редактировать">'+
+                                '<i class="fa fa-pencil"></i></a>'+
+                                '<a class="btn btn-default btn-sm btn-delete" onclick="delete_flat(event, this)" id="'+row[6]+'" title="Удалить">'+
+                                '<i class="fa fa-trash " ></i></a></div>'
                         }}
                 ],
                 "createdRow": function( row, data, dataIndex ) {
-                    var url = 'admin/flats/detail/'+data[6]
-                    $(row).attr( 'data-gref', url );
+                    var url = 'detail/'+data[6]
+                    $(row).attr( 'data-href', url );
                     $(row).on("click", function() {
                         document.location = $(this).data('href');
                         });
             }
             });
-        $('#house').on('keyup click', function () {
+        $('#house').on('blur click', function () {
             table.columns(1).search($(this).val()).draw();
         } );
-        $('#number').on('keyup clear', function () {
+        $('#number').on('blur clear', function () {
             table.columns([0]).search($(this).val()).draw();
         });
-        $('#section').on('keyup change clear', function () {
+        $('#section').on('change clear', function () {
             table.columns([2]).search($(this).val()).draw();
         });
-        $('#floor').on('keyup change clear', function () {
+        $('#floor').on('change clear', function () {
             table.columns([3]).search($(this).val()).draw();
         });
-        $('#owner').on('keyup change clear', function () {
+        $('#owner').on('change clear', function () {
             table.columns([4]).search($(this).val()).draw();
         });
-        $('#dolg').on('keyup change clear', function () {
+        $('#dolg').on('change clear', function () {
             table.columns([5]).search($(this).val()).draw();
         });
     } );
@@ -251,7 +280,9 @@
     <!-- AJAX -->
     <script>
         function delete_house(id) {
-            $.ajax({
+            const result = confirm('Вы уверены, что хотите удалить этоу квартиру?')
+            if (result) {
+                $.ajax({
                 url:`{% url 'houses:delete_house' %}`,
                 type: 'get',
                 data: {'id': id},
@@ -265,11 +296,12 @@
                 }
             })
         }
+            }
+
     </script>
     <script>
         function ajax_section (){
             const house = ($(this).val())
-            console.log(house)
             if (house) {
                 $.ajax({
                 url: '{% url 'houses:get_section_and_floor' %}',
@@ -278,10 +310,6 @@
                     'house': house,
                 },
                 success: (data) => {
-                    console.log(data)
-                    console.log(data.sectionist)
-                    console.log(data.floors)
-
                     var id_sections = $('#section');
                     var id_floor = $('#floor');
                     var sections = '';
@@ -313,7 +341,7 @@
         $('.odd').css('background-color', '#f9f9f9')
     })
     </script>
-            <script src="{% static 'houses/js/houses.js' %}"></script>
+            <script src="{% static 'houses/js/flats.js' %}"></script>
     <style>
         .sorting {
             padding: 8px!important;

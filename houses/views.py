@@ -217,10 +217,8 @@ class FlatsListViewAjax(BaseDatatableView):
     columns = ['number', 'house', 'section', 'floor', 'owner', 'personal_account.balance', 'id']
     order_columns = ['number', 'house', 'section', 'floor', 'owner', 'personal_account', 'id']
 
-
     def get_initial_queryset(self):
         return self.model.objects.all().select_related('floor', 'section', 'house', 'owner', 'personal_account')
-
 
     def filter_queryset(self, qs):
         number = self.request.GET.get('number')
@@ -247,11 +245,79 @@ class FlatsListViewAjax(BaseDatatableView):
         return qs
 
 
+def delete_flat(request):
+    if request.POST:
+        flat = request.POST.get('flat')
+        instance = Flat.objects.get(pk=flat)
+        instance.delete()
+        return JsonResponse({'success': 'success'}, status=200)
 
-def ajax_server_side(request):
-    print(request)
-    print(request.GET)
-    return JsonResponse({'success': 'success'})
+
+class FlatDetailView(DetailView):
+    model = Flat
+    template_name = 'houses/flat/flat_detail.html'
+
+
+class FlatUpdateView(UpdateView):
+    model = Flat
+    form_class = FlatForm
+    template_name = 'houses/flat/flat_update_form.html'
+    success_url = reverse_lazy('houses:flat_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['label_suffix'] = ''
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['account'] = PersonalAccountForm(instance=self.object.personal_account)
+        context['sections'] = Section.objects.filter(flat=self.object)
+        context['floors'] = Floor.objects.filter(flat=self.object)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        flat = self.get_object()
+        form_class = self.form_class(request.POST or None, instance=flat)
+        account_form = PersonalAccountForm(request.POST or None, instance=flat.personal_account)
+        print(account_form.is_valid(), account_form.errors)
+        print(form_class.is_valid(), form_class.errors)
+        if form_class.is_valid():
+            form_class.save(commit=False)
+            if account_form.is_valid():
+                account = PersonalAccount.objects.filter(account_number__exact=request.POST['account_number'])
+                if account.exists():
+                    if not account.first().flat:
+                        account.first().flat = form_class.instance
+                        form_class.instance.personal_account = account.first()
+                        messages.success(request, 'Квартира успешно изменена')
+                    else:
+                        form_class.save()
+                    return create_or_add_next(self, request, form_class)
+                else:
+                    account_form.save(commit=False)
+                    form_class.save()
+                    # print(account_form.instance.account_number)
+                    # print(account_form.account_number)
+                    if account_form.instance.account_number:
+                        account_form.instance.flat = form_class.instance
+                        account_form.instance.house = form_class.instance.house
+                        account_form.instance.section = form_class.instance.section
+                        account_form.instance.owner = form_class.instance.owner
+                        account_form.save()
+                        form_class.instance.personal_account = account_form.instance
+                    else:
+                        form_class.instance.personal_account = None
+                        account_form.instance.flat = None
+                        account_form.instance.house = None
+                        account_form.instance.section = None
+                        account_form.instance.owner = None
+            form_class.save()
+            messages.success(request, 'Квартира успешно изменена')
+            return create_or_add_next(self, request, form_class)
+        else:
+            content = {'form': form_class, 'account': account_form}
+            return render(request, self.template_name, content)
 
 
 def create_or_add_next(self, request, form_class):
