@@ -56,7 +56,7 @@ class Flat(models.Model):
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True, blank=True,)
     owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT, null=True, blank=True,)
     tariff = models.ForeignKey(Tariff, on_delete=models.PROTECT, null=True, blank=True,)
-    personal_account = models.OneToOneField(PersonalAccount, on_delete=models.CASCADE, related_name='account_flat',
+    personal_account = models.OneToOneField(PersonalAccount, on_delete=models.SET_NULL, related_name='account_flat',
                                             null=True, blank=True)
 
     class Meta:

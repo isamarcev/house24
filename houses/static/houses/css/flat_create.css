@@ -101,14 +101,14 @@
 
 
 
-.label-success {
-    background-color: #00a65a!important;
-    color: white;
-    padding: 5px;
-    font-size: 11px;
-    border-radius: 3px;
-    font-weight: 700;
-}
+    .label-success {
+        background-color: #00a65a!important;
+        color: white;
+        padding: 5px;
+        font-size: 11px;
+        border-radius: 3px;
+        font-weight: 700;
+    }
 
 .label-warning {
     background-color: #f39c12 !important;

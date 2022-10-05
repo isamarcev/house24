@@ -13,8 +13,10 @@ urlpatterns = [
     path('account/counter/detail/<int:pk>/', views.main_page, name='counter_data'),
 
     # transaction приходная ведомость
-    path('account/', views.AccountCreateView.as_view(), name='account_list'),
+    path('account/', views.AccountListView.as_view(), name='account_list'),
+    path('account/get-ajax-list/', views.AccountListViewAjax.as_view(), name='get_account_ajax_list'),
     path('account/create/', views.AccountCreateView.as_view(), name='account_create'),
+    path('account/delete/', views.DeletePersonalAccount.as_view(), name='delete_account'),
     path('get-flats/', views.get_flats, name='get_flats'),
     path('get-users/', views.get_users, name='get_users'),
     path('account/transaction/', views.main_page, name='transaction_account_detail'),

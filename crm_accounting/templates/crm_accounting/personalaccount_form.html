@@ -38,6 +38,13 @@
                         </div>
                         {{ form.account_number }}
                     </div>
+                    <div class="errorlist">
+                        {% if form.errors.account_number %}
+                            {% for field in form.errors.account_number %}
+                                {{ field }}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,6 +76,13 @@
                                         <select name="flat" id="id_flat" class="form-select">
                                             <option value="">Выберите...</option>
                                         </select>
+                                        <div class="errorlist">
+                                            {% if form.errors.flat %}
+                                                {% for field in form.errors.flat %}
+                                                    {{ field }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                     <p style="font-size: 14px">
                                         <b>Владелец:</b> <span id="user-fullname">Не выбран</span>
@@ -104,7 +118,6 @@
     <script>
         function ajax_owner() {
             const flat = ($('#id_flat').val());
-            console.log(flat)
             var empty_value = 'Не выбран'
             if (flat) {
                 $.ajax({
@@ -114,8 +127,7 @@
                         'flat': flat
                     },
                     success: (data) => {
-                        console.log(data)
-                        if (data.owner.length === 0) {
+                        if ($.isEmptyObject(data.owner)) {
                             $('#user-fullname').empty().append(empty_value)
                             $('#user-phone').empty().append(empty_value)
                         } else {
@@ -126,7 +138,6 @@
                                     '<a class="link-list" id="'+data.owner.name+ '_'+ data.owner.id+'">'+ data.owner.name +'</a>'
                                 )
                                 $(`#user-fullname a`).attr('href', `${location}/users/owner/detail/${data.owner.id}/`)
-                                console.log($(`#user-fullname a`))
                             } else {
                                 $('#user-fullname').empty().append(empty_value)
                             }
@@ -147,7 +158,6 @@
         function ajax_flat () {
             const section = ($('#id_section').val());
             var empty_value = '<option value="">Выберите...</option>'
-            console.log(section)
             if (section) {
                 $.ajax({
                     url: '{% url 'crm_accounting:get_flats' %}',
@@ -156,7 +166,6 @@
                         'section': section,
                     },
                     success: (data) => {
-                        console.log(data)
                         var id_flats = $('#id_flat')
                         id_flats.empty()
                         id_flats.append(empty_value)
@@ -178,10 +187,9 @@
 
     <script>
         function ajax_section (){
-            const house = ($(this).val())
+            const house = ($("#id_house").val())
             var empty_value = '<option value="">Выберите...</option>'
 
-            console.log(house)
             if (house) {
                 $.ajax({
                 url: '{% url 'houses:get_section_and_floor' %}',
@@ -213,6 +221,14 @@
         $('#id_house').on('change', ajax_section)
         $('#id_section').on('change', ajax_flat)
         $('#id_flat').on('change', ajax_owner)
+    </script>
+
+    <script>
+            window.onload =  function () {
+                ajax_section()
+                ajax_flat()
+                ajax_owner()
+            }
     </script>
 
 

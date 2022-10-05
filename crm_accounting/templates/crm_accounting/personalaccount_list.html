@@ -1,7 +1,7 @@
 {% extends 'houses/layout/base_houses.html' %}
 {% load static %}
 {% block title %}
-    Квартиры
+     Лицевые счета
 {% endblock %}
 {% block css %}
 
@@ -11,6 +11,7 @@
     <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
     <link rel="stylesheet" href="{% static 'users/css/jquery.toast.css' %}" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 
 {% endblock %}
 {% block content %}
@@ -34,25 +35,32 @@
         <!-- MESSAGE FROM BACKEND-->
 
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
-        <h1 style="color: #444; font-size: 24px">Квартиры
+        <h1 style="color: #444; font-size: 24px">Лицевые счета
         </h1>
         <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
         margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
         top: 15px!important; right: 15px!important; border-radius: 2px!important;">
             <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
-            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Квартиры </li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Лицевые счета </li>
         </ul>
     </section>
 
-
-    <!-- BUTTON ANN NEW USER -->
     <section class="content" style="padding-top: 15px">
     <div class="row">
         <div class="col-sm-12" style="text-align: right; padding: 0 15px">
-            <a class="btn btn-success" href="{% url 'houses:flat_create' %}" style="width: auto">Добавить квартиру</a>
+            <div class="dropdown">
+              <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Выберите действие
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="{% url 'crm_accounting:account_create' %}">Добавить лицевой счет</a>
+                <a class="dropdown-item" href="#">Выгрузить в Excel</a>
+              </div>
+            </div>
         </div>
     </div>
     </section>
+
 
     <!-- content -->
     <section class="content content-custom" >
@@ -68,32 +76,47 @@
                 </div>
                 </div>
                     <div class="box-body" style="padding: 0">
-                        <table id="flats" style="margin: 0; width: 100%" class="table table-bordered table-hover table-striped linkedRow">
+                    {% csrf_token %}
+                        <table id="flats" style="margin: 0; width: 100%" class="table table-bordered table-hover table-responsive table-striped linkedRow">
                              <thead>
                                   <tr>
-                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 10%; color: rgb(60, 141, 188);" >
-                                          № квартиры
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 125px;min-width: 125px; " >
+                                          №
                                       </th>
-                                      <th  tabindex="0"  rowspan="1" colspan="1" style="width: 160px; min-width: 120px; color: rgb(60, 141, 188);">
+                                      <th  tabindex="0"  rowspan="1" colspan="1" style="min-width: 100px">
+                                          Статус
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 100px; min-width: 100px; ">
+                                          Квартира
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 200px; ">
                                           Дом
                                       </th>
-                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 160px; min-width: 65px; color: rgb(60, 141, 188);">
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 160px;min-width: 160px; ">
                                           Секция
                                       </th>
-                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 160px; min-width: 65px; color: rgb(60, 141, 188);">
-                                          Этаж
-                                      </th>
-                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 200px; color: rgb(60, 141, 188);">
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 200px;">
                                           Владелец
                                       </th>
-                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 120px;">
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 100px!important;">
                                           Остаток (грн)
                                       </th>
                                       <th></th>
                                   </tr>
                                     <tr>
                                             <th>
-                                                <input type="text" id="number" class="form-control" >
+                                                <input type="text" id="account_number" class="form-control" >
+                                            </th>
+                                            <th class="sort">
+                                                <select name="status" id="status" class="form-select">
+                                                    <option value=""></option>
+                                                    <option value="active">Активен</option>
+                                                    <option value="nonactive">Неактивен</option>
+
+                                                </select>
+                                            </th>
+                                            <th class="sort">
+                                                <input type="text" name="flat" id="flat" class="form-control">
                                             </th>
                                             <th class="sort">
                                                 <select name="house" id="house" class="form-select">
@@ -109,18 +132,12 @@
                                                 </select>
                                             </th>
                                             <th class="sort">
-                                                <select name="floor" id="floor" class="form-select">
-                                                    <option value="">Выберите дом</option>
-                                                </select>
-                                            </th>
-                                            <th class="sort">
                                                 <select name="owner" id="owner" class="form-select">
                                                     <option value=""></option>
                                                     {% for user in owner %}
                                                         <option value="{{ user.id }}">{{ user }}</option>
                                                     {% endfor %}
                                                 </select>
-{#                                                <input type="text" id="owner" class="form-control">#}
                                             </th>
                                             <th class="sort">
                                                 <select name="dolg" id="dolg" class="form-select">
@@ -157,18 +174,20 @@
             const result = confirm('Вы уверены, что хотите удалить этоу квартиру?')
             if (result) {
                 var csrf = $("input[name=csrfmiddlewaretoken]").val();
-                let qwer = elem.closest('tr[data-href]')
-                qwer.removeAttribute('data-href')
+                {#let qwer = elem.closest('tr[data-href]')#}
+                {#qwer.removeAttribute('data-href')#}
                 $.ajax({
-                    url: '{% url 'houses:delete_flat' %}',
+                    url: '{% url 'crm_accounting:delete_account' %}',
                     type: 'post',
                     data: {
-                        'flat': elem.id,
+                        'account': elem.id,
                         csrfmiddlewaretoken: csrf,
                     },
                     success: (data) => {
                         if (data.success === 'success') {
                             $('#reset').click()
+                        } else {
+                            alert(data.success)
                         }
                     },
                     errors: (errors) => {
@@ -196,27 +215,27 @@
                     'infoFiltered': '',
                     "infoEmpty": "",
                     "paginate": {
-
                         "next":       "След.",
                         "previous":   "Пред."
                     },
                   },
                 "aoColumnDefs": [
-                    { 'bSortable': false, 'targets': [5, 6, ] },
-                    {'targets': 5, createdCell:function (td, cellData, rowData, row, col) {
-                        if (parseFloat(td) < 0) {
-                            $(td).css('color', 'red');
-                        } else if ((parseFloat(rowData[5]) > 0)){
-                            $(td).css('color', '#00a65a');
-                        }
-                        }}
+                    { 'bSortable': false, 'targets': [0, 1, 2, 3, 4, 5, 6, 7] },
+                    {#{'targets': 5, createdCell:function (td, cellData, rowData, row, col) {#}
+                    {#    if (parseFloat(td) < 0) {#}
+                    {#        $(td).css('color', 'red');#}
+                    {#    } else if ((parseFloat(rowData[5]) > 0)){#}
+                    {#        $(td).css('color', '#00a65a');#}
+                    {#    }#}
+                    {#    }}#}
                     ],
                 "fnServerParams": function ( aoData ) {
                       aoData.push(
-                          { "name": 'number', "value": $('#number').val() },
+                          { "name": 'number', "value": $('#account_number').val() },
+                          { "name": 'status', "value": $('#status').val() },
+                          { "name": 'flat', "value": $('#flat').val() },
                           { "name": 'house', "value": $('#house').val() },
                           { "name": 'section', "value": $('#section').val() },
-                          { "name": 'floor', "value": $('#floor').val() },
                           { "name": 'owner', "value": $('#owner').val() },
                           { "name": 'dolg', "value": $('#dolg').val() },
 
@@ -224,16 +243,31 @@
                 },
                 processing: true,
                 serverSide: true,
-                sAjaxSource: "{% url 'houses:get_ajax' %}",
+                sAjaxSource: "{% url 'crm_accounting:get_account_ajax_list' %}",
                 columns: [
                     {name: "number", data: 0},
-                    {name: "house", data: 1},
-                    {name: "section", data: 2},
-                    {name: "floor", data: 3},
-                    {name: "owner", data: 4},
-                    {name: "personal_account", data: null, render: function (data, type, row){
-                            if (row[5]) {
-                                this.data = row[5]
+                    {name: "status", data: null, render: function (data, type, row) {
+                            console.log(row)
+                        if (row[1] === 'Активен') {
+                            this.data = `<small class="label label-success">${row[1]}</small>`
+                        } else if (row[1] === 'Неактивен') {
+                            this.data = `<small class="label label-danger">${row[1]}</small>`
+                        } else {
+                            this.data = "Нет счета"
+                        }
+
+                            return this.data
+                        }},
+                    {name: "flat", data: 2},
+                    {name: "house", data: 3},
+                    {name: "section", data: 4},
+                    {name: "owner", data: 5},
+                    {name: "dolg", data: null, render: function (data, type, row) {
+                            let balance = row[6]
+                            if (parseFloat(balance) < 0) {
+                                this.data = `<p style="color: orangered">${balance}</p>`
+                            } else if (parseFloat(balance) > 0) {
+                                this.data = `<p style="color: #00a65a">${balance}</p>`
                             } else {
                                 this.data = "(Нет счета)"
                             }
@@ -243,14 +277,15 @@
                     {name: 'link', data: null, render: function (data, type, row){
                         var url = 'update'
                             return '<div class="btn-group pull-right" >'+
-                                '<a class="btn btn-default btn-sm" href="'+url+'/'+row[6]+'" title="Редактировать">'+
+                                '<a class="btn btn-default btn-sm" href="'+url+'/'+row[7]+'" title="Редактировать">'+
                                 '<i class="fa fa-pencil"></i></a>'+
-                                '<a class="btn btn-default btn-sm btn-delete" onclick="delete_flat(event, this)" id="'+row[6]+'" title="Удалить">'+
+                                '<a class="btn btn-default btn-sm btn-delete" onclick="delete_flat(event, this)" id="'+row[7]+'" title="Удалить">'+
                                 '<i class="fa fa-trash " ></i></a></div>'
                         }}
                 ],
                 "createdRow": function( row, data, dataIndex ) {
-                    var url = 'detail/'+data[6]
+                    console.log(data[0])
+                    var url = 'update/'+data[7]
                     $(row).attr( 'data-href', url );
                     $(row).on("click", function() {
                         document.location = $(this).data('href');
@@ -260,7 +295,7 @@
         $('#house').on('blur click', function () {
             table.columns(1).search($(this).val()).draw();
         } );
-        $('#number').on('blur clear', function () {
+        $('#account_number').on('blur clear', function () {
             table.columns([0]).search($(this).val()).draw();
         });
         $('#section').on('change clear', function () {
@@ -278,30 +313,13 @@
     } );
     </script>
     <!-- AJAX -->
-    <script>
-        function delete_house(id) {
-            const result = confirm('Вы уверены, что хотите удалить этоу квартиру?')
-            if (result) {
-                $.ajax({
-                url:`{% url 'houses:delete_flat' %}`,
-                type: 'get',
-                data: {'id': id},
-                success: (data) => {
-                    if (data.success) {
-                        $('#instance-' + id).css('display', 'none')
-                    }
-                },
-                errors: (errors) => {
-                    console.log(errors)
-                }
-            })
-        }
-            }
 
-    </script>
     <script>
         function ajax_section (){
-            const house = ($(this).val())
+            const house = ($("#house").val())
+            var empty_value = '<option value="">Выберите дом...</option>'
+            const section = $('#section')
+            section.empty()
             if (house) {
                 $.ajax({
                 url: '{% url 'houses:get_section_and_floor' %}',
@@ -310,24 +328,15 @@
                     'house': house,
                 },
                 success: (data) => {
-                    var id_sections = $('#section');
-                    var id_floor = $('#floor');
                     var sections = '';
-                    var floors = '';
-
                     $(data.sectionist).each(function (index, value) {
                         sections += "<option value='"+value.id+"'>"+value.title+"</option>"
                     })
-                    id_sections.append(sections)
-                    $(data.floors).each(function (index, value) {
-                        floors += "<option value='"+value.id+"'>"+value.title+"</option>"
-                    })
-                    id_floor.append(floors)
-
+                    section.append(sections)
                 }
             })
             } else {
-
+                section.append(empty_value)
             }
         }
     </script>
@@ -341,7 +350,7 @@
         $('.odd').css('background-color', '#f9f9f9')
     })
     </script>
-            <script src="{% static 'houses/js/flats.js' %}"></script>
+            <script src="{% static 'crm_accounting/js/account_list.js' %}"></script>
     <style>
         .sorting {
             padding: 8px!important;

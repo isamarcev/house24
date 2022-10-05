@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from houses.models import House
+from houses.models import House, Flat
 from .models import *
 
 
@@ -14,6 +14,29 @@ class PersonalAccountForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')
         super(PersonalAccountForm, self).__init__(*args, **kwargs)
+
+    def clean_account_number(self):
+        account_number = self.cleaned_data.get('account_number')
+        account = PersonalAccount.objects.filter(account_number=account_number)
+        if account.exists():
+            raise ValidationError(
+                'Этот лицевой счет уже существует'
+            )
+        return account_number
+
+    def clean_flat(self):
+        flat_id = self.cleaned_data.get('flat')
+        print(flat_id)
+        if flat_id:
+            if flat_id.personal_account:
+                raise ValidationError(
+                    'У этой квартиры уже есть лицевой счет.'
+                    )
+        else:
+            raise ValidationError(
+                'Поле квартиры обязательно к заполнению.'
+            )
+        return flat_id
 
 
     class Meta:
@@ -29,6 +52,7 @@ class PersonalAccountForm(forms.ModelForm):
             'section': 'Секция',
             'flat': "Квартира"
         }
+
 
 
 

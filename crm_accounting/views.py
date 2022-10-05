@@ -1,6 +1,8 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import CreateView, UpdateView, DetailView
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
+from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from houses.models import Section, Flat
 from .models import *
@@ -16,8 +18,77 @@ def main_page(request, pk):
 class AccountCreateView(CreateView):
     model = PersonalAccount
     form_class = PersonalAccountForm
+    success_url = reverse_lazy('houses:house_list')
+    template_name = 'crm_accounting/personalaccount_form.html'
 
-    # def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST or None)
+        if form_class.is_valid():
+            flat = Flat.objects.get(pk=request.POST.get('flat'))
+            form_class.save()
+            flat.personal_account = form_class.instance
+            return HttpResponseRedirect(self.success_url)
+        else:
+            return render(request, self.template_name, context={'form': form_class})
+
+
+class AccountListView(ListView):
+    model = PersonalAccount
+    queryset = None
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = dict()
+        context['houses'] = House.objects.all()
+        context['owner'] = CustomUser.objects.all()
+        return context
+
+
+class AccountListViewAjax(BaseDatatableView):
+    model = PersonalAccount
+    columns = ['account_number', 'status', 'flat.number', 'house', 'section', 'flat.owner', 'balance', 'id']
+    order_columns = ['account_number', 'status', 'flat.number', 'house', 'section', 'flat.owner', 'balance' ,'id']
+
+    def get_initial_queryset(self):
+        return self.model.objects.all().select_related('house', 'section', 'flat__owner')
+
+    def filter_queryset(self, qs):
+        number = self.request.GET.get('number')
+        house = self.request.GET.get('house')
+        section = self.request.GET.get('section')
+        flat = self.request.GET.get('floor')
+        status = self.request.GET.get('status')
+        owner = self.request.GET.get('owner')
+        dolg = self.request.GET.get('dolg')
+        if number:
+            qs = qs.filter(account_number__icontains=number)
+        if house:
+            qs = qs.filter(house=house)
+        if section:
+            qs = qs.filter(section=section)
+        if flat:
+            qs = qs.filter(flat=flat)
+        if owner:
+            qs = qs.filter(flat__owner=owner)
+        if dolg:
+            if dolg == 'false':
+                qs = qs.filter(balance__gt=0)
+            elif dolg == 'true':
+                qs = qs.filter(balance__lt=0)
+        if status:
+            qs = qs.filter(status=status)
+        return qs
+
+
+class DeletePersonalAccount(DeleteView):
+    model = PersonalAccount
+
+    def post(self, request, *args, **kwargs):
+        personal_account = self.model.objects.get(pk=request.POST.get('account'))
+        if request.user.is_superuser:
+            personal_account.delete()
+            return JsonResponse({'success': 'success'})
+        else:
+            return JsonResponse({'success': 'Удаление счета доступно только Директору'})
 
 
 def get_flats(request):
