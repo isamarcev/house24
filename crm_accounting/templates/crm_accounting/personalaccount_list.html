@@ -206,7 +206,7 @@
                 "order": [],
                 "bSortCellsTop": true,
                 "bFilter": false,
-                 "iDisplayLength": 25,
+                 "iDisplayLength": 10,
                 "lengthChange": false,
                 {#dom: 't',#}
                 "language": {
@@ -247,13 +247,13 @@
                 columns: [
                     {name: "number", data: 0},
                     {name: "status", data: null, render: function (data, type, row) {
-                            console.log(row)
+                            console.log(row[1])
                         if (row[1] === 'Активен') {
                             this.data = `<small class="label label-success">${row[1]}</small>`
                         } else if (row[1] === 'Неактивен') {
                             this.data = `<small class="label label-danger">${row[1]}</small>`
                         } else {
-                            this.data = "Нет счета"
+                            this.data = "Не выбран"
                         }
 
                             return this.data
@@ -269,7 +269,7 @@
                             } else if (parseFloat(balance) > 0) {
                                 this.data = `<p style="color: #00a65a">${balance}</p>`
                             } else {
-                                this.data = "(Нет счета)"
+                                this.data = balance
                             }
                             return this.data
                         }
@@ -284,8 +284,7 @@
                         }}
                 ],
                 "createdRow": function( row, data, dataIndex ) {
-                    console.log(data[0])
-                    var url = 'update/'+data[7]
+                    var url = 'detail/'+data[7]
                     $(row).attr( 'data-href', url );
                     $(row).on("click", function() {
                         document.location = $(this).data('href');
@@ -293,22 +292,25 @@
             }
             });
         $('#house').on('blur click', function () {
-            table.columns(1).search($(this).val()).draw();
+            table.columns(3).search($(this).val()).draw();
         } );
         $('#account_number').on('blur clear', function () {
             table.columns([0]).search($(this).val()).draw();
         });
         $('#section').on('change clear', function () {
-            table.columns([2]).search($(this).val()).draw();
-        });
-        $('#floor').on('change clear', function () {
-            table.columns([3]).search($(this).val()).draw();
-        });
-        $('#owner').on('change clear', function () {
             table.columns([4]).search($(this).val()).draw();
         });
-        $('#dolg').on('change clear', function () {
+        $('#flat').on('change clear', function () {
+            table.columns([2]).search($(this).val()).draw();
+        });
+        $('#owner').on('change clear', function () {
             table.columns([5]).search($(this).val()).draw();
+        });
+        $('#dolg').on('change clear', function () {
+            table.columns([6]).search($(this).val()).draw();
+        });
+        $('#status').on('change clear', function () {
+            table.columns([1]).search($(this).val()).draw();
         });
     } );
     </script>

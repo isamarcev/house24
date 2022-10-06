@@ -25,6 +25,7 @@ urlpatterns = [
     path('flats/delete/', views.delete_flat, name="delete_flat"),
     path('ajax-data-table/', views.FlatsListViewAjax.as_view(), name='get_ajax'),
 
+
     # path('create/', views.HousesListView.as_view(), name='house_create'),
 
     # path('about-us/', views.about, name='about'),

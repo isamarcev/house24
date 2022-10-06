@@ -10,25 +10,35 @@ from users.forms import RoleForm
 from users.models import Role
 from . import forms
 from .models import *
-from django.views.generic import DetailView, UpdateView, DeleteView, FormView, ListView, CreateView
+from django.views.generic import DetailView, UpdateView, DeleteView, FormView,\
+    ListView, CreateView
 
 
 class ServiceSettings(FormView, SuccessMessageMixin):
     formset_service = modelformset_factory(Service, forms.ServiceForm,
-                                           extra=0, can_delete=True, fields=('name', 'show', 'unit'))
+                                           extra=0, can_delete=True,
+                                           fields=('name', 'show', 'unit'))
     template_name = 'crm_home/system_settings/services.html'
-    queryset = Service.objects.all().prefetch_related('invoiceservice_set').select_related('unit')
-    formset_units = modelformset_factory(Unit, forms.UnitForm, extra=0, can_delete=True, fields=('title',))
+    queryset = Service.objects.all().prefetch_related('invoiceservice_set').\
+        select_related('unit')
+    formset_units = modelformset_factory(Unit, forms.UnitForm, extra=0,
+                                         can_delete=True, fields=('title',))
 
     def get_context_data(self, **kwargs):
-        context = {'formset_service': self.formset_service(queryset=self.queryset, prefix='service'),
+        context = {'formset_service': self.formset_service(
+            queryset=self.queryset, prefix='service'),
                    'formset_units': self.formset_units(
-                       queryset=Unit.objects.all().prefetch_related('service_set').all(), prefix='unit')}
+                       queryset=Unit.objects.all().
+                       prefetch_related('service_set').all(), prefix='unit')}
         return context
 
     def post(self, request, *args, **kwargs):
-        formset_service = self.formset_service(request.POST, queryset=Service.objects.all(), prefix='service')
-        formset_units = self.formset_units(request.POST, queryset=Unit.objects.all(), prefix='unit')
+        formset_service = self.formset_service(request.POST,
+                                               queryset=Service.objects.all(),
+                                               prefix='service')
+        formset_units = self.formset_units(request.POST,
+                                           queryset=Unit.objects.all(),
+                                           prefix='unit')
         if all([formset_service.is_valid(), formset_units.is_valid()]):
             formset_service.save(commit=False)
             formset_units.save(commit=False)
@@ -44,8 +54,9 @@ class ServiceSettings(FormView, SuccessMessageMixin):
             messages.success(request, 'Выполнено успешно.')
             return HttpResponseRedirect(reverse_lazy('crm_home:set_services'))
         messages.error(request, 'Неправильно заполнены поля')
-        return render(request, self.template_name, context={'formset_service': formset_service,
-                                                            'formset_units': formset_units})
+        return render(request, self.template_name,
+                      context={'formset_service': formset_service,
+                               'formset_units': formset_units})
 
 
 class TariffListView(ListView):
@@ -60,14 +71,17 @@ class TariffDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = {
             'tariff': self.object,
-            'services': TariffService.objects.filter(tariff=self.object).select_related('service__unit'),
+            'services': TariffService.objects.filter(tariff=self.object).
+            select_related('service__unit'),
         }
         return context
 
 
 class TariffCreateVIew(CreateView):
     template_name = 'crm_home/system_settings/tariff/tariff_create.html'
-    services_formset = modelformset_factory(TariffService, forms.TariffServiceForm, fields=('service', 'price',),
+    services_formset = modelformset_factory(TariffService,
+                                            forms.TariffServiceForm,
+                                            fields=('service', 'price',),
                                             can_delete=True, extra=0)
     def get_context_data(self, **kwargs):
         data = {'service-TOTAL_FORMS': '0',
@@ -146,7 +160,7 @@ def delete_tariff(request):
                 tariff_and_service.delete()
             tariff.delete()
             return JsonResponse({'success': 'success'}, status=200)
-        except:
+        finally:
             return JsonResponse({'error': 'error'}, status=500)
 
 
@@ -169,10 +183,10 @@ class RolesUpdateView(FormView):
         return render(request, self.template_name, context={'roles_formset': roles_formset})
 
 
-
 class RequisitesUpdateView(UpdateView):
     model = Requisites
     form_class = forms.RequisitesForm
+
     def get_object(self, queryset=None):
         return Requisites.objects.first()
 
@@ -215,13 +229,20 @@ class PaymentStateUpdateView(UpdateView):
         messages.success(request, 'Успешно выполнено')
         return response
 
+
 def delete_payment_state(request):
     if request.GET:
         try:
             pk = request.GET.get('id')
             state = PaymentState.objects.get(pk=pk)
-            print(state)
             state.delete()
             return JsonResponse({'success': 'success'}, status=200)
-        except:
+        finally:
             return JsonResponse({'error': 'error'}, status=500)
+
+
+class CounterDataCreateView(CreateView):
+    model = CounterData
+    template_name = 'crm_home/counterdata_form.html'
+    form_class = forms.CounterDataForm
+

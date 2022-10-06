@@ -231,10 +231,10 @@
         $('#id_house').on('change', ajax_section)
     </script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function (){
             $('#id_house').change()
             $('[aria-controls="select2-id_owner-container"]').removeClass("select2-selection select2-selection--single")
-            $('[aria-controls="select2-account_list-container"]').removeClass("select2-selection select2-selection--single")
+            $('body > div.wrapper > div > section.content.content-custom > div > div > div > div > form > div > div:nth-child(2) > div > span > span.selection > span').removeClass("select2-selection select2-selection--single")
         })
     </script>
     <style>

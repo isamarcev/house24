@@ -1,0 +1,241 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Новое показание
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_accounting/css/account_create.css' %}">
+
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Новое показание
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_home:counter_data_list' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Счетчики
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span> Новое показание</li>
+        </ul>
+    </section>
+    <form method="post" style="padding:15px">
+        {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec">
+                <div class="form-group" style="margin-bottom: 0px">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            №
+                        </div>
+                        {{ form.number }}
+                    </div>
+                    <div class="errorlist">
+                        {% if form.errors.account_number %}
+                            {% for field in form.errors.account_number %}
+                                {{ field }}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <span class="label-mid">
+                    от
+                </span>
+                <div class="form-group">
+                        {{ form.date }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        {{ form.status.label_tag }}
+                                        {{ form.status }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.house.label_tag }}
+                                        {{ form.house }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.section.label_tag }}
+                                        <select name="section" id="id_section"  class="form-select">
+                                            <option value="">Выберите...</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.flat.label_tag }}
+                                        <select name="flat" id="id_flat" class="form-select">
+                                            <option value="">Выберите...</option>
+                                        </select>
+                                        <div class="errorlist">
+                                            {% if form.errors.flat %}
+                                                {% for field in form.errors.flat %}
+                                                    {{ field }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 14px">
+                                        <b>Владелец:</b> <span id="user-fullname">Не выбран</span>
+                                    </p>
+                                    <p style="font-size: 14px">
+                                        <b>Телефон:</b> <span id="user-phone">Не выбран</span>
+                                    </p>
+                                </div>
+                                <div class="row" style="text-align: right">
+                                    <div class="form-group">
+                                        <a href="{% url 'crm_accounting:account_list' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+                                        ">Отменить</a>
+                                        <button type="submit" class="btn btn-success" name="save">Сохранить</button>
+                                    </div>
+                                    </div>
+                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </form>
+
+    <div>
+
+    </div>
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'crm_accounting/js/account_create.js' %}"></script>
+
+    <script>
+        function ajax_owner() {
+            const flat = ($('#id_flat').val());
+            var empty_value = 'Не выбран'
+            if (flat) {
+                $.ajax({
+                    url: '{% url 'crm_accounting:get_users' %}',
+                    type: 'get',
+                    data: {
+                        'flat': flat
+                    },
+                    success: (data) => {
+                        if ($.isEmptyObject(data.owner)) {
+                            $('#user-fullname').empty().append(empty_value)
+                            $('#user-phone').empty().append(empty_value)
+                        } else {
+                            if (data.owner.name.length > 0) {
+                                let location = window.location.origin
+
+                                $('#user-fullname').empty().append(
+                                    '<a class="link-list" id="'+data.owner.name+ '_'+ data.owner.id+'">'+ data.owner.name +'</a>'
+                                )
+                                $(`#user-fullname a`).attr('href', `${location}/users/owner/detail/${data.owner.id}/`)
+                            } else {
+                                $('#user-fullname').empty().append(empty_value)
+                            }
+                            if (data.owner.phone === null)
+                                $('#user-phone').empty().append(empty_value);
+                            else if (data.owner.phone.length > 0){
+                                $('#user-phone').empty().append(data.owner.phone)
+                            } else {
+                                $('#user-phone').empty().append(empty_value);
+
+                            }
+                        }
+                    }
+                })
+            }
+        }
+
+        function ajax_flat () {
+            const section = ($('#id_section').val());
+            var empty_value = '<option value="">Выберите...</option>'
+            if (section) {
+                $.ajax({
+                    url: '{% url 'crm_accounting:get_flats' %}',
+                    type: 'get',
+                    data: {
+                        'section': section,
+                    },
+                    success: (data) => {
+                        var id_flats = $('#id_flat')
+                        id_flats.empty()
+                        id_flats.append(empty_value)
+                        var flats = '';
+                        $(data.flats).each(function(index, value) {
+                            flats += "<option value='"+value.flat_id+"'>"+value.flat_number+"</option>"
+                        })
+                        id_flats.append(flats)
+                    }
+                })
+            } else {
+                $('#id_flat').empty().append(empty_value)
+                $('#user-phone').empty().append('Не выбран');
+                $('#user-user-fullname').empty().append('Не выбран');
+
+            }
+        }
+    </script>
+
+    <script>
+        function ajax_section (){
+            const house = ($("#id_house").val())
+            var empty_value = '<option value="">Выберите...</option>'
+
+            if (house) {
+                $.ajax({
+                url: '{% url 'houses:get_section_and_floor' %}',
+                type: 'get',
+                data: {
+                    'house': house,
+                },
+                success: (data) => {
+                    var id_sections = $('#id_section');
+                    id_sections.empty()
+                    id_sections.append(empty_value)
+                    var sections = '';
+
+                    $(data.sectionist).each(function (index, value) {
+                        sections += "<option value='"+value.id+"'>"+value.title+"</option>"
+                    })
+                    id_sections.append(sections)
+                }
+            })
+            } else {
+                $('#id_section').empty()
+                $('#id_section').append(empty_value)
+                $('#user-phone').empty().append('Не выбран');
+                $('#user-user-fullname').empty().append('Не выбран');
+            }
+        }
+    </script>
+    <script>
+        $('#id_house').on('change', ajax_section)
+        $('#id_section').on('change', ajax_flat)
+        $('#id_flat').on('change', ajax_owner)
+    </script>
+
+    <script>
+            window.onload =  function () {
+                ajax_section()
+                ajax_flat()
+                ajax_owner()
+            }
+    </script>
+
+
+{% endblock %}

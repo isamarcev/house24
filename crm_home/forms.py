@@ -1,13 +1,18 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from houses.models import House
 from .models import *
 
 
 class ServiceForm(forms.ModelForm):
-    name = forms.CharField(label='Услуга', label_suffix='', error_messages={'required': 'Поле не может быть пустым.'}, widget=forms.TextInput(
-        attrs=({'class': 'form-control'})))
-    show = forms.BooleanField(label_suffix='', label="Показывать в счетчиках", required=False)
+    name = forms.CharField(label='Услуга', label_suffix='',
+                           error_messages=
+                           {'required': 'Поле не может быть пустым.'},
+                           widget=forms.TextInput(
+                            attrs=({'class': 'form-control'})))
+    show = forms.BooleanField(label_suffix='', label="Показывать в счетчиках",
+                              required=False)
     # unit = forms.CharField(label_suffix='', label="Ед. изм.", empty_value="Выберите")
     class Meta:
         model = Service
@@ -95,11 +100,41 @@ class RequisitesForm(forms.ModelForm):
 
 
 class PaymentStateForm(forms.ModelForm):
-    title = forms.CharField(label_suffix='', label="Название", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    title = forms.CharField(label_suffix='', label="Название",
+                            widget=forms.TextInput(
+                                attrs={'class': 'form-control'}))
 
-    type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-select'}),
-                             label_suffix='', label="Приход/расход", choices=[("Приход", "Приход"), ("Расход", "Расход")])
+    type = forms.ChoiceField(widget=forms.Select(
+        attrs={'class': 'form-select'}), label_suffix='',
+        label="Приход/расход",
+        choices=[("Приход", "Приход"), ("Расход", "Расход")])
 
     class Meta:
         model = PaymentState
         fields = ['title', 'type']
+
+
+class CounterDataForm(forms.ModelForm):
+    date = forms.DateField()
+    house = forms.ModelChoiceField(empty_label='Выберите',
+                                   queryset=House.objects.all(),
+                                   label='Дом',
+                                   widget=forms.Select(
+                                       attrs={'class': 'form-select'}))
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(CounterDataForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = CounterData
+        exclude = ['id', ]
+        widgets = {
+            'number': forms.TextInput(attrs={'class': 'form-control'}),
+            # 'date': 'form-control',
+            # 'status': 'form-control',
+            # 'data': 'form-se',
+        }
+
+
+

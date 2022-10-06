@@ -88,7 +88,11 @@
                         <tr>
                             <td class="user-label">Владелец</td>
                             <td>
+                                {% if object.owner %}
                                 <a class="link-list" href="{% url 'users:owner_detail' object.owner.id %}">{{ object.owner }}</a>
+                                {% else %}
+                                    Владелец не указан
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
