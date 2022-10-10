@@ -1,3 +1,5 @@
+import datetime
+
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -115,12 +117,26 @@ class PaymentStateForm(forms.ModelForm):
 
 
 class CounterDataForm(forms.ModelForm):
-    date = forms.DateField()
+
+    date = forms.DateField(widget=forms.DateInput(
+        attrs={'class': 'form-control'}), initial=datetime.date.today,
+        input_formats=('%Y-%m-%d', '%Y-%d-%m'))
     house = forms.ModelChoiceField(empty_label='Выберите',
                                    queryset=House.objects.all(),
                                    label='Дом',
                                    widget=forms.Select(
                                        attrs={'class': 'form-select'}))
+    StatusCounter = [("Новое", "Новое"), ("Учтено", "Учтено"),
+                     ("Учтено и оплачено", "Учтено и оплачено"),
+                     ("Нулевое", "Нулевое")]
+    status = forms.ChoiceField(choices=StatusCounter, label='Статус',
+                               widget=forms.Select(
+                                   attrs={'class': 'form-select'}),)
+    service = forms.ModelChoiceField(queryset=Service.objects.all(),
+                                     empty_label='Выберите...',
+                                     label="Счетчик",
+                                     widget=forms.Select(
+                                         attrs={'class': 'form-select'}))
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')
@@ -131,9 +147,13 @@ class CounterDataForm(forms.ModelForm):
         exclude = ['id', ]
         widgets = {
             'number': forms.TextInput(attrs={'class': 'form-control'}),
-            # 'date': 'form-control',
-            # 'status': 'form-control',
-            # 'data': 'form-se',
+            'date': forms.DateInput(attrs={'class': 'form-control'}),
+            'data': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'section': 'Секция',
+            'flat': 'Квартира',
+            'data': 'Показания счетчика'
         }
 
 

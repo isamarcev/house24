@@ -64,4 +64,4 @@ class Flat(models.Model):
         verbose_name = 'Квартира'
 
     def __str__(self):
-        return f'№{self.number}, {self.house}'
+        return f'№{self.number}'

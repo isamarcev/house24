@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 
@@ -58,7 +60,7 @@ def get_next_counter_number():
 class CounterData(models.Model):
     number = models.IntegerField(default=get_next_counter_number,
                                  editable=True)
-    date = models.DateField(auto_now=True)
+    date = models.DateField(default=datetime.datetime.now)
     house = models.ForeignKey('houses.House', on_delete=models.CASCADE)
     section = models.ForeignKey('houses.Section', on_delete=models.CASCADE)
     flat = models.ForeignKey('houses.Flat', on_delete=models.CASCADE)

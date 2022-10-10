@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic.base import View
-
+from houses.views import create_or_add_next
 from users.forms import RoleForm
 from users.models import Role
 from . import forms
@@ -245,4 +245,36 @@ class CounterDataCreateView(CreateView):
     model = CounterData
     template_name = 'crm_home/counterdata_form.html'
     form_class = forms.CounterDataForm
+    success_url = reverse_lazy('crm_home:counter_data_list')
+
+    def get_success_url(self, form_class):
+        if 'save_and_add' in self.request.POST.keys():
+            address = f'{self.success_url}create/?counter_id={form_class.instance.id}'
+            return address
+        else:
+            return self.success_url
+
+    def get(self, request, *args, **kwargs):
+        counter_id = request.GET.get('counter_id')
+        if counter_id:
+            counter_data = CounterData.objects.get(id=counter_id)
+            self.initial = {
+                'number': (str(counter_data.number+1)).zfill(10),
+                'house': counter_data.house,
+                'section': counter_data.section,
+                'flat': counter_data.flat,
+                'service': counter_data.service,
+
+            }
+        return super().get(self, request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST or None)
+        if form_class.is_valid():
+            form_class.save()
+            return HttpResponseRedirect(self.get_success_url(form_class))
+        else:
+            return render(request, self.template_name, context={
+                'form': form_class
+            })
 

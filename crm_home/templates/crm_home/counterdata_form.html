@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
 {% endblock %}
 {% block css_after %}
-    <link rel="stylesheet" href="{% static 'crm_accounting/css/account_create.css' %}">
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'crm_home/css/counter_create.css' %}">
 
 {% endblock %}
 {% block content %}
@@ -30,7 +31,7 @@
         {% csrf_token %}
     <div class="row">
         <div class="col-xs-12 col-md-7 col-lg-6">
-            <div class="page-header-spec">
+            <div class="page-header-spec" style="align-items: normal">
                 <div class="form-group" style="margin-bottom: 0px">
                     <div class="input-group">
                         <div class="input-group-addon">
@@ -46,11 +47,13 @@
                         {% endif %}
                     </div>
                 </div>
-                <span class="label-mid">
+                <span class="label-mid" style="vertical-align: center; padding-top: 10px;margin: 0 15px; font-size: 14px">
                     от
                 </span>
                 <div class="form-group">
+                    <div class="input-group">
                         {{ form.date }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,25 +65,29 @@
                 <div class="box">
                     <div class="box-body">
                             <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        {{ form.status.label_tag }}
-                                        {{ form.status }}
-                                    </div>
-                                    <div class="form-group">
+                                <div class="col-xs-12 col-sm-6">
+
+                                    <div class="form-group no-margin" style="margin-bottom: 0">
                                         {{ form.house.label_tag }}
                                         {{ form.house }}
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group no-margin" style="margin-bottom: 0">
                                         {{ form.section.label_tag }}
                                         <select name="section" id="id_section"  class="form-select">
                                             <option value="">Выберите...</option>
+                                            {% if form.initial.section %}
+                                                <option value="{{ form.initial.section.id }}" selected>{{ form.initial.section }}</option>
+                                            {% endif %}
                                         </select>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group no-margin" style="margin-bottom: 0">
                                         {{ form.flat.label_tag }}
+
                                         <select name="flat" id="id_flat" class="form-select">
                                             <option value="">Выберите...</option>
+                                            {% if form.initial %}
+                                                <option value="{{ form.initial.flat.id }}" selected>{{ form.initial.flat }}</option>
+                                            {% endif %}
                                         </select>
                                         <div class="errorlist">
                                             {% if form.errors.flat %}
@@ -90,18 +97,27 @@
                                             {% endif %}
                                         </div>
                                     </div>
-                                    <p style="font-size: 14px">
-                                        <b>Владелец:</b> <span id="user-fullname">Не выбран</span>
-                                    </p>
-                                    <p style="font-size: 14px">
-                                        <b>Телефон:</b> <span id="user-phone">Не выбран</span>
-                                    </p>
+                                    <div class="form-group no-margin" style="margin-bottom: 0">
+                                        {{ form.service.label_tag }}
+                                        {{ form.service }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        {{ form.status.label_tag }}
+                                        {{ form.status }}
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        {{ form.data.label_tag }}
+                                        {{ form.data }}
+                                    </div>
                                 </div>
                                 <div class="row" style="text-align: right">
                                     <div class="form-group">
-                                        <a href="{% url 'crm_accounting:account_list' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+                                        <a href="{% url 'crm_home:counter_data_list' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
                                         ">Отменить</a>
                                         <button type="submit" class="btn btn-success" name="save">Сохранить</button>
+                                        <button type="submit" class="btn btn-success add-more" style="background-color: #008d4c" name="save_and_add">Сохранить и добавить новые показания</button>
                                     </div>
                                     </div>
                                 </div>
@@ -120,76 +136,6 @@
 {% endblock %}
 {% block script %}
     <script src="{% static 'crm_accounting/js/account_create.js' %}"></script>
-
-    <script>
-        function ajax_owner() {
-            const flat = ($('#id_flat').val());
-            var empty_value = 'Не выбран'
-            if (flat) {
-                $.ajax({
-                    url: '{% url 'crm_accounting:get_users' %}',
-                    type: 'get',
-                    data: {
-                        'flat': flat
-                    },
-                    success: (data) => {
-                        if ($.isEmptyObject(data.owner)) {
-                            $('#user-fullname').empty().append(empty_value)
-                            $('#user-phone').empty().append(empty_value)
-                        } else {
-                            if (data.owner.name.length > 0) {
-                                let location = window.location.origin
-
-                                $('#user-fullname').empty().append(
-                                    '<a class="link-list" id="'+data.owner.name+ '_'+ data.owner.id+'">'+ data.owner.name +'</a>'
-                                )
-                                $(`#user-fullname a`).attr('href', `${location}/users/owner/detail/${data.owner.id}/`)
-                            } else {
-                                $('#user-fullname').empty().append(empty_value)
-                            }
-                            if (data.owner.phone === null)
-                                $('#user-phone').empty().append(empty_value);
-                            else if (data.owner.phone.length > 0){
-                                $('#user-phone').empty().append(data.owner.phone)
-                            } else {
-                                $('#user-phone').empty().append(empty_value);
-
-                            }
-                        }
-                    }
-                })
-            }
-        }
-
-        function ajax_flat () {
-            const section = ($('#id_section').val());
-            var empty_value = '<option value="">Выберите...</option>'
-            if (section) {
-                $.ajax({
-                    url: '{% url 'crm_accounting:get_flats' %}',
-                    type: 'get',
-                    data: {
-                        'section': section,
-                    },
-                    success: (data) => {
-                        var id_flats = $('#id_flat')
-                        id_flats.empty()
-                        id_flats.append(empty_value)
-                        var flats = '';
-                        $(data.flats).each(function(index, value) {
-                            flats += "<option value='"+value.flat_id+"'>"+value.flat_number+"</option>"
-                        })
-                        id_flats.append(flats)
-                    }
-                })
-            } else {
-                $('#id_flat').empty().append(empty_value)
-                $('#user-phone').empty().append('Не выбран');
-                $('#user-user-fullname').empty().append('Не выбран');
-
-            }
-        }
-    </script>
 
     <script>
         function ajax_section (){
@@ -218,23 +164,59 @@
             } else {
                 $('#id_section').empty()
                 $('#id_section').append(empty_value)
-                $('#user-phone').empty().append('Не выбран');
-                $('#user-user-fullname').empty().append('Не выбран');
+            }
+        }
+        function ajax_flat () {
+            const section = ($('#id_section').val());
+            var empty_value = '<option value="">Выберите...</option>'
+            if (section) {
+                $.ajax({
+                    url: '{% url 'crm_accounting:get_flats' %}',
+                    type: 'get',
+                    data: {
+                        'section': section,
+                    },
+                    success: (data) => {
+                        var id_flats = $('#id_flat')
+                        id_flats.empty()
+                        id_flats.append(empty_value)
+                        var flats = '';
+                        $(data.flats).each(function(index, value) {
+                            flats += "<option value='"+value.flat_id+"'>"+value.flat_number+"</option>"
+                        })
+                        id_flats.append(flats)
+                    }
+                })
+            } else {
+                $('#id_flat').empty().append(empty_value)
+
             }
         }
     </script>
     <script>
         $('#id_house').on('change', ajax_section)
         $('#id_section').on('change', ajax_flat)
-        $('#id_flat').on('change', ajax_owner)
+        {#$('#id_flat').on('change', ajax_owner)#}
     </script>
 
     <script>
             window.onload =  function () {
-                ajax_section()
-                ajax_flat()
-                ajax_owner()
+                {#ajax_section()#}
+                {#ajax_flat()#}
             }
+    </script>
+
+     <script>
+    $(function () {
+        $("#id_date").datepicker({
+                showOn: "both",
+              dateFormat: "yy-mm-dd"
+
+            });
+        $('.ui-datepicker-trigger').html("<i class='fa fa-calendar'></i>").addClass('btn btn-date').before($("#id_date"))
+
+    })
+
     </script>
 
 
