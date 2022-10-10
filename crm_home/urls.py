@@ -39,9 +39,16 @@ urlpatterns = [
 
 
     #counter
-    path('counter-data/', views.PaymentStateListView.as_view(),
+    path('counter-data/', views.CounterDataListView.as_view(),
          name='counter_data_list'),
+    path('counter-data/flat-counter-list/',
+         views.FlatCounterDataListView.as_view(),
+         name='flat_counter_list'),
+    path('counter-data-ajax-list/', views.CounterDataListViewAjax.as_view(),
+         name='counter_data_list_ajax'),
     path('counter-data/create/', views.CounterDataCreateView.as_view(),
          name='counter_data_create'),
+    path('counter-data/detail/<int:pk>/', views.CounterDataCreateView.as_view(),
+         name='counter_data_detail'),
 
 ]

@@ -58,8 +58,8 @@ def get_next_counter_number():
 
 
 class CounterData(models.Model):
-    number = models.IntegerField(default=get_next_counter_number,
-                                 editable=True)
+    number = models.CharField(default=get_next_counter_number, max_length=20,
+                              unique=True)
     date = models.DateField(default=datetime.datetime.now)
     house = models.ForeignKey('houses.House', on_delete=models.CASCADE)
     section = models.ForeignKey('houses.Section', on_delete=models.CASCADE)
@@ -72,7 +72,7 @@ class CounterData(models.Model):
     data = models.DecimalField(decimal_places=2, max_digits=10)
 
     def __str__(self):
-        return self.number
+        return str(self.number)
 
 
 class Requisites(models.Model):

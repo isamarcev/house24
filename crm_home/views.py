@@ -2,16 +2,19 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.base import View
+from django_datatables_view.base_datatable_view import BaseDatatableView
+
+from houses.models import House, Flat
 from houses.views import create_or_add_next
 from users.forms import RoleForm
 from users.models import Role
 from . import forms
 from .models import *
 from django.views.generic import DetailView, UpdateView, DeleteView, FormView,\
-    ListView, CreateView
+    ListView, CreateView, TemplateView
 
 
 class ServiceSettings(FormView, SuccessMessageMixin):
@@ -277,4 +280,78 @@ class CounterDataCreateView(CreateView):
             return render(request, self.template_name, context={
                 'form': form_class
             })
+
+
+class CounterDataListView(ListView):
+    model = CounterData
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = {
+            'houses': House.objects.all(),
+            'services': Service.objects.all()
+        }
+        return context
+
+
+class CounterDataListViewAjax(BaseDatatableView):
+    model = CounterData
+    columns = ['house', 'section', 'flat.number', 'service', 'data',
+               'service.unit', 'id', 'service.id', 'flat.id']
+    order_columns = ['house', 'section', 'flat', 'service']
+
+    def get_initial_queryset(self):
+        return self.model.objects.all().select_related('flat',
+                                                       'service__unit')
+
+    def filter_queryset(self, qs):
+        house = self.request.GET.get('house')
+        section = self.request.GET.get('section')
+        service = self.request.GET.get('service')
+        flat = self.request.GET.get('flat')
+        # dolg = self.request.GET.get('dolg')
+        if house:
+            qs = qs.filter(house=house)
+        if section:
+            qs = qs.filter(section=section)
+        if service:
+            qs = qs.filter(service=service)
+        if flat:
+            qs = qs.filter(flat__number__icontains=flat)
+        return qs
+
+
+class FlatCounterDataListView(TemplateView):
+    model = CounterData
+    template_name = 'crm_home/counterdata_flat_list.html'
+
+    # def get_queryset(self):
+    #     flat_id = self.request.GET.get('flat_id')
+    #     service_id = self.request.GET.get('service_id')
+    #     queryset = CounterData.objects.filter(flat_id=flat_id,
+    #                                           service_id=service_id)
+    #     return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = dict()
+        context['houses'] = House.objects.all()
+        context['services'] = Service.objects.all()
+        flat_id = self.request.GET.get('flat_id')
+        service_id = self.request.GET.get('service_id')
+        context['flat'] = Flat.objects.get(pk=flat_id)
+        context['counters'] = CounterData.objects.filter(flat_id=flat_id,
+                                                         service_id=service_id)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        # flat_id = request.GET.get('flat_id')
+        # self.object_list = self.get_queryset()
+        # service_id = request.GET.get('service_id')
+        # counters = CounterData.objects.filter(flat_id=flat_id,
+        #                                       service_id=service_id)
+        # print(counters)
+        # for counter in counters:
+        #     print(counter)
+        context = self.get_context_data()
+        return self.render_to_response(context)
+
 

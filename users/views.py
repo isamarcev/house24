@@ -82,6 +82,7 @@ class UserUpdateView(UpdateView):
     success_url = reverse_lazy('users:users')
     template_name = 'users/customuser_update_form.html'
 
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['label_suffix'] = ''
@@ -89,6 +90,7 @@ class UserUpdateView(UpdateView):
 
     def post(self, request, *args, **kwargs):
         form_class = self.form_class(request.POST, instance=self.get_object())
+        print(form_class.is_valid(), form_class.errors)
         if form_class.is_valid():
             form_class.save(commit=False)
             if len(request.POST.get('password')) == 0:

@@ -6,6 +6,7 @@ from django.views.generic import CreateView, UpdateView, DetailView, \
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from houses.models import Section, Flat
+from users.models import CustomUser
 from .models import PersonalAccount
 from .forms import *
 

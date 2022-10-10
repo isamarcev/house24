@@ -52,11 +52,18 @@ class Flat(models.Model):
     number = models.IntegerField()
     area = models.FloatField()
     house = models.ForeignKey(House, on_delete=models.CASCADE)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True, blank=True, error_messages={'required': 'Это поле обязательно.'})
-    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True, blank=True,)
-    owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT, null=True, blank=True,)
-    tariff = models.ForeignKey(Tariff, on_delete=models.PROTECT, null=True, blank=True,)
-    personal_account = models.OneToOneField(PersonalAccount, on_delete=models.SET_NULL, related_name='account_flat',
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True,
+                                blank=True, error_messages=
+                                {'required': 'Это поле обязательно.'})
+    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True,
+                              blank=True,)
+    owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT, null=True,
+                              blank=True,)
+    tariff = models.ForeignKey(Tariff, on_delete=models.PROTECT, null=True,
+                               blank=True,)
+    personal_account = models.OneToOneField(PersonalAccount,
+                                            on_delete=models.SET_NULL,
+                                            related_name='account_flat',
                                             null=True, blank=True)
 
     class Meta:
@@ -64,4 +71,4 @@ class Flat(models.Model):
         verbose_name = 'Квартира'
 
     def __str__(self):
-        return f'№{self.number}'
+        return f'№{str(self.number)}'

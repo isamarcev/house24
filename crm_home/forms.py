@@ -156,5 +156,18 @@ class CounterDataForm(forms.ModelForm):
             'data': 'Показания счетчика'
         }
 
+    def clean_number(self):
+        account_number = self.cleaned_data.get('account_number')
+        account = CounterData.objects.filter(
+            number=account_number)
+        if account.exists():
+            if account.first() == self.instance:
+                return account_number
+            else:
+                raise ValidationError(
+                    'Показатель с таким номером уже существует'
+                )
+        return account_number
+
 
 

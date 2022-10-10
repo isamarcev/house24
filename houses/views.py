@@ -280,8 +280,6 @@ class FlatUpdateView(UpdateView):
         flat = self.get_object()
         form_class = self.form_class(request.POST or None, instance=flat)
         account_form = PersonalAccountForm(request.POST or None, instance=flat.personal_account)
-        print(account_form.is_valid(), account_form.errors)
-        print(form_class.is_valid(), form_class.errors)
         if form_class.is_valid():
             form_class.save(commit=False)
             if account_form.is_valid():
@@ -297,8 +295,6 @@ class FlatUpdateView(UpdateView):
                 else:
                     account_form.save(commit=False)
                     form_class.save()
-                    # print(account_form.instance.account_number)
-                    # print(account_form.account_number)
                     if account_form.instance.account_number:
                         account_form.instance.flat = form_class.instance
                         account_form.instance.house = form_class.instance.house

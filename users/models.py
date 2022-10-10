@@ -35,7 +35,8 @@ class CustomUser(AbstractUser):
     viber = models.CharField(max_length=20, null=True, blank=True, default='')
     telegram = models.CharField(max_length=20, null=True, blank=True, default='')
     status_state = [('Активен', 'Активен'), ('Новый', 'Новый'), ('Отключен','Отключен')]
-    status = models.CharField(choices=status_state, default=status_state[1][0], max_length=20)
+    status = models.CharField(choices=status_state, default=status_state[1][0],
+                              max_length=20, null=True, blank=True)
     username = models.CharField(max_length=100, verbose_name="User ID", unique=True, help_text='Required',
                                 error_messages={"unique": "Пользователь с таким ID уже существует."},
                                 blank=True, null=True)
