@@ -2,6 +2,13 @@ let reset = document.getElementById('reset')
 reset.addEventListener("click", function () {
     let house = document.getElementById('house');
     house.value = '';
+    let date_range = document.getElementById('date_range')
+    date_range.value = '';
+    let flat_number = document.getElementById('flat_number');
+    let status = document.getElementById('status');
+    status.value = '';
+
+    flat_number.value = '';
     let number = document.getElementById('flat_number');
     number.value = '';
     let section = document.getElementById('section');

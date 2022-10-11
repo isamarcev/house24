@@ -3,7 +3,7 @@ import datetime
 from django import forms
 from django.core.exceptions import ValidationError
 
-from houses.models import House
+from houses.models import House, Flat
 from .models import *
 
 
@@ -131,12 +131,19 @@ class CounterDataForm(forms.ModelForm):
                      ("Нулевое", "Нулевое")]
     status = forms.ChoiceField(choices=StatusCounter, label='Статус',
                                widget=forms.Select(
-                                   attrs={'class': 'form-select'}),)
+                                   attrs={'class': 'form-select'}),
+                               error_messages={
+                                   'required': 'Это поле обязательно к заполнению.'
+                               })
     service = forms.ModelChoiceField(queryset=Service.objects.all(),
                                      empty_label='Выберите...',
                                      label="Счетчик",
                                      widget=forms.Select(
-                                         attrs={'class': 'form-select'}))
+                                         attrs={'class': 'form-select'}),
+                                     error_messages={
+                                         'required': 'Это поле обязательно к заполнению.'
+                                     })
+    # })
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')
@@ -155,9 +162,13 @@ class CounterDataForm(forms.ModelForm):
             'flat': 'Квартира',
             'data': 'Показания счетчика'
         }
+        error_messages = {
+            'flat': {'required': 'Это поле обязательно к заполнению.'},
+            'data': {'required': 'Это поле обязательно к заполнению.'},
+        }
 
     def clean_number(self):
-        account_number = self.cleaned_data.get('account_number')
+        account_number = self.cleaned_data.get('number')
         account = CounterData.objects.filter(
             number=account_number)
         if account.exists():

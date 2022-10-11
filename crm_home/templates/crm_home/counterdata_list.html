@@ -193,13 +193,11 @@
                   },
                 "aoColumnDefs": [
                     { 'bSortable': false, 'targets': [0, 1, 3, 4, 5, 6] },
-                    {#{'targets': 5, createdCell:function (td, cellData, rowData, row, col) {#}
-                    {#    if (parseFloat(td) < 0) {#}
-                    {#        $(td).css('color', 'red');#}
-                    {#    } else if ((parseFloat(rowData[5]) > 0)){#}
-                    {#        $(td).css('color', '#00a65a');#}
-                    {#    }#}
-                    {#    }}#}
+                    {'targets': 6, createdCell:function (td, cellData, rowData, row, col) {
+                            $(td).find('.btn-create').on('click', function (event) {
+                                event.stopImmediatePropagation()
+                            })
+                        }}
                     ],
                 "fnServerParams": function ( aoData ) {
                       aoData.push(
@@ -224,12 +222,13 @@
                     {name: "data", data: 4},
                     {name: "service.unit", data: 5},
                     {name: "id", data: null, render: function (data, type, row) {
-                            console.log(row)
-                            return '<div class="btn-group pull-right" >'+
-                                '<a class="btn btn-default btn-sm" href="'+'create'+'/?counter_id='+row[6]+'" target="_blank" title="Снять новое показание счетчика">'+
+                            this.data = '<div class="btn-group pull-right" >'+
+                                '<a class="btn btn-default btn-sm btn-create" href="'+'create'+'/?counter_id='+row[6]+'" target="_blank" title="Снять новое показание счетчика">'+
                                 '<i class="fa fa-dashboard"></i></a>'+
                                 '<a class="btn btn-default btn-sm btn-delete" href="flat-counter-list/?flat_id='+ row[8] + '&' + 'service_id='+ row[7] +'" title="Открыть историю показаний для счетчика">'+
                                 '<i class="fa fa-eye " ></i></a></div>'
+
+                            return this.data
                         }}],
                 "createdRow": function( row, data, dataIndex ) {
                     var url = 'detail/' + data[6]
@@ -253,6 +252,7 @@
             table.columns([3]).search($(this).val()).draw();
         });
     } );
+
     </script>
     <!-- AJAX -->
 

@@ -50,7 +50,7 @@ class TariffService(models.Model):
 def get_next_counter_number():
     """ Getting next number of counter """
     try:
-        number = CounterData.objects.order_by('-number')[0].number
+        number = CounterData.objects.order_by('-id')[0].number
         x = str(int(number) + 1).zfill(10)
     except IndexError:
         x = str(1).zfill(10)

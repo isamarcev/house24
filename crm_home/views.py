@@ -262,7 +262,7 @@ class CounterDataCreateView(CreateView):
         if counter_id:
             counter_data = CounterData.objects.get(id=counter_id)
             self.initial = {
-                'number': (str(counter_data.number+1)).zfill(10),
+                'number': get_next_counter_number,
                 'house': counter_data.house,
                 'section': counter_data.section,
                 'flat': counter_data.flat,
@@ -324,13 +324,6 @@ class FlatCounterDataListView(TemplateView):
     model = CounterData
     template_name = 'crm_home/counterdata_flat_list.html'
 
-    # def get_queryset(self):
-    #     flat_id = self.request.GET.get('flat_id')
-    #     service_id = self.request.GET.get('service_id')
-    #     queryset = CounterData.objects.filter(flat_id=flat_id,
-    #                                           service_id=service_id)
-    #     return queryset
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = dict()
         context['houses'] = House.objects.all()
@@ -338,20 +331,94 @@ class FlatCounterDataListView(TemplateView):
         flat_id = self.request.GET.get('flat_id')
         service_id = self.request.GET.get('service_id')
         context['flat'] = Flat.objects.get(pk=flat_id)
+        context['service'] = Service.objects.get(pk=service_id)
         context['counters'] = CounterData.objects.filter(flat_id=flat_id,
                                                          service_id=service_id)
         return context
 
-    def get(self, request, *args, **kwargs):
-        # flat_id = request.GET.get('flat_id')
-        # self.object_list = self.get_queryset()
-        # service_id = request.GET.get('service_id')
-        # counters = CounterData.objects.filter(flat_id=flat_id,
-        #                                       service_id=service_id)
-        # print(counters)
-        # for counter in counters:
-        #     print(counter)
-        context = self.get_context_data()
-        return self.render_to_response(context)
+
+class FlatCounterDataGetViewAjax(BaseDatatableView):
+    model = CounterData
+    columns = ['house', 'section', 'flat.number', 'service', 'data',
+               'service.unit', 'id', 'service.id', 'flat.id', 'number',
+               'status', 'date']
+    order_columns = ['house', 'section', 'flat', 'service']
+
+    def get_initial_queryset(self):
+        print(self.request.GET)
+        flat_id = self.request.GET.get('id_flat')
+        service_id = self.request.GET.get('id_service')
+        return self.model.objects.filter(flat_id=flat_id).select_related('flat',
+                                                       'service__unit')
+
+    def filter_queryset(self, qs):
+        number = self.request.GET.get('number')
+        house = self.request.GET.get('house')
+        status = self.request.GET['status']
+        date_range = self.request.GET.get('date_range')
+        section = self.request.GET.get('section')
+        flat_number = self.request.GET.get('flat_number')
+        service = self.request.GET.get('service')
+        if house:
+            qs = qs.filter(house=house)
+        if number:
+            qs = qs.filter(number=number)
+        if status:
+            qs = qs.filter(status=status)
+        if section:
+            qs = qs.filter(section=section)
+        if service:
+            qs = qs.filter(service=service)
+        if flat_number:
+            qs = qs.filter(flat__number__icontains=flat_number)
+        return qs
+
+
+class CounterDeleteAjax(DeleteView):
+    model = CounterData
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_superuser or request.user.is_staff:
+            counter_id = request.POST.get('id')
+            counter = get_object_or_404(CounterData, id=counter_id)
+            counter.delete()
+            return JsonResponse({'success': 'success'})
+        else:
+            return JsonResponse(
+                {'success': "У Вас недостаточно прав для удаления."}
+            )
+
+
+class CounterDetailView(DetailView):
+    model = CounterData
+
+    def get_queryset(self):
+        return self.model.objects.all().\
+            select_related('flat__owner', 'service__unit')
+
+
+class CounterDataUpdateView(UpdateView):
+    model = CounterData
+    template_name = 'crm_home/counterdata_update_form.html'
+    form_class = forms.CounterDataForm
+    success_url = reverse_lazy('crm_home:counter_data_list')
+
+    def get_success_url(self, form_class):
+        if 'save_and_add' in self.request.POST.keys():
+            address = f'{self.success_url}create/?counter_id={form_class.instance.id}'
+            return address
+        else:
+            return self.success_url
+
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        form_class = self.form_class(request.POST or None, instance=instance)
+        if form_class.is_valid():
+            form_class.save()
+            return HttpResponseRedirect(self.get_success_url(form_class))
+        else:
+            return render(request, self.template_name, context={
+                'form': form_class
+            })
 
 

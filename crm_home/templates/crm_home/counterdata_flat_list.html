@@ -50,40 +50,42 @@
                         <span class="hidden-xs">Очистить</span>
                     </button>
                 </div>
+                    <input type="hidden" id="id_flat" value="{{ flat.id }}">
+                    <input type="hidden" id="id_service" value="{{ service.id }}">
                 </div>
                     <div class="box-body" style="padding: 0">
                     {% csrf_token %}
                         <table id="counters" align="center" style="margin: 0; width: 100%;" class="table table-bordered table-hover table-responsive table-striped linkedRow">
                              <thead>
                                   <tr>
-                                      <th tabindex="0"  rowspan="1" colspan="1" >
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 140px; min-width: 140px" >
                                           №
                                       </th>
-                                      <th tabindex="0"  rowspan="1" colspan="1" >
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 130px; min-width: 130px">
                                           Статус
                                       </th>
-                                      <th tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc ">
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc; width: 120px; min-width: 120px ">
                                           Дата
                                       </th>
-                                      <th  tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc ">
+                                      <th  tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc; width: 110px; min-width: 110px">
                                           Месяц
                                       </th>
-                                      <th tabindex="0"  rowspan="1" colspan="1" >
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 150px; min-width: 150px">
                                           Дом
                                       </th>
-                                      <th tabindex="0"  rowspan="1" colspan="1" >
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 120px; min-width: 120px">
                                           Секция
                                       </th>
                                       <th  tabindex="0" rowspan="1" colspan="1"  style="width: 100px; min-width: 100px; color: #3c8dbc  ">
                                           № квартиры
                                       </th>
-                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 150px; ">
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 110px; ">
                                           Счетчик
                                       </th>
-                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 100px;min-width: 100px; ">
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 70px;min-width: 70px; ">
                                           Показания
                                       </th>
-                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 150px;">
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 110px;">
                                           Ед. изм.
                                       </th>
                                       <th style="width: 50px"></th>
@@ -124,8 +126,12 @@
                                             <th class="sort">
                                                 <select name="service" id="service" class="form-select">
                                                     <option value=""></option>
-                                                    {% for service in services %}
-                                                        <option value="{{ service.id }}">{{ service.name }}</option>
+                                                    {% for ser in services %}
+                                                        {% if ser == service %}
+                                                        <option value="{{ ser.id }}" selected>{{ ser.name }}</option>
+                                                            {% else %}
+                                                        <option value="{{ ser.id }}">{{ ser.name }}</option>
+                                                        {% endif %}
                                                     {% endfor %}
                                                 </select>
                                             </th>
@@ -159,17 +165,17 @@
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
     <script>
-        function delete_flat(event, elem) {
-            const result = confirm('Вы уверены, что хотите удалить этоу квартиру?')
+        function delete_counter(event, elem) {
+            const result = confirm('Вы уверены, что хотите удалить этот счетчик?')
             if (result) {
                 var csrf = $("input[name=csrfmiddlewaretoken]").val();
                 {#let qwer = elem.closest('tr[data-href]')#}
                 {#qwer.removeAttribute('data-href')#}
                 $.ajax({
-                    url: '{% url 'crm_accounting:delete_account' %}',
+                    url: '{% url 'crm_home:counter_delete_ajax' %}',
                     type: 'post',
                     data: {
-                        'account': elem.id,
+                        'id': elem.id,
                         csrfmiddlewaretoken: csrf,
                     },
                     success: (data) => {
@@ -209,14 +215,7 @@
                     },
                   },
                 "aoColumnDefs": [
-                    { 'bSortable': false, 'targets': [0, 1, 4, 5, 6, 8, 9] },
-                    {#{'targets': 5, createdCell:function (td, cellData, rowData, row, col) {#}
-                    {#    if (parseFloat(td) < 0) {#}
-                    {#        $(td).css('color', 'red');#}
-                    {#    } else if ((parseFloat(rowData[5]) > 0)){#}
-                    {#        $(td).css('color', '#00a65a');#}
-                    {#    }#}
-                    {#    }}#}
+                    { 'bSortable': false, 'targets': [0, 1, 4, 5, 6, 7, 8, 9] },
                     ],
                 "fnServerParams": function ( aoData ) {
                       aoData.push(
@@ -227,36 +226,56 @@
                           { "name": 'section', "value": $('#section').val() },
                           { "name": 'flat_number', "value": $('#flat_number').val() },
                           { "name": 'service', "value": $('#service').val() },
-                          {#{ "name": 'section', "value": $('#section').val() },#}
-                          {#{ "name": 'owner', "value": $('#owner').val() },#}
-                          {#{ "name": 'dolg', "value": $('#dolg').val() },#}
-
+                          { "name": 'id_flat', "value": $('#id_flat').val() },
+                          { "name": 'id_service', "value": $('#id_service').val() },
                       );
                 },
                 processing: true,
                 serverSide: true,
-                sAjaxSource: "{% url 'crm_home:counter_data_list_ajax' %}",
+                sAjaxSource: "{% url 'crm_home:counter_data-flat_get_ajax' %}",
                 columns: [
-                    {name: "number", data: 0},
-                    {name: "status", data: 1},
-                    {name: "date_range", data: 2},
-                    {name: "house", data: 3},
-                    {name: "section", data: 4},
-                    {name: "flat_number", data: 5},
-                    {name: "service", data: 6},
-                    {name: "service", data: 7},
-                    {name: "service", data: 8},
-                    {name: "service", data: 9},
+                    {name: "number", data: 9},
+                    {name: "status", data: null, render: function (data, type, row) {
+                            console.log(row[10])
+                            if (row[10] === 'Новое') {
+                                this.data = `<small class="label label-success">${row[10]}</small>`
+                            } else if (row[10] === 'Учтено') {
+                                this.data = `<small class="label label-warning">${row[10]}</small>`
+                            } else if (row[10] === 'Учтено и оплачено') {
+                                this.data = `<small class="label label-danger">${row[10]}</small>`
+                            } else if (row[10] === 'Нулевое') {
+                                this.data = `<small class="label label-null">${row[10]}</small>`
+                            } else {
+                                this.data = 'Не выбрано'
+                            }
+                            return this.data
+                        }},
+                    {name: "date_range", data: 11},
+                    {name: "month", data: null, render: function(data, type, row) {
+                            var months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+                            var myDate = new Date(row[11]);
+                            var fullDate = months[myDate.getMonth()] + ' ' + myDate.getFullYear()
+                            return fullDate
+                        }},
+                    {name: "house", data: 0},
+                    {name: "section", data: 1},
+                    {name: "flat_number", data: 2},
+                    {name: "service", data: 3},
+                    {name: "data", data: 4},
+                    {name: "unit", data: 5},
                     {name: "id", data: null, render: function (data, type, row) {
-                            console.log(row)
-                            return '<div class="btn-group pull-right" >'+
-                                '<a class="btn btn-default btn-sm" href="'+'create'+'/?counter_id='+row[6]+'" target="_blank" title="Снять новое показание счетчика">'+
-                                '<i class="fa fa-dashboard"></i></a>'+
-                                '<a class="btn btn-default btn-sm btn-delete" href="flat-counter-list/?flat_id='+ row[8] + '&' + 'service_id='+ row[7] +'" title="Открыть историю показаний для счетчика">'+
-                                '<i class="fa fa-eye " ></i></a></div>'
+                            return '<div class="btn-group pull-right">' +
+                                '<a class="btn btn-default btn-sm" href="../update/'+ row[6] + '" title="Редактировать" data-toggle="tooltip">' +
+                                '<i class="fa fa-pencil"></i>' +
+                                '</a> ' +
+                                '<a class="btn btn-default btn-sm btn-delete" onclick="delete_counter(event, this)" id="'+row[6]+'" title="Удалить">' +
+                                '<i class="fa fa-trash"></i>' +
+                                '</a>' +
+                                '</div>'
                         }}],
                 "createdRow": function( row, data, dataIndex ) {
-                    var url = 'detail/' + data[6]
+                    var url = '../detail/' + data[6]
                     $(row).attr( 'data-href', url );
                     $(row).on("click", function() {
                         document.location = $(this).data('href');
@@ -295,6 +314,7 @@
             var empty_value = '<option value="">Выберите дом...</option>'
             const section = $('#section')
             section.empty()
+
             if (house) {
                 $.ajax({
                 url: '{% url 'houses:get_section_and_floor' %}',
@@ -347,7 +367,7 @@
 {#  if(extensionRange.endDateText) $('[name=endDate]').val(extensionRange.endDateText);#}
 
     </script>
-            <script src="{% static 'crm_home/js/counter_data_list.js' %}"></script>
+            <script src="{% static 'crm_home/js/counter_data-flat_list.js' %}"></script>
     <style>
         .sorting {
             padding: 8px!important;
@@ -357,21 +377,6 @@
             float: left;
             padding: 10px 0 0 25px;
         }
-
-{#        .ui-datepicker .selected-start:not(.selected-end) a,#}
-{#.ui-datepicker .selected-end:not(.selected-start) a {#}
-{#  background: #F3FDD5;#}
-{#}#}
-{##}
-{#.ui-datepicker .selected.first-of-month:not(.selected-start) a {#}
-{#  border-left: 2px dotted #D4E7F6;#}
-{#  padding-left: 1px;#}
-{#}#}
-{##}
-{#.ui-datepicker .selected.last-of-month:not(.selected-end) a {#}
-{#  border-right: 2px dotted #D4E7F6;#}
-{#  padding-right: 1px;#}
-{#}#}
 
     </style>
 

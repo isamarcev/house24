@@ -44,11 +44,22 @@ urlpatterns = [
     path('counter-data/flat-counter-list/',
          views.FlatCounterDataListView.as_view(),
          name='flat_counter_list'),
+
+
+
     path('counter-data-ajax-list/', views.CounterDataListViewAjax.as_view(),
          name='counter_data_list_ajax'),
+    path('counters-flat-ajax/', views.FlatCounterDataGetViewAjax.as_view(),
+         name='counter_data-flat_get_ajax'),
+    path('counter-data/delete', views.CounterDeleteAjax.as_view(),
+         name='counter_delete_ajax'),
     path('counter-data/create/', views.CounterDataCreateView.as_view(),
          name='counter_data_create'),
-    path('counter-data/detail/<int:pk>/', views.CounterDataCreateView.as_view(),
+    path('counter-data/detail/<int:pk>/',
+         views.CounterDetailView.as_view(),
          name='counter_data_detail'),
+    path('counter-data/update/<int:pk>/',
+         views.CounterDataUpdateView.as_view(),
+         name='counter_data_update'),
 
 ]

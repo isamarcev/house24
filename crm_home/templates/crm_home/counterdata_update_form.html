@@ -75,8 +75,8 @@
                                         {{ form.section.label_tag }}
                                         <select name="section" id="id_section"  class="form-select">
                                             <option value="">Выберите...</option>
-                                            {% if form.initial.section %}
-                                                <option value="{{ form.initial.section.id }}" selected>{{ form.initial.section }}</option>
+                                            {% if form.section %}
+                                                <option value="{{ object.section.id }}" selected>{{ object.section }}</option>
                                             {% endif %}
                                         </select>
                                     </div>
@@ -85,8 +85,8 @@
 
                                         <select name="flat" id="id_flat" class="form-select">
                                             <option value="">Выберите...</option>
-                                            {% if form.initial %}
-                                                <option value="{{ form.initial.flat.id }}" selected>{{ form.initial.flat }}</option>
+                                            {% if form.flat %}
+                                                <option value="{{ object.flat.id }}" selected>{{ object.flat }}</option>
                                             {% endif %}
                                         </select>
                                         <div class="errorlist">

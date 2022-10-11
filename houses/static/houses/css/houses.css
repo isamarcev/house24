@@ -216,3 +216,22 @@ table.dataTable tbody tr:hover {
     border-radius: 3px;
     font-weight: 700;
 }
+
+
+.label-warning {
+    background-color: #f39c12 !important;
+    color: white;
+    padding: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+.label-null {
+    background-color: #02b7fa !important;
+    color: white;
+    padding: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 700;
+}
