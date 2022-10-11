@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from home24 import settings
@@ -62,17 +64,22 @@ class Message(models.Model):
 
 
 class Request(models.Model):
-    date = models.DateField(auto_now_add=True)
-    time = models.TimeField(auto_now_add=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='owner_transaction')
+    date = models.DateField(default=datetime.datetime.now)
+    time = models.TimeField(default=datetime.datetime.now)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              on_delete=models.PROTECT,
+                              related_name='owner_request')
     description = models.TextField(max_length=1999, blank=True, null=True)
     comment = models.TextField(max_length=1000, blank=True, null=True)
     flat = models.ForeignKey('houses.Flat', on_delete=models.PROTECT)
-    masters = [("Сантехник", "Сантехник"), ("Электрик", "Электрик"), ("Любой специалист", "Любой специалист")]
-    type_master = models.CharField(choices=masters, default=masters[0][0], max_length=50)
+    masters = [("Сантехник", "Сантехник"), ("Электрик", "Электрик"),
+               ("Слесарь", "Слесарь"), ("Любой специалист", "Любой специалист")]
+    type_master = models.CharField(choices=masters, default=masters[0][0],
+                                   max_length=50)
     status_request = [("Новое", "Новое"), ("В работе", "В работе"), ("Выполнено", "Выполнено")]
     status = models.CharField(choices=status_request, max_length=50)
-    master = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    master = models.ForeignKey(settings.AUTH_USER_MODEL,
+                               on_delete=models.PROTECT)
 
 
 class MessageUsers(models.Model):
