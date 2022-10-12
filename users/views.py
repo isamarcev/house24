@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
@@ -10,10 +12,12 @@ from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django_datatables_view.base_datatable_view import BaseDatatableView
 
-from houses.models import House
-from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm, OwnerUserForm
-from users.models import CustomUser, Role
+from houses.models import House, Flat
+from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm, \
+    OwnerUserForm, RequestForm
+from users.models import CustomUser, Role, Request
 
 
 class LoginUser(LoginView):
@@ -169,8 +173,126 @@ class OwnerDetailView(DetailView):
     template_name = 'users/owner_detail.html'
 
     def get_queryset(self):
-        return CustomUser.objects.all().prefetch_related('flat_set__house__personalaccount_set')
+        return CustomUser.objects.all().\
+            prefetch_related('flat_set__house__personalaccount_set')
 
 
+class RequestsCreateView(CreateView):
+    model = Request
+    success_url = reverse_lazy('users:requests_list')
+    form_class = RequestForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['masters'] = CustomUser.objects.filter(~Q(role=None))
+        return context
 
 
+class AjaxUserFlatsList(View):
+
+    @staticmethod
+    def get(request, *args, **kwargs):
+        owner_id = request.GET.get('owner_id')
+        query_flats = Flat.objects.filter(owner=owner_id)
+        flat_list = list()
+        for flat in query_flats:
+            item = {
+                'id': flat.id,
+                'number': flat.number,
+                'house': flat.house.title
+            }
+            flat_list.append(item)
+        return JsonResponse({'flats': flat_list})
+
+
+class RequestListView(ListView):
+    model = Request
+    queryset = model.objects.all().select_related('flat__house', 'owner')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['owners'] = CustomUser.objects.filter(role=None)
+        context['masters'] = CustomUser.objects.filter(~Q(role=None)).\
+            select_related('role')
+        return context
+
+
+class RequestGetViewAjax(BaseDatatableView):
+    model = Request
+    columns = ['id', 'date', 'time', 'type_master',
+               'description', 'flat', 'flat.house', 'flat.id',
+               'owner', 'owner.id', 'owner.phone', 'master',
+               'master.id', 'status']
+    order_columns = ['id', 'date', 'type_master']
+
+    def get_initial_queryset(self):
+        return self.model.objects.all().select_related('flat__house',
+                                                       'owner')
+
+    def filter_queryset(self, qs):
+        id = self.request.GET.get('id')
+        date_range = self.request.GET.get('date_range')
+        type_master = self.request.GET['type_master']
+        description = self.request.GET.get('description')
+        flat = self.request.GET.get('flat')
+        owner = self.request.GET.get('owner')
+        phone = self.request.GET.get('phone')
+        master = self.request.GET.get('master')
+        status = self.request.GET.get('status')
+        if date_range:
+            date_start = datetime.datetime.strptime(date_range.split(' - ')[0],
+                                                    '%m/%d/%Y')
+            date_end = datetime.datetime.strptime(date_range.split(' - ')[1],
+                                                    '%m/%d/%Y')
+            qs = qs.filter(Q(date__gt=date_start), Q(date__lt=date_end))
+        if id:
+            qs = qs.filter(id=id)
+        if type_master:
+            qs = qs.filter(type_master=type_master)
+        if description:
+            qs = qs.filter(description__contains=description)
+        if flat:
+            qs = qs.filter(Q(flat__contains=flat)|Q(flat__house__contains=flat))
+        if owner:
+            qs = qs.filter(owner=owner)
+        if phone:
+            qs = qs.filter(flat__owner__phone__contains=phone)
+        if master:
+            qs = qs.filter(master=master)
+        if status:
+            qs = qs.filter(status=status)
+        return qs
+
+
+class RequestDeleteAjax(DeleteView):
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_superuser or request.user.is_staff:
+            request_id = request.POST.get('id')
+            request_instance = get_object_or_404(Request, id=request_id)
+            request_instance.delete()
+            return JsonResponse({'success': 'success'})
+        else:
+            return JsonResponse(
+                {'success': "У Вас недостаточно прав для удаления."}
+            )
+
+
+class RequestDetailView(DetailView):
+    model = Request
+
+    def get_queryset(self):
+        return self.model.objects.all().select_related('flat__house',
+                                                       'owner', 'master')
+
+
+class RequestUpdateView(UpdateView):
+    model = Request
+    template_name = 'users/request_update_form.html'
+    success_url = reverse_lazy('users:requests_list')
+    form_class = RequestForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['masters'] = CustomUser.objects.filter(~Q(role=None))
+        return context

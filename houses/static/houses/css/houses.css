@@ -235,3 +235,14 @@ table.dataTable tbody tr:hover {
     border-radius: 3px;
     font-weight: 700;
 }
+
+.link-list {
+    color: #3c8dbc;
+    text-decoration: none;
+}
+
+.link-list:hover {
+    outline: none;
+    text-decoration: none;
+    color: #72afd2;
+}

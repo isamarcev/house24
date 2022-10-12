@@ -156,12 +156,11 @@
 
 {% endblock %}
 {% block script %}
-{#    <script type="text/javascript" src="{% static 'crm_home/js/daterangepicker.js' %}"></script>#}
-{#<script type="text/javascript" src="{% static 'crm_home/js/moment.min.js' %}"></script>#}
-{#<link rel="stylesheet" type="text/css" href="{% static 'crm_home/css/daterangepicker.css' %}" />#}
-{#     <script>#}
-{#    $('#date_range').daterangepicker();#}
-{#  </script>#}
+ <!-- DATEPICKER -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
     <script>
@@ -289,7 +288,7 @@
         $('#status').on('change clear', function () {
             table.columns([1]).search($(this).val()).draw();
         });
-        $('#date_range').on('change clear', function () {
+        $('#date_range').on('blur change clear', function () {
             table.columns([2]).search($(this).val()).draw();
         });
         $('#house').on('change clear', function () {
@@ -379,5 +378,28 @@
         }
 
     </style>
+
+     <!-- DATE PICKER -->
+    <script type="text/javascript">
+            $(function() {
+              $('#date_range').daterangepicker({
+                  autoUpdateInput: false,
+                  locale: {
+                      cancelLabel: 'Clear'
+                  }
+              });
+
+              $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                  $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+                  $(this).blur()
+              });
+
+              $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                  $(this).val('');
+                  $(this).click()
+              });
+
+            });
+    </script>
 
 {% endblock %}

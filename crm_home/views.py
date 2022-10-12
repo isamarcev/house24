@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Q
 from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -345,9 +346,7 @@ class FlatCounterDataGetViewAjax(BaseDatatableView):
     order_columns = ['house', 'section', 'flat', 'service']
 
     def get_initial_queryset(self):
-        print(self.request.GET)
         flat_id = self.request.GET.get('id_flat')
-        service_id = self.request.GET.get('id_service')
         return self.model.objects.filter(flat_id=flat_id).select_related('flat',
                                                        'service__unit')
 
@@ -356,9 +355,16 @@ class FlatCounterDataGetViewAjax(BaseDatatableView):
         house = self.request.GET.get('house')
         status = self.request.GET['status']
         date_range = self.request.GET.get('date_range')
+        print(date_range)
         section = self.request.GET.get('section')
         flat_number = self.request.GET.get('flat_number')
         service = self.request.GET.get('service')
+        if date_range:
+            date_start = datetime.datetime.strptime(date_range.split(' - ')[0],
+                                                    '%m/%d/%Y')
+            date_end = datetime.datetime.strptime(date_range.split(' - ')[1],
+                                                    '%m/%d/%Y')
+            qs = qs.filter(Q(date__gt=date_start), Q(date__lt=date_end))
         if house:
             qs = qs.filter(house=house)
         if number:

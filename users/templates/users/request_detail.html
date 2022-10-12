@@ -1,0 +1,205 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Заявка №{{ object.id }}
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'users/css/request.css' %}">
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Заявка №{{ object.id }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'users:requests_list' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Заявки вызова мастера
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span> Заявка №{{ object.id }}</li>
+        </ul>
+    </section>
+    <form method="post" style="padding:15px">
+        {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec" style="align-items: normal; margin-bottom: 0">
+                <div class="form-group" style="margin-bottom: 0; width: 45%">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class='fa fa-calendar' ></i>
+                        </div>
+                        <div class="input-group-addon" style="width:75%; text-align: left">
+                            {{ object.date|date:'d.m.Y' }}
+                        </div>
+                    </div>
+                </div>
+                <span class="label-mid" style="vertical-align: center; padding-top: 8px;margin: 0 auto; font-size: 14px">
+                    от
+                </span>
+                <div class="form-group" style="width: 45%">
+
+                    <div class="input-group" >
+                        <div class="input-group-addon">
+                            <i class='fa fa-clock-o' ></i>
+                        </div>
+                        <div class="input-group-addon" style="width:75%; text-align: left">
+                            {{ object.time|date:'H:i' }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-body">
+<div class="box-header" style="position: relative; height: 42px; padding: 0!important; text-align: right">
+                    <div class="box-tools">
+                        <a href="{% url 'users:requests_update' object.id %}" class="btn btn-tariff btn-sm">
+                <span class="hidden-xs">Редактировать заявку</span>
+            </a>
+        </div>
+                </div>
+                                <div class="col-sm-12 col-lg-12">
+                        <table class="table table-bordered table-striped table-view" >
+                    <tbody>
+                        <tr>
+                            <td class="user-label">Статус</td>
+                            <td style="width: 60%">
+                                 {% if object.status == 'Новое' %}
+                                    <small class="label label-danger">{{ object.status }}</small>
+                                    {% elif object.status == 'В работе' %}
+                                    <small class="label label-warning">{{ object.status }}</small>
+                                    {% elif object.status == 'Выполнено' %}
+                                    <small class="label label-success">{{ object.status }}</small>
+                                    {% else %}
+                                    Не выбран
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Владелец</td>
+                            <td>
+                                <a class="link-list" href="{% url 'users:owner_detail' object.owner.id %}">
+                                {{ object.owner }}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Телефон</td>
+                            {% if object.owner.phone %}
+                                <td>{{ object.owner.phone }}</td>
+                                {% else %}
+                                <td>Не указано</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="user-label">Квартира</td>
+                            {% if object.flat %}
+                            <td><a class="link-list" href="{% url 'houses:flat_detail' object.flat.id %}">{{ object.flat }}, {{ object.flat.house }}</a></td>
+                            {% else %}
+                            <td>Не привязана квартира</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="user-label">Тип мастера</td>
+                            <td>
+                            {% if object.master %}
+                                {{ object.master.role }}
+                            {% else %}
+                            Не выбран
+                            {% endif %}
+                        </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Мастер</td>
+                            <td style="width: 100%">
+                                {% if object.master %}
+                                <a class="link-list" href="{% url 'users:user_detail' object.master.id %}">
+                                    {{ object.master }} ({{ object.master.role }})
+                                </a>
+                            {% else %}
+                            Не выбран
+                            {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Описание</td>
+                            <td style="width: 60%">
+                                {{ object.description }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Добавлено</td>
+                                <td>
+                                    {{ object.created_at|date:"d.m.Y H:i" }}
+                                </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                    </div>
+                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </form>
+
+    <div>
+
+    </div>
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+
+    <script>
+            function ajax_get_flat() {
+                var owner_val = ($('#id_owner').val());
+                var flat_list = ($('#id_flat'))
+                var empty_value = '<option value="">Выберите...</option>'
+                flat_list.empty()
+                flat_list.append(empty_value)
+                if (owner_val) {
+                    $.ajax({
+                        url: '{% url 'users:ajax_user_flats' %}',
+                        type: 'GET',
+                        data: {
+                            'owner_id': owner_val,
+                        },
+                        success: (data) => {
+                            console.log(data)
+                            var flats = '';
+                            $(data.flats).each(function (index, value) {
+                                flats += "<option value='"+value.id+"'>№"+value.number + " " + value.house + "</option>"
+                            })
+                            flat_list.append(flats)
+                        }
+                    })
+                }
+            }
+
+    </script>
+
+    <style>
+        .user-label {
+            width: 30%
+        }
+    </style>
+
+{% endblock %}

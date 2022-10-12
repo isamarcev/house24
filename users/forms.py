@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
 from . import models
-from .models import Role, CustomUser
+from .models import Role, CustomUser, Request
 
 
 class RegisterUserForm(UserCreationForm):
@@ -16,6 +16,7 @@ class LoginUserForm(AuthenticationForm):
                                                                             'placeholder': 'Email или ID'}))
     password = forms.CharField(label='Password Input', widget=forms.PasswordInput(attrs={'class': 'form-input',
                                                                                          'placeholder': 'Пароль'}))
+
 
 class BaseModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -31,6 +32,7 @@ class CustomUserForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='', label='Имя')
     last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='',
                                 label='Фамилия')
+
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'password', 'password2', 'role', 'email', 'phone', 'status']
@@ -184,8 +186,65 @@ class OwnerUserForm(forms.ModelForm):
         password1 = self.cleaned_data.get("password")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
-            print('Ne sovpada')
             raise ValidationError(
                 'Пароли не совпадают. Попробуйте снова'
             )
         return password2
+
+
+class RequestForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(RequestForm, self).__init__(*args, **kwargs)
+
+    owner = forms.ModelChoiceField(
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        queryset=CustomUser.objects.filter(role=None),
+        empty_label="Выберите...", label='Владелец квартиры'
+    )
+
+    class Meta:
+        model = Request
+        exclude = ['id', ]
+        widgets = {
+            'date': forms.DateInput(attrs={'class': 'form-control'}),
+            'time': forms.TimeInput(attrs=({'class': 'form-control',
+                                           "data-clocklet": ""}),
+                                    format=('%H:%M')),
+            'description': forms.Textarea(attrs={'class': 'form-control',
+                                                 'style': 'resize: none;',
+                                                 'rows': '8'}),
+            'comment': forms.Textarea(attrs={'class': 'form-control',
+                                                 'style': 'resize: none;',
+                                                 'rows': '8'}),
+            'type_master': forms.Select(attrs={'class': 'form-select'},
+                                        choices=[("", "Выберите..."),
+                                                 ("Сантехник", "Сантехник"),
+                                                 ("Электрик", "Электрик"),
+                                                 ("Слесарь", "Слесарь"),
+                                                 ("Любой специалист",
+                                                  "Любой специалист")]),
+            'status': forms.Select(attrs={'class': 'form-select'})
+        }
+        labels = {
+            'owner': 'Владелец квартиры',
+            'master': 'Мастер',
+            'description': "Описание",
+            'flat': 'Квартира',
+            'status': 'Статус',
+            'comment': 'Комментарий',
+            'type_master': 'Тип мастера'
+        }
+
+        error_messages = {
+            'owner': {
+                'required': "Это поле обязательно к заполнению"
+            },
+            'flat': {
+                'required': "Это поле обязательно к заполнению"
+            },
+            'master': {
+                'required': "Это поле обязательно к заполнению"
+            },
+        }

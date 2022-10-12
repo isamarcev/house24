@@ -32,18 +32,25 @@ class Role(models.Model):
 class CustomUser(AbstractUser):
     photo = models.ImageField(upload_to='users/', blank=True, null=True)
     birthday = models.DateField(null=True, blank=True)
-    father_name = models.CharField(max_length=30, help_text='Отчество', null=True, blank=True, default='')
+    father_name = models.CharField(max_length=30, help_text='Отчество',
+                                   null=True, blank=True, default='')
     phone = models.CharField(max_length=20, null=True, blank=True, default='')
     viber = models.CharField(max_length=20, null=True, blank=True, default='')
-    telegram = models.CharField(max_length=20, null=True, blank=True, default='')
-    status_state = [('Активен', 'Активен'), ('Новый', 'Новый'), ('Отключен','Отключен')]
+    telegram = models.CharField(max_length=20, null=True, blank=True,
+                                default='')
+    status_state = [('Активен', 'Активен'), ('Новый', 'Новый'),
+                    ('Отключен', 'Отключен')]
     status = models.CharField(choices=status_state, default=status_state[1][0],
                               max_length=20, null=True, blank=True)
-    username = models.CharField(max_length=100, verbose_name="User ID", unique=True, help_text='Required',
-                                error_messages={"unique": "Пользователь с таким ID уже существует."},
+    username = models.CharField(max_length=100, verbose_name="User ID",
+                                unique=True, help_text='Required',
+                                error_messages=
+                                {"unique":
+                                     "Пользователь с таким ID уже существует."},
                                 blank=True, null=True)
     about = models.TextField(max_length=1000, null=True, blank=True)
-    role = models.ForeignKey('Role', on_delete=models.PROTECT, null=True, blank=True)
+    role = models.ForeignKey('Role', on_delete=models.PROTECT, null=True,
+                             blank=True)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} {self.father_name}'
@@ -76,10 +83,13 @@ class Request(models.Model):
                ("Слесарь", "Слесарь"), ("Любой специалист", "Любой специалист")]
     type_master = models.CharField(choices=masters, default=masters[0][0],
                                    max_length=50)
-    status_request = [("Новое", "Новое"), ("В работе", "В работе"), ("Выполнено", "Выполнено")]
-    status = models.CharField(choices=status_request, max_length=50)
+    status_request = [("", "Выберите..."), ("Новое", "Новое"),
+                      ("В работе", "В работе"), ("Выполнено", "Выполнено")]
+    status = models.CharField(choices=status_request, max_length=50,
+                              default=status_request[1][0])
     master = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class MessageUsers(models.Model):
