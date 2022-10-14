@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.forms import modelformset_factory
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -282,6 +283,13 @@ class TransactionListViewAjax(BaseDatatableView):
 class DeleteTransaction(DeleteView):
     model = models.Transaction
 
+    def get(self, request, *args, **kwargs):
+        transaction = self.model.objects.get(
+            pk=request.GET.get('transaction')
+        )
+        transaction.delete()
+        return HttpResponseRedirect(reverse_lazy('crm_accounting:transaction_list'))
+
     def post(self, request, *args, **kwargs):
         transaction = self.model.objects.get(
             pk=request.POST.get('account'))
@@ -316,3 +324,38 @@ class TransactionUpdateView(UpdateView):
         return context
 
 
+class TransactionDetailView(DetailView):
+    model = models.Transaction
+
+    def get_queryset(self):
+        return self.model.objects.all().\
+            select_related('personal_account__flat__owner', 'payment_state')
+
+    def get_context_data(self, **kwargs):
+        context = super(TransactionDetailView, self).get_context_data()
+        if self.object.payment_state.type == 'in':
+            context['type'] = 'Приходная ведомость'
+        else:
+            context['type'] = 'Расходная ведомость'
+        return context
+
+
+class InvoiceListView(ListView):
+    model = models.Invoice
+
+
+class InvoiceCreateView(CreateView):
+    model = models.Invoice
+    # service_formset = modelformset_factory(models.InvoiceService)
+
+
+class InvoiceDetailView(CreateView):
+    model = models.Invoice
+
+
+class InvoiceUpdateView(CreateView):
+    model = models.Invoice
+
+
+class InvoiceDeleteView(CreateView):
+    model = models.Invoice

@@ -39,7 +39,7 @@ urlpatterns = [
          views.TransactionUpdateView.as_view(),
          name='transaction_update'),
     path('transactions/detail/<int:pk>/',
-         views.TransactionUpdateView.as_view(),
+         views.TransactionDetailView.as_view(),
          name='transaction_detail'),
     path('transactions/delete/', views.DeleteTransaction.as_view(),
          name='delete_transaction'),
@@ -50,11 +50,20 @@ urlpatterns = [
          views.TransactionListViewAjax.as_view(),
          name='get_transaction_ajax_list'),
 
-    # invoice для
+    # invoices
     path('account/invoice/detail/<int:pk>/', views.main_page,
          name='invoices_for_flat'),
     path('account/invoice/create/', views.main_page,
          name="create_invoice_for_flat"),
+    path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
+    path('invoices/create/', views.InvoiceCreateView.as_view(),
+         name='invoice_create'),
+    path('invoices/detail/<int:pk>/', views.InvoiceDetailView.as_view(),
+         name='invoice_detail'),
+    path('invoices/update/<int:pk>/', views.InvoiceUpdateView.as_view(),
+         name='invoice_update'),
+    path('invoices/delete/', views.InvoiceDeleteView.as_view(),
+         name='invoice_delete'),
     #
     path('transactionыаыфав/create/', views.TransactionCreateView.as_view(),
          name='transaction_account_create'),
