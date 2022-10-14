@@ -77,10 +77,10 @@
                                         <tr data-href="{% url 'crm_home:payment_state_update' object.id %}" id="instance-{{ object.id }}">
                                                 <td >{{ object.title }}</td>
                                                 <td  class="payment-state">
-                                                    {% if object.type == "Расход" %}
-                                                    <span style="color: red;">{{ object.type }}</span>
+                                                    {% if object.type == "in" %}
+                                                    <span style="color: green;">Приход</span>
                                                     {% else %}
-                                                    <span style="color: green;">{{ object.type }}</span>
+                                                    <span style="color: red;">Расход</span>
                                                     {% endif %}
                                                 </td>
                                                 <td >

@@ -115,7 +115,7 @@
                     </tbody>
                 </table>
                     <div>
-                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:counter_data' object.id %}">Посмотреть показания счетчиков</a></p>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_home:flat_counter_list' %}?flat_id={{ object.flat.id }}">Посмотреть показания счетчиков</a></p>
                     <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:transaction_account_detail' %}/?account={{ object.personal_account.id }}">Посмотреть приходы</a></p>
                     <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:invoices_for_flat' object.id %}">Посмотреть квитанции</a></p>
                 </div>

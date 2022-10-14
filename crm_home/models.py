@@ -81,6 +81,9 @@ class Requisites(models.Model):
 
 class PaymentState(models.Model):
     title = models.CharField(max_length=100)
-    type = models.CharField(choices=[("Приход", "Приход"),
-                                     ("Расход", "Расход")],
+    type = models.CharField(choices=[("in", "Приход"),
+                                     ("out", "Расход")],
                             max_length=30)
+
+    def __str__(self):
+        return self.title

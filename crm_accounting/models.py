@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from users.models import CustomUser
 from crm_home.models import Tariff, Service, Unit, PaymentState
@@ -65,7 +67,8 @@ class Invoice(models.Model):
     phone = models.CharField(max_length=20, null=True, blank=True)
     payment_state = models.BooleanField(verbose_name='Проведена')
     status = models.CharField(max_length=120,
-                              choices=[('Оплачена', 'Оплачена'), ('Частично оплачена', 'Частично оплачена'),
+                              choices=[('Оплачена', 'Оплачена'),
+                                       ('Частично оплачена', 'Частично оплачена'),
                                        ('Неоплачена', 'Неоплачена')])
     tariff = models.ForeignKey(Tariff, on_delete=models.PROTECT)
     period_start = models.DateField(auto_now_add=True)
@@ -82,21 +85,40 @@ class Invoice(models.Model):
 
 def get_next_transaction():
     ''' Getiing next number of transaction '''
-    number = Transaction.objects.order_by('number')[-1].number
-    x = str(int(number) + 1).zfill(10)
-    return x
+    try:
+        number_list = Transaction.objects.all().order_by('-number').values('number')
+        values_list = list()
+        for item in number_list:
+            values_list.append(item['number'])
+
+        def check_instance(number_list, values_list, step=1):
+            new_number = str(int(number_list[0]['number']) + step).zfill(11)
+            if new_number in values_list:
+                step += 1
+                check_instance(number_list, values_list, step)
+            else:
+                return new_number
+        return check_instance(number_list, values_list)
+    except IndexError:
+        new_number = str(1).zfill(11)
+        return new_number
 
 
 class Transaction(models.Model):
-    number = models.IntegerField(default=get_next_transaction)
-    date = models.DateField(auto_now_add=True)
-    owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT, related_name='owner')
-    personal_account = models.ForeignKey(PersonalAccount, on_delete=models.PROTECT)
+    number = models.CharField(default=get_next_transaction, max_length=15)
+    date = models.DateField(default=datetime.datetime.now)
+    owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT,
+                              related_name='owner', null=True, blank=True)
+    personal_account = models.ForeignKey(PersonalAccount,
+                                         on_delete=models.PROTECT,
+                                         null=True, blank=True)
     payment_state = models.ForeignKey(PaymentState, on_delete=models.PROTECT)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
-    completed = models.BooleanField(null=True)
-    manager = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    comment = models.TextField(max_length=1000)
+    completed = models.BooleanField(null=True, blank=True, default=True)
+    manager = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.PROTECT,
+                                null=True, blank=True)
+    comment = models.TextField(max_length=1000, null=True, blank=True)
 
     def __str__(self):
         return self.number

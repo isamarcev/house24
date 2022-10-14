@@ -55,7 +55,7 @@
                 </div>
                     <div class="box-body" style="padding: 0">
                     {% csrf_token %}
-                        <table id="counters" align="center" style="margin: 0; width: 100%;" class="table table-bordered table-hover table-responsive table-striped linkedRow">
+                        <table id="counters" align="center" style="margin: 0; width: 100%;" class="table table-bordered table-hover table-striped linkedRow">
                              <thead>
                                   <tr>
                                       <th tabindex="0"  rowspan="1" colspan="1" style="width: 140px; min-width: 140px" >
@@ -70,7 +70,7 @@
                                       <th  tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc; width: 110px; min-width: 110px">
                                           Месяц
                                       </th>
-                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 150px; min-width: 150px">
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="">
                                           Дом
                                       </th>
                                       <th tabindex="0"  rowspan="1" colspan="1" style="width: 120px; min-width: 120px">
@@ -205,7 +205,7 @@
                 {#dom: 't',#}
                 "language": {
                     "zeroRecords": "Ничего не найдено",
-                    "info": "Количество квартир:  _MAX_",
+                    "info": "Количество показаний:  <b>_MAX_</b>",
                     'infoFiltered': '',
                     "infoEmpty": "",
                     "paginate": {
@@ -214,7 +214,7 @@
                     },
                   },
                 "aoColumnDefs": [
-                    { 'bSortable': false, 'targets': [0, 1, 4, 5, 6, 7, 8, 9] },
+                    { 'bSortable': false, 'targets': [0, 1, 4, 5, 6, 7, 8, 9, 10] },
                     ],
                 "fnServerParams": function ( aoData ) {
                       aoData.push(
@@ -235,7 +235,6 @@
                 columns: [
                     {name: "number", data: 9},
                     {name: "status", data: null, render: function (data, type, row) {
-                            console.log(row[10])
                             if (row[10] === 'Новое') {
                                 this.data = `<small class="label label-success">${row[10]}</small>`
                             } else if (row[10] === 'Учтено') {

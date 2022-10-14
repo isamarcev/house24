@@ -214,6 +214,8 @@ class PaymentStateCreateView(CreateView):
     form_class = forms.PaymentStateForm
 
     def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST)
+        print(form_class.is_valid(), form_class.errors)
         response = super().post(self, request, *args, **kwargs)
         messages.success(request, 'Успешно выполнено')
         return response
@@ -332,7 +334,8 @@ class FlatCounterDataListView(TemplateView):
         flat_id = self.request.GET.get('flat_id')
         service_id = self.request.GET.get('service_id')
         context['flat'] = Flat.objects.get(pk=flat_id)
-        context['service'] = Service.objects.get(pk=service_id)
+        if service_id:
+            context['service'] = Service.objects.get(pk=service_id)
         context['counters'] = CounterData.objects.filter(flat_id=flat_id,
                                                          service_id=service_id)
         return context
@@ -355,7 +358,6 @@ class FlatCounterDataGetViewAjax(BaseDatatableView):
         house = self.request.GET.get('house')
         status = self.request.GET['status']
         date_range = self.request.GET.get('date_range')
-        print(date_range)
         section = self.request.GET.get('section')
         flat_number = self.request.GET.get('flat_number')
         service = self.request.GET.get('service')

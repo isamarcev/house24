@@ -179,7 +179,7 @@ tr[data-href]:hover {
 
 .page-header-spec {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     margin-bottom: 15px;
 }
@@ -189,6 +189,7 @@ tr[data-href]:hover {
     border-radius: 0;
     border-color: #d2d6de;
     background-color: #fff;
+    line-height: 1.4!important;
 
 }
 

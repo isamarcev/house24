@@ -279,11 +279,13 @@ class FlatUpdateView(UpdateView):
     def post(self, request, *args, **kwargs):
         flat = self.get_object()
         form_class = self.form_class(request.POST or None, instance=flat)
-        account_form = PersonalAccountForm(request.POST or None, instance=flat.personal_account)
+        account_form = PersonalAccountForm(request.POST or None,
+                                           instance=flat.personal_account)
         if form_class.is_valid():
             form_class.save(commit=False)
             if account_form.is_valid():
-                account = PersonalAccount.objects.filter(account_number__exact=request.POST['account_number'])
+                account = PersonalAccount.objects.filter(
+                    account_number__exact=request.POST['account_number'])
                 if account.exists():
                     if not account.first().flat:
                         account.first().flat = form_class.instance
@@ -359,7 +361,8 @@ class FlatCreate(CreateView):
         if form_class.is_valid():
             form_class.save(commit=False)
             if account_form.is_valid():
-                account = PersonalAccount.objects.filter(account_number__exact=request.POST['account_number'])
+                account = PersonalAccount.objects.filter(
+                    account_number__exact=request.POST['account_number'])
                 if account.exists():
                     if not account.first().flat:
                         account.first().flat = form_class.instance
@@ -385,10 +388,10 @@ class FlatCreate(CreateView):
             content = {'form': form_class, 'account': account_form}
             return render(request, self.template_name, content)
 
+
 def get_account_list(request):
     account_list = get_next_account(3)
     return JsonResponse({'data': account_list})
-
 
 
 def get_sections_and_floors(request):

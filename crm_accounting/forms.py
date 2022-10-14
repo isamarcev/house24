@@ -1,8 +1,11 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from houses.models import House, Flat
+from users.models import CustomUser
 from . import models
+from .models import PersonalAccount
 
 
 class PersonalAccountForm(forms.ModelForm):
@@ -57,3 +60,63 @@ class PersonalAccountForm(forms.ModelForm):
         }
 
 
+class TransactionForm(forms.ModelForm):
+    owner = forms.ModelChoiceField(queryset=CustomUser.objects.filter(role=None),
+                                   empty_label="Выберите...",
+                                   widget=forms.Select(
+                                       attrs={'class': 'form-select'}),
+                                   label='Владелец квартиры',
+                                   required=False)
+    # manager = forms.ModelChoiceField(
+    #     queryset=CustomUser.objects.filter(~Q(role=None)),
+    #     empty_label="Выберите...",
+    #     widget=forms.Select(
+    #         attrs={'class': 'form-select'}),
+    #     label='Менеджер')
+    personal_account = forms.ModelChoiceField(queryset=
+                                              PersonalAccount.objects.all(),
+                                              empty_label="Выберите...",
+                                              widget=forms.Select(
+                                                  attrs=
+                                                  {'class': 'form-select'}),
+                                              label='Лицевой счет',
+                                              required=False)
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(TransactionForm, self).__init__(*args, **kwargs)
+        self.fields['manager'].empty_label = 'Выберите...'
+
+
+    class Meta:
+        model = models.Transaction
+        exclude = ['id', ]
+        widgets = {
+            'number': forms.TextInput(attrs={'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'class': 'form-control'}),
+            'owner': forms.Select(attrs={'class': 'form-select'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control',
+                                               'step': 0.1}),
+            'comment': forms.Textarea(attrs={'class': 'form-control',
+                                             'style': 'resize: none;',
+                                             'rows': 5}),
+            'completed': forms.CheckboxInput()
+        }
+        labels = {
+            'payment_state': 'Статья',
+            'amount': 'Сумма',
+            'manager': 'Менеджер',
+            'completed': 'Проведен',
+            'comment': 'Комментарий'
+        }
+        error_messages = {
+            'payment_state': {
+                'required': 'Поле "Статья" обязательно к заполнению'
+            },
+            'amount': {
+                'required': 'Поле "Сумма" обязательно к заполнению'
+            },
+            'number': {
+                'unique': 'Пока вы дуумали, этот номер уже заняли!'
+            }
+        }

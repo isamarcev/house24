@@ -109,7 +109,7 @@ class PaymentStateForm(forms.ModelForm):
     type = forms.ChoiceField(widget=forms.Select(
         attrs={'class': 'form-select'}), label_suffix='',
         label="Приход/расход",
-        choices=[("Приход", "Приход"), ("Расход", "Расход")])
+        choices=[("in", "Приход"), ("out", "Расход")])
 
     class Meta:
         model = PaymentState
@@ -135,7 +135,7 @@ class CounterDataForm(forms.ModelForm):
                                error_messages={
                                    'required': 'Это поле обязательно к заполнению.'
                                })
-    service = forms.ModelChoiceField(queryset=Service.objects.all(),
+    service = forms.ModelChoiceField(queryset=Service.objects.filter(show=True),
                                      empty_label='Выберите...',
                                      label="Счетчик",
                                      widget=forms.Select(

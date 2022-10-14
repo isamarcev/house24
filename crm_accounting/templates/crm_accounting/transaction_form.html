@@ -1,0 +1,176 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Новое показание
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'crm_home/css/counter_create.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Новая {{ type }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_accounting:transaction_list' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Платежи
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span> Новая {{ type }} </li>
+        </ul>
+    </section>
+    <form method="post" style="padding:15px">
+        {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec" style="align-items: normal; justify-content: flex-start">
+                <div class="form-group" style="margin-bottom: 0px">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            №
+                        </div>
+{#                        {% if form.initial.number %}#}
+{#                            <input type="text" id="id_number" class="form-control" name="number" value="{{ form.initial.number }}">#}
+{#                        {% else %}#}
+                            {{ form.number }}
+{#                        {% endif %}#}
+                    </div>
+                    <div class="errorlist">
+                        {% if form.errors.number %}
+                            {% for field in form.errors.number %}
+                                {{ field }}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <span class="label-mid" style="vertical-align: center; padding-top: 10px;margin: 0 15px; font-size: 14px">
+                    от
+                </span>
+                <div class="form-group">
+                    <div class="input-group">
+                        {{ form.date }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-body">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6 col-sm-offset-6"></div>
+                                <div class="col-xs-12 col-sm-6 col-sm-offset-6">
+                                    {{ form.completed }}
+                                    {{ form.completed.label_tag }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6">
+                                {% if type == 'приходная ведомость' %}
+                                    <div class="form-group no-margin" style="margin-bottom: 0">
+                                        {{ form.owner.label_tag }}
+                                        {{ form.owner }}
+                                    </div>
+                                    <div class="form-group no-margin" style="margin-bottom: 0">
+                                        {{ form.personal_account.label_tag }}
+                                        {{ form.personal_account }}
+                                    </div>
+                                {% endif %}
+                                    <div class="form-group no-margin" style="margin-bottom: 0">
+                                        {{ form.payment_state.label_tag }}
+                                        <select name="payment_state" id="id_payment_state" class="form-select">
+                                            <option value="">Выберите...</option>
+                                            {% for state in payment_states %}
+                                                {% if state == form.initial.payment_state %}
+                                                <option value="{{ state.id }}" selected >{{ state }}</option>
+                                                {% else %}
+                                                <option value="{{ state.id }}" >{{ state }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <div class="errorlist">
+                                            {% if form.errors.payment_state %}
+                                                {% for field in form.errors.payment_state %}
+                                                    {{ field }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group no-margin" style="margin-bottom: 0">
+                                        {{ form.amount.label_tag }}
+                                        {{ form.amount }}
+                                        <div class="errorlist">
+                                            {% if form.errors.amount %}
+                                                {% for field in form.errors.amount %}
+                                                    {{ field }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        {{ form.manager.label_tag }}
+                                        <select name="manager" id="id_manager" class="form-select">
+                                            <option value="">Выберите...</option>
+                                            {% for man in manager_list %}
+                                                {% if man == manager %}
+                                                    <option value="{{ man.id }}" selected>{{ man.role }} - {{ man }}</option>
+                                                {% else %}
+                                                    <option value="{{ man.id }}" >{{ man.role }} - {{ man }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row" style="text-align: right">
+                                    <div class="form-group">
+                                        <a href="{% url 'crm_home:counter_data_list' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+                                        ">Отменить</a>
+                                        <button type="submit" class="btn btn-success" name="save">Сохранить</button>
+                                    </div>
+                                </div>
+                            <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            {{ form.comment.label_tag }}
+                                            {{ form.comment }}
+                                        </div>
+                                    </div>
+                            </div>
+                            </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </form>
+
+    <div>
+
+    </div>
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        const urlGet = "{% url 'crm_accounting:get_personal_accounts_ajax' %}"
+    </script>
+    <script src="{% static 'crm_accounting/js/transaction_create.js' %}"></script>
+
+{% endblock %}

@@ -272,3 +272,21 @@ button .add-more {
     background-color: #008d4c !important;
     border-color: #39841C;
 }
+
+.box-header {
+    height: 40px;
+    position: relative;
+    padding: 0 0 5px 0;
+
+}
+
+.box-header .box-tools {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}
+
+.box-tools > a {
+    font-size: 12px!important;
+}
+
