@@ -35,8 +35,6 @@ class PersonalAccount(models.Model):
     status = models.CharField(choices=status_choice, null=True, blank=True,
                               max_length=20)
     balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
-    # owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT, null=True, blank=True)
-    # phone = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Персональные счета"
@@ -57,22 +55,27 @@ def get_next_invoice():
 
 
 class Invoice(models.Model):
-    number = models.IntegerField(unique=True, default=get_next_invoice)
-    date = models.DateField(auto_now_add=True)
+    number = models.CharField(unique=True, default=get_next_invoice,
+                              max_length=15)
+    date = models.DateField(default=datetime.datetime.now)
     house = models.ForeignKey('houses.House', on_delete=models.CASCADE)
     section = models.ForeignKey('houses.Section', on_delete=models.CASCADE)
     flat = models.ForeignKey('houses.Flat', on_delete=models.CASCADE)
     personal_account = models.CharField(max_length=50)
-    owner = models.CharField(max_length=128, null=True, blank=True)
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    payment_state = models.BooleanField(verbose_name='Проведена')
+    # owner = models.CharField(max_length=128, null=True, blank=True)
+    # phone = models.CharField(max_length=20, null=True, blank=True)
+    payment_state = models.BooleanField(verbose_name='Проведена',
+                                        null=True, blank=True)
     status = models.CharField(max_length=120,
-                              choices=[('Оплачена', 'Оплачена'),
+                              choices=[('', 'Выберите...'),
+                                       ('Оплачена', 'Оплачена'),
                                        ('Частично оплачена', 'Частично оплачена'),
-                                       ('Неоплачена', 'Неоплачена')])
+                                       ('Неоплачена', 'Неоплачена')],
+                              null=True,
+                              blank=True)
     tariff = models.ForeignKey(Tariff, on_delete=models.PROTECT)
-    period_start = models.DateField(auto_now_add=True)
-    period_end = models.DateField(auto_now_add=True)
+    period_start = models.DateField(default=datetime.datetime.now)
+    period_end = models.DateField(default=datetime.datetime.now)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
 
     class Meta:
@@ -86,16 +89,17 @@ class Invoice(models.Model):
 def get_next_transaction():
     ''' Getiing next number of transaction '''
     try:
-        number_list = Transaction.objects.all().order_by('-number').values('number')
+        number_list = Transaction.objects.all().order_by('-number').\
+            values('number')
         values_list = list()
         for item in number_list:
             values_list.append(item['number'])
 
-        def check_instance(number_list, values_list, step=1):
-            new_number = str(int(number_list[0]['number']) + step).zfill(11)
-            if new_number in values_list:
+        def check_instance(numbers, values, step=1):
+            new_number = str(int(numbers[0]['number']) + step).zfill(11)
+            if new_number in values:
                 step += 1
-                check_instance(number_list, values_list, step)
+                check_instance(numbers, values, step)
             else:
                 return new_number
         return check_instance(number_list, values_list)
@@ -134,7 +138,6 @@ class InvoiceService(models.Model):
     price = models.DecimalField(decimal_places=2, max_digits=10)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     total = models.DecimalField(decimal_places=2, max_digits=10)
-    unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
 
     def __str__(self):
         return f'{self.invoice} {self.service}'

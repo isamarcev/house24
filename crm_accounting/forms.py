@@ -1,7 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.forms import modelformset_factory
 
+from crm_home.models import Unit, Service
 from houses.models import House, Flat
 from users.models import CustomUser
 from . import models
@@ -67,12 +69,6 @@ class TransactionForm(forms.ModelForm):
                                        attrs={'class': 'form-select'}),
                                    label='Владелец квартиры',
                                    required=False)
-    # manager = forms.ModelChoiceField(
-    #     queryset=CustomUser.objects.filter(~Q(role=None)),
-    #     empty_label="Выберите...",
-    #     widget=forms.Select(
-    #         attrs={'class': 'form-select'}),
-    #     label='Менеджер')
     personal_account = forms.ModelChoiceField(queryset=
                                               PersonalAccount.objects.all(),
                                               empty_label="Выберите...",
@@ -120,3 +116,90 @@ class TransactionForm(forms.ModelForm):
                 'unique': 'Пока вы дуумали, этот номер уже заняли!'
             }
         }
+
+    def clean_number(self):
+        number = self.cleaned_data.get('number')
+        if number:
+            if not number.isdigit():
+                raise ValidationError(
+                    'Номер должен состоять из цифр.'
+                )
+
+
+class InvoiceForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(InvoiceForm, self).__init__(*args, **kwargs)
+        self.fields['house'].empty_label = 'Выберите...'
+        self.fields['status'].empty_label = 'Выберите...'
+        self.fields['tariff'].empty_label = 'Выберите...'
+
+    class Meta:
+        model = models.Invoice
+        exclude = ['id']
+        widgets = {
+            'number': forms.TextInput(attrs={'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'class': 'form-control'}),
+            'house': forms.Select(attrs={'class': 'form-select'}),
+            'personal_account':
+                forms.TextInput(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'tariff': forms.Select(attrs={'class': 'form-select'}),
+            'period_start': forms.DateInput(attrs={'class': 'form-control'}),
+            'period_end': forms.DateInput(attrs={'class': 'form-control'}),
+            'payment_state': forms.CheckboxInput(),
+        }
+        labels = {
+            'house': 'Дом',
+            'section': 'Секция',
+            'personal_account': 'Лицевой счет',
+            'status': 'Статус',
+            'tariff': 'Тариф',
+            'period_start': 'Период с',
+            'period_end': 'Период по',
+            'payment_state': 'Проведена',
+            'flat': 'Квартира',
+        }
+
+
+class InvoiceServiceForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(InvoiceServiceForm, self).__init__(*args, **kwargs)
+        self.fields['unit'].empty_label = 'Выберите...'
+        self.fields['service'].empty_label = 'Выберите...'
+
+    unit = forms.ModelChoiceField(queryset=Unit.objects.all(),
+                                  label='Ед. изм.',
+                                  widget=forms.Select(
+                                      attrs={'class': 'form-select'}),
+                                  # empty_label='Выберите...'
+                                  )
+    service = forms.ModelChoiceField(queryset=Service.objects.all(),
+                                     label='Услуга',
+                                     # empty_label='Выберите...',
+                                     widget=forms.Select(
+                                         attrs={'class': 'form-select'})
+                                     )
+
+    class Meta:
+        model = models.InvoiceService
+        exclude = ['id']
+        widgets = {
+            'amount': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.TextInput(attrs={'class': 'form-control'}),
+            'total': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'total': 'Стоимость, грн.',
+            'price': 'Цена за ед., грн.',
+            'amount': 'Расход'
+        }
+
+
+InvoiceServiceFormset = modelformset_factory(models.InvoiceService,
+                                             InvoiceServiceForm,
+                                             fields='__all__', can_delete=True,
+                                             extra=0)

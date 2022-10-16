@@ -186,7 +186,8 @@ class TransactionCreateView(CreateView):
         context['manager'] = self.request.user
         instance_id = self.request.GET.get('transaction_id')
         if instance_id:
-            transaction = models.Transaction.objects.select_related('manager', 'owner').\
+            transaction = models.Transaction.objects.select_related('manager',
+                                                                    'owner'). \
                 get(pk=instance_id)
             initial = {
                 # 'number': get_next_transaction,
@@ -201,7 +202,8 @@ class TransactionCreateView(CreateView):
             context['form'] = self.form_class(initial=initial)
             type_of_transaction = transaction.payment_state.type
             context['manager'] = transaction.manager
-        else: context['form'] = self.form_class()
+        else:
+            context['form'] = self.form_class()
         if type_of_transaction == 'in':
             context['type'] = 'приходная ведомость'
         elif type_of_transaction == 'out':
@@ -245,7 +247,7 @@ class TransactionListViewAjax(BaseDatatableView):
     order_columns = ['date']
 
     def get_initial_queryset(self):
-        return self.model.objects.all().select_related('payment_state').\
+        return self.model.objects.all().select_related('payment_state'). \
             order_by('-number')
 
     def filter_queryset(self, qs):
@@ -288,7 +290,8 @@ class DeleteTransaction(DeleteView):
             pk=request.GET.get('transaction')
         )
         transaction.delete()
-        return HttpResponseRedirect(reverse_lazy('crm_accounting:transaction_list'))
+        return HttpResponseRedirect(
+            reverse_lazy('crm_accounting:transaction_list'))
 
     def post(self, request, *args, **kwargs):
         transaction = self.model.objects.get(
@@ -297,7 +300,8 @@ class DeleteTransaction(DeleteView):
             transaction.delete()
             return JsonResponse({'success': 'success'})
         else:
-            return JsonResponse({'success': 'Удаление счета доступно только старшему персоналу!'})
+            return JsonResponse({
+                                    'success': 'Удаление счета доступно только старшему персоналу!'})
 
 
 class TransactionUpdateView(UpdateView):
@@ -328,7 +332,7 @@ class TransactionDetailView(DetailView):
     model = models.Transaction
 
     def get_queryset(self):
-        return self.model.objects.all().\
+        return self.model.objects.all(). \
             select_related('personal_account__flat__owner', 'payment_state')
 
     def get_context_data(self, **kwargs):
@@ -346,7 +350,19 @@ class InvoiceListView(ListView):
 
 class InvoiceCreateView(CreateView):
     model = models.Invoice
-    # service_formset = modelformset_factory(models.InvoiceService)
+    service_formset = forms.InvoiceServiceFormset
+    form_class = forms.InvoiceForm
+
+    def get_context_data(self, **kwargs):
+        context = super(InvoiceCreateView, self).get_context_data()
+        date_service = {'form-TOTAL_FORMS': '0',
+                        'form-INITIAL_FORMS': '0',
+                        }
+        context['service_formset'] = self.service_formset(data=date_service)
+        context['services'] = forms.Service.objects.all()
+        context['units'] = forms.Unit.objects.all()
+        print(context)
+        return context
 
 
 class InvoiceDetailView(CreateView):

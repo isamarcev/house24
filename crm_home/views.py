@@ -350,13 +350,18 @@ class FlatCounterDataGetViewAjax(BaseDatatableView):
 
     def get_initial_queryset(self):
         flat_id = self.request.GET.get('id_flat')
-        return self.model.objects.filter(flat_id=flat_id).select_related('flat',
-                                                       'service__unit')
+        if flat_id:
+            qs = self.model.objects.filter(flat_id=flat_id).select_related(
+                'flat', 'service__unit')
+        else:
+            qs = self.model.objects.all().select_related('flat',
+                                                         'service__unit')
+        return qs
 
     def filter_queryset(self, qs):
         number = self.request.GET.get('number')
         house = self.request.GET.get('house')
-        status = self.request.GET['status']
+        status = self.request.GET.get('status')
         date_range = self.request.GET.get('date_range')
         section = self.request.GET.get('section')
         flat_number = self.request.GET.get('flat_number')

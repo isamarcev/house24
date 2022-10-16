@@ -1,5 +1,6 @@
 from django.db.models import Q
-from django.forms import modelformset_factory, inlineformset_factory, formset_factory
+from django.forms import modelformset_factory, inlineformset_factory, \
+    formset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -12,7 +13,8 @@ from psycopg2 import IntegrityError
 from crm_accounting.models import get_next_account
 
 from users.models import Role
-from .forms import SectionForm, FloorForm, HouseForm, UserForm, FlatForm, PersonalAccountForm
+from .forms import SectionForm, FloorForm, HouseForm, UserForm, FlatForm, \
+    PersonalAccountForm
 from .models import *
 
 
@@ -27,9 +29,13 @@ class HousesListView(ListView):
 
 
 class HouseCreateView(CreateView):
-    section_formset = modelformset_factory(Section, SectionForm, fields=('title', ), can_delete=True, extra=0)
-    floor_formset = modelformset_factory(Floor, FloorForm, fields=('title', ), can_delete=True, extra=0)
-    user_formset = modelformset_factory(CustomUser, UserForm, fields=('name', ), extra=0, can_delete=True)
+    section_formset = modelformset_factory(Section, SectionForm,
+                                           fields=('title',), can_delete=True,
+                                           extra=0)
+    floor_formset = modelformset_factory(Floor, FloorForm, fields=('title',),
+                                         can_delete=True, extra=0)
+    user_formset = modelformset_factory(CustomUser, UserForm, fields=('name',),
+                                        extra=0, can_delete=True)
     model = House
     form_class = HouseForm
     template_name = 'houses/house_form.html'
@@ -39,8 +45,8 @@ class HouseCreateView(CreateView):
                         'section-INITIAL_FORMS': '0',
                         }
         data_floor = {'floor-TOTAL_FORMS': '0',
-                        'floor-INITIAL_FORMS': '0',
-                        }
+                      'floor-INITIAL_FORMS': '0',
+                      }
         data_users = {'users-TOTAL_FORMS': '0',
                       'users-INITIAL_FORMS': '0',
                       }
@@ -52,7 +58,8 @@ class HouseCreateView(CreateView):
         context['section_formset'] = section_formset
         context['floor_formset'] = floor_formset
         context['users_formset'] = users_formset
-        context['users'] = CustomUser.objects.filter(role=True).select_related('role')
+        context['users'] = CustomUser.objects.filter(role=True).select_related(
+            'role')
         return context
 
     def post(self, request, *args, **kwargs):
@@ -90,7 +97,8 @@ class HouseCreateView(CreateView):
                 'section_formset': section_formset,
                 'floor_formset': floor_formset,
                 'users_formset': users_formset,
-                'users': CustomUser.objects.filter(role=True).select_related('role')
+                'users': CustomUser.objects.filter(role=True).select_related(
+                    'role')
             })
 
 
@@ -100,40 +108,55 @@ class HousesDetail(DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
-        context['users'] = CustomUser.objects.filter(house=self.object).select_related('role')
+        context['users'] = CustomUser.objects.filter(
+            house=self.object).select_related('role')
         return self.render_to_response(context)
 
 
 class HouseUpdateView(UpdateView):
-    section_formset = modelformset_factory(Section, SectionForm, fields=('title',), can_delete=True, extra=0)
-    floor_formset = modelformset_factory(Floor, FloorForm, fields=('title',), can_delete=True, extra=0)
-    user_formset = modelformset_factory(CustomUser, UserForm, fields=('name',), extra=0, can_delete=True)
+    section_formset = modelformset_factory(Section, SectionForm,
+                                           fields=('title',), can_delete=True,
+                                           extra=0)
+    floor_formset = modelformset_factory(Floor, FloorForm, fields=('title',),
+                                         can_delete=True, extra=0)
+    user_formset = modelformset_factory(CustomUser, UserForm, fields=('name',),
+                                        extra=0, can_delete=True)
     model = House
     form_class = HouseForm
     template_name = 'houses/house_update_form.html'
 
     def get_context_data(self, **kwargs):
         section_formset = self.section_formset(prefix='section',
-                                               queryset=Section.objects.filter(house=self.object))
-        floor_formset = self.floor_formset(prefix='floor', queryset=Floor.objects.filter(house=self.object))
+                                               queryset=Section.objects.filter(
+                                                   house=self.object))
+        floor_formset = self.floor_formset(prefix='floor',
+                                           queryset=Floor.objects.filter(
+                                               house=self.object))
         users_formset = self.user_formset(prefix='users',
-                                          queryset=CustomUser.objects.filter(house=self.object).select_related('role'))
+                                          queryset=CustomUser.objects.filter(
+                                              house=self.object).select_related(
+                                              'role'))
         context = super().get_context_data()
         context['section_formset'] = section_formset
         context['floor_formset'] = floor_formset
         context['users_formset'] = users_formset
-        context['users'] = CustomUser.objects.filter(role=True).select_related('role')
+        context['users'] = CustomUser.objects.filter(role=True).select_related(
+            'role')
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form_class = self.form_class(request.POST, request.FILES, instance=self.object)
+        form_class = self.form_class(request.POST, request.FILES,
+                                     instance=self.object)
         section_formset = self.section_formset(request.POST, prefix='section',
-                                               queryset=Section.objects.filter(house=self.object))
+                                               queryset=Section.objects.filter(
+                                                   house=self.object))
         floor_formset = self.floor_formset(request.POST, prefix='floor',
-                                           queryset=Floor.objects.filter(house=self.object))
+                                           queryset=Floor.objects.filter(
+                                               house=self.object))
         users_formset = self.user_formset(request.POST, prefix='users',
-                                          queryset=CustomUser.objects.filter(house=self.object))
+                                          queryset=CustomUser.objects.filter(
+                                              house=self.object))
         if form_class.is_valid():
             form_class.save(commit=False)
             if users_formset.is_valid():
@@ -183,7 +206,8 @@ class HouseUpdateView(UpdateView):
                 'section_formset': section_formset,
                 'floor_formset': floor_formset,
                 'users_formset': users_formset,
-                'users': CustomUser.objects.filter(role=True).select_related('role')
+                'users': CustomUser.objects.filter(role=True).select_related(
+                    'role')
             })
 
 
@@ -214,11 +238,15 @@ class FlatsListView(ListView):
 
 class FlatsListViewAjax(BaseDatatableView):
     model = Flat
-    columns = ['number', 'house', 'section', 'floor', 'owner', 'personal_account.balance', 'id']
-    order_columns = ['number', 'house', 'section', 'floor', 'owner', 'personal_account', 'id']
+    columns = ['number', 'house', 'section', 'floor', 'owner',
+               'personal_account.balance', 'id']
+    order_columns = ['number', 'house', 'section', 'floor', 'owner',
+                     'personal_account', 'id']
 
     def get_initial_queryset(self):
-        return self.model.objects.all().select_related('floor', 'section', 'house', 'owner', 'personal_account')
+        return self.model.objects.all().select_related('floor', 'section',
+                                                       'house', 'owner',
+                                                       'personal_account')
 
     def filter_queryset(self, qs):
         number = self.request.GET.get('number')
@@ -271,7 +299,8 @@ class FlatUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['account'] = PersonalAccountForm(instance=self.object.personal_account)
+        context['account'] = PersonalAccountForm(
+            instance=self.object.personal_account)
         context['sections'] = Section.objects.filter(flat=self.object)
         context['floors'] = Floor.objects.filter(flat=self.object)
         return context
@@ -342,7 +371,7 @@ class FlatCreate(CreateView):
         if flat_id:
             flat = Flat.objects.get(id=flat_id)
             self.initial = {
-                'number': flat.number+1,
+                'number': flat.number + 1,
                 'area': flat.area,
                 'house': flat.house,
                 'tariff': flat.tariff,
@@ -413,6 +442,3 @@ def get_sections_and_floors(request):
         }
         floors.append(floor)
     return JsonResponse({'sectionist': sections, 'floors': floors})
-
-
-
