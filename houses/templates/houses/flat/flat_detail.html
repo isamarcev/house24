@@ -51,7 +51,7 @@
                             <td class="user-label">Лицевой счет</td>
                             {% if object.personal_account %}
                                 <td>
-                                    <a class="link-list" href="{% url 'crm_accounting:account_detail' object.personal_account.id %}">
+                                    <a class="link-list" href="{% url 'crm_accounting:detail_account' object.personal_account.id %}">
                                         {{ object.personal_account }}
                                     </a>
                                 </td>

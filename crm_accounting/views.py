@@ -1,18 +1,19 @@
+from django.contrib import messages
 from django.db.models import Q
 from django.forms import modelformset_factory
-from django.http import JsonResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView, \
-    ListView, DeleteView
+    ListView, DeleteView, View
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from datetime import datetime
-from crm_home.models import PaymentState
+from crm_home.models import PaymentState, TariffService
 from houses.models import Section, Flat, House
 from users.models import CustomUser
 from . import models
 from . import forms
-from .models import get_next_transaction
+from .models import get_next_transaction, PersonalAccount
 
 
 # Create your views here.
@@ -239,6 +240,16 @@ class TransactionListView(ListView):
         return context
 
 
+def filter_qs_daterange(date, qs):
+    date_start = datetime.strptime(date.split(' - ')[0],
+                                   '%m-%d-%Y')
+    date_end = datetime.strptime(date.split(' - ')[1],
+                                 '%m-%d-%Y')
+    qs = qs.filter(Q(date__gt=date_start), Q(date__lt=date_end))
+    return qs
+
+
+
 class TransactionListViewAjax(BaseDatatableView):
     model = models.Transaction
     columns = ['number', 'date', 'completed', 'payment_state',
@@ -274,11 +285,7 @@ class TransactionListViewAjax(BaseDatatableView):
         if payment_state:
             qs = qs.filter(payment_state=payment_state)
         if date:
-            date_start = datetime.strptime(date.split(' - ')[0],
-                                           '%m-%d-%Y')
-            date_end = datetime.strptime(date.split(' - ')[1],
-                                         '%m-%d-%Y')
-            qs = qs.filter(Q(date__gt=date_start), Q(date__lt=date_end))
+            qs = filter_qs_daterange(date, qs)
         return qs
 
 
@@ -348,6 +355,46 @@ class InvoiceListView(ListView):
     model = models.Invoice
 
 
+class InvoiceListViewAjax(BaseDatatableView):
+    model = models.Invoice
+    columns = ['number', 'status', 'date', 'flat',
+               'house', 'flat.owner', 'payment_state',
+               'amount', 'id']
+    order_columns = ['date']
+
+    def get_initial_queryset(self):
+        return self.model.objects.all().select_related('house', 'section',
+                                                       'flat__owner')
+
+    def filter_queryset(self, qs):
+        number = self.request.GET.get('number')
+        status = self.request.GET.get('status')
+        date = self.request.GET.get('date')
+        month = self.request.GET.get('month')
+        month_list = [
+            'January', 'February', 'March', 'April', 'May', 'June', 'July',
+            'August', 'September', 'October', 'November', 'December'
+        ]
+        if month:
+            filter_month = month.split(' ')[0]
+            qs = qs.filter(date__month=int(month_list.index(filter_month) + 1))
+        if date:
+            qs = filter_qs_daterange(date, qs)
+        flat = self.request.GET.get('flat')
+        owner = self.request.GET.get('owner')
+        payment_state = self.request.GET.get('payment_state')
+        if number:
+            qs = qs.filter(account_number__icontains=number)
+        if status:
+            qs = qs.filter(status=status)
+        if flat:
+            qs = qs.filter(flat__owner_id=owner)
+        if payment_state:
+            qs = qs.filter(payment_state=payment_state)
+        x = self.model.objects.filter()
+        return qs
+
+
 class InvoiceCreateView(CreateView):
     model = models.Invoice
     service_formset = forms.InvoiceServiceFormset
@@ -361,17 +408,152 @@ class InvoiceCreateView(CreateView):
         context['service_formset'] = self.service_formset(data=date_service)
         context['services'] = forms.Service.objects.all()
         context['units'] = forms.Unit.objects.all()
-        print(context)
         return context
 
+    def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST or None)
+        service_formset = self.service_formset(request.POST or None)
+        if form_class.is_valid():
+            form_class.save()
+            if service_formset.is_valid():
+                service_formset.save(commit=False)
+                for service in service_formset.new_objects:
+                    if service.total:
+                        service.invoice = form_class.instance
+                        service.save()
+            return HttpResponseRedirect(reverse_lazy
+                                        ('crm_accounting:invoice_list'))
+        return self.render_to_response(self.get_context_data(form=form_class,
+                                                             service_formset=service_formset))
 
-class InvoiceDetailView(CreateView):
+
+class InvoiceDetailView(DetailView):
     model = models.Invoice
 
+    def get_queryset(self):
+        queryset = models.Invoice.objects.all().\
+            select_related('flat__personal_account', 'flat__owner', ).\
+            prefetch_related('invoiceservice_set__service__unit')
+        return queryset
 
-class InvoiceUpdateView(CreateView):
+
+class InvoiceUpdateView(UpdateView):
+    model = models.Invoice
+    template_name = 'crm_accounting/invoice_update_form.html'
+    service_formset = forms.InvoiceServiceFormset
+    form_class = forms.InvoiceForm
+    queryset = model.objects.all().select_related('flat__section__house')
+
+    def get_context_data(self, **kwargs):
+        # context = super().get_context_data()
+        context = dict()
+        context['object'] = self.object
+        context['sections'] = Section.objects.filter(house=self.object.house)
+        context['flats'] = Flat.objects.filter\
+            (section_id=self.object.section.id)
+        context['form'] = self.form_class(instance=self.object)
+        context['service_formset'] = self.service_formset(
+            queryset=models.InvoiceService.objects.filter(
+                invoice=self.object))
+        context['services'] = forms.Service.objects.all()
+        context['units'] = forms.Unit.objects.all()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        form_class = self.form_class(request.POST or None,
+                                     instance=instance)
+        service_formset = self.service_formset(
+            request.POST or None,
+            queryset=models.InvoiceService.objects.filter(invoice=instance))
+        if all([form_class.is_valid(), service_formset.is_valid()]):
+            form_class.save()
+            service_formset.save(commit=False)
+            for service in service_formset.new_objects:
+                if service.total:
+                    service.invoice = form_class.instance
+                    service.save()
+            for service in service_formset.deleted_objects:
+                service.delete()
+            for service in service_formset.changed_objects:
+                if all([service[0].total, service[0].service]):
+                    service[0].save()
+            service_formset.save()
+            messages.success(request, "Квитанция изменена")
+            return HttpResponseRedirect(reverse_lazy
+                                        ('crm_accounting:invoice_list'))
+        return render(request, self.template_name, self.get_context_data(form=form_class,
+                                                             service_formset=service_formset))
+
+
+class InvoiceDeleteView(DeleteView):
     model = models.Invoice
 
+    def post(self, request, *args, **kwargs):
+        delete_list = request.POST.get('deleted_list').split(',')
+        if request.user.is_superuser:
+            self.model.objects.filter(id__in=delete_list).delete()
+            return JsonResponse({'success': 'success'})
+        else:
+            return JsonResponse({'success': 'У Вас нет прав для удаления!'})
 
-class InvoiceDeleteView(CreateView):
-    model = models.Invoice
+
+class SectionAjaxView(View):
+    @staticmethod
+    def get(request):
+        house_id = request.GET.get('house_id')
+        sections = list()
+        if house_id:
+            query_sections = Section.objects.filter(house_id=house_id)
+            for section in query_sections:
+                instance = {'section_id': section.id,
+                            'section_title': section.title}
+                sections.append(instance)
+        return JsonResponse({'data': sections})
+
+
+class FlatAjaxList(View):
+    @staticmethod
+    def get(request):
+        section_id = request.GET.get('section_id')
+        flats = list()
+        if section_id:
+            query_flats = Flat.objects.filter(section_id=section_id)
+            for flat in query_flats:
+                instance = {'flat_id': flat.id,
+                            'flat_title': flat.number}
+                flats.append(instance)
+        print(flats)
+        return JsonResponse({'flats': flats})
+
+
+class FlatAjaxInfo(View):
+    @staticmethod
+    def get(request):
+        flat_id = request.GET.get('flat_id')
+        data = dict()
+        flat = get_object_or_404(Flat, id=flat_id)
+        data['owner'] = {'owner': f'{flat.owner.first_name} '
+                                  f'{flat.owner.last_name}',
+                         'phone': flat.owner.phone,
+                         'id': flat.owner.id}
+        personal_account = PersonalAccount.objects.filter(flat=flat)
+        if personal_account.exists():
+            data['personal_account'] = PersonalAccount\
+                .objects.get(flat=flat).account_number
+        return JsonResponse({'data': data})
+
+
+def tariff_ajax_info(request):
+    tariff_id = request.GET.get('tariff')
+    services = TariffService.objects.filter(tariff_id=tariff_id).\
+        select_related('service__unit')
+    services_list = list()
+    for service in services:
+        instance = {
+            'service_id': service.service.id,
+            'unit_id': service.service.unit.id,
+            'price': service.price
+        }
+        services_list.append(instance)
+    return JsonResponse({'services': services_list})

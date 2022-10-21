@@ -6,6 +6,28 @@ from crm_home.models import Tariff, Service, Unit, PaymentState
 from home24 import settings
 
 
+def get_next_transaction():
+    ''' Getiing next number of transaction '''
+    try:
+        number_list = Transaction.objects.all().order_by('-number').\
+            values('number')
+        values_list = list()
+        for item in number_list:
+            values_list.append(item['number'])
+
+        def check_instance(numbers, values, step=1):
+            new_number = str(int(numbers[0]['number']) + step).zfill(11)
+            if new_number in values:
+                step += 1
+                check_instance(numbers, values, step)
+            else:
+                return new_number
+        return check_instance(number_list, values_list)
+    except IndexError:
+        new_number = str(1).zfill(11)
+        return new_number
+
+
 def get_next_account(count=None):
     """ Getiing next number of account """
     if not count:
@@ -44,14 +66,29 @@ class PersonalAccount(models.Model):
         return str(self.account_number)
 
 
+
+
 def get_next_invoice():
-    ''' Getiing next number of invoice '''
+    ''' Getiing next number of transaction '''
     try:
-        number = Invoice.objects.order_by('number')[-1].number
-        x = str(int(number) + 1).zfill(10)
-    except ValueError:
-        x = str(0).zfill(10)
-    return x
+        number_list = Invoice.objects.all().order_by('-number'). \
+            values('number')
+        values_list = list()
+        for item in number_list:
+            values_list.append(item['number'])
+
+        def check_instance(numbers, values, step=1):
+            new_number = str(int(numbers[0]['number']) + step).zfill(11)
+            if new_number in values:
+                step += 1
+                check_instance(numbers, values, step)
+            else:
+                return new_number
+
+        return check_instance(number_list, values_list)
+    except IndexError:
+        new_number = str(1).zfill(11)
+        return new_number
 
 
 class Invoice(models.Model):
@@ -62,8 +99,6 @@ class Invoice(models.Model):
     section = models.ForeignKey('houses.Section', on_delete=models.CASCADE)
     flat = models.ForeignKey('houses.Flat', on_delete=models.CASCADE)
     personal_account = models.CharField(max_length=50)
-    # owner = models.CharField(max_length=128, null=True, blank=True)
-    # phone = models.CharField(max_length=20, null=True, blank=True)
     payment_state = models.BooleanField(verbose_name='Проведена',
                                         null=True, blank=True)
     status = models.CharField(max_length=120,
@@ -72,6 +107,7 @@ class Invoice(models.Model):
                                        ('Частично оплачена', 'Частично оплачена'),
                                        ('Неоплачена', 'Неоплачена')],
                               null=True,
+                              default="Неоплачена",
                               blank=True)
     tariff = models.ForeignKey(Tariff, on_delete=models.PROTECT)
     period_start = models.DateField(default=datetime.datetime.now)
@@ -86,26 +122,7 @@ class Invoice(models.Model):
         return self.number
 
 
-def get_next_transaction():
-    ''' Getiing next number of transaction '''
-    try:
-        number_list = Transaction.objects.all().order_by('-number').\
-            values('number')
-        values_list = list()
-        for item in number_list:
-            values_list.append(item['number'])
 
-        def check_instance(numbers, values, step=1):
-            new_number = str(int(numbers[0]['number']) + step).zfill(11)
-            if new_number in values:
-                step += 1
-                check_instance(numbers, values, step)
-            else:
-                return new_number
-        return check_instance(number_list, values_list)
-    except IndexError:
-        new_number = str(1).zfill(11)
-        return new_number
 
 
 class Transaction(models.Model):
@@ -133,11 +150,11 @@ class Transaction(models.Model):
 
 
 class InvoiceService(models.Model):
-    invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT)
-    service = models.ForeignKey(Service, on_delete=models.PROTECT)
-    price = models.DecimalField(decimal_places=2, max_digits=10)
-    amount = models.DecimalField(decimal_places=2, max_digits=10)
-    total = models.DecimalField(decimal_places=2, max_digits=10)
+    invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT, null=True)
+    service = models.ForeignKey(Service, on_delete=models.PROTECT, null=True)
+    price = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True)
+    amount = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True)
+    total = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True)
 
     def __str__(self):
         return f'{self.invoice} {self.service}'

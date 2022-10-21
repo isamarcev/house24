@@ -42,6 +42,30 @@ urlpatterns = [
          name='requests_update'),
     path('requests/detail/<int:pk>/', views.RequestDetailView.as_view(),
          name='requests_detail'),
+
+    # MESSAGE
+
+    path('messages/', views.MessageListView.as_view(),
+         name='message_list'),
+    path('messages/get-ajax-list/', views.MessageAjaxList.as_view(),
+         name='message_get_ajax_list'),
+
+    path('messages/get-ajax-house/', views.MessageAjaxHouseInfo.as_view(),
+         name='message_ajax_info_for_house'),
+
+    path('messages/get-ajax-section/', views.MessageAjaxSectionInfo.as_view(),
+         name='message_ajax_info_for_section'),
+
+
+
+    path('messages/create/', views.MessageCreateView.as_view(),
+         name='message_create'),
+    path('messages/detail/<int:pk>/', views.MessageDetailView.as_view(),
+             name='message_detail'),
+    path('messages/delete/', views.MessageDeleteView.as_view(),
+             name='message_delete'),
+
+
     # path('accounts/login/', views.LoginUser.as_view(), name='login'),
 
     # path('admin/login/', views.LoginUser.as_view(), name='login'),

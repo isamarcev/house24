@@ -32,8 +32,9 @@ $('.select-choose').change(function () {
 	if (textOption === '---------') {
 		$(`.`+this.id).text('Выберите...')
 	} else {
-		console.log(this.id)
-		return get_unit(this.value[0], this.id)
+		console.log(this)
+		console.log($(this).value[0])
+		return get_unit($(this).value[0], this.id)
 	}
 })
 
@@ -42,8 +43,7 @@ function changeUnit(self) {
 	if (textOption === 'Выберите...') {
 		$(`.`+self.id).text('Выберите...')
 	} else {
-		console.log(self.id)
-		return get_unit(self.value[0], self.id)
+		return get_unit($(self).val(), self.id)
 	}
 }
 

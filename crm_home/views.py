@@ -150,6 +150,7 @@ class TariffUpdateView(UpdateView):
 def get_unit_for_service(request):
     if request.GET:
         x = request.GET.get('id')
+        print(x)
         unit = Service.objects.get(pk=x).unit.title
         return JsonResponse({'unit': unit}, status=200)
 
@@ -184,7 +185,8 @@ class RolesUpdateView(FormView):
         if roles_formset.is_valid():
             roles_formset.save()
             return HttpResponseRedirect(reverse_lazy('crm_home:roles'))
-        return render(request, self.template_name, context={'roles_formset': roles_formset})
+        return render(request, self.template_name,
+                      context={'roles_formset': roles_formset})
 
 
 class RequisitesUpdateView(UpdateView):

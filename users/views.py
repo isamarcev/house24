@@ -14,10 +14,10 @@ from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
-from houses.models import House, Flat
+from houses.models import House, Flat, Section, Floor
 from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm, \
-    OwnerUserForm, RequestForm
-from users.models import CustomUser, Role, Request
+    OwnerUserForm, RequestForm, MessageForm
+from users.models import CustomUser, Role, Request, Message
 
 
 class LoginUser(LoginView):
@@ -296,3 +296,91 @@ class RequestUpdateView(UpdateView):
         context = super().get_context_data()
         context['masters'] = CustomUser.objects.filter(~Q(role=None))
         return context
+
+
+
+class MessageListView(ListView):
+    model = Message
+
+
+class MessageAjaxList(BaseDatatableView):
+    model = Message
+    columns = ['id', 'title', 'text', 'date',
+               'message_address_house_id',
+               'message_address_section_id', 'message_address_floor_id',
+               'message_address_flat_id']
+    # order_columns = ['house', 'section', 'flat', 'service']
+
+    def get_initial_queryset(self):
+        return self.model.objects.all()
+
+    def filter_queryset(self, qs):
+        print(self.request.GET)
+        return qs
+
+
+class MessageCreateView(CreateView):
+    model = Message
+    form_class = MessageForm
+
+
+class MessageAjaxHouseInfo(View):
+    @staticmethod
+    def get(request):
+        print(request.GET)
+        house = request.GET.get('house')
+        sections = Section.objects.filter(house_id=house)
+        floors = Floor.objects.filter(house_id=house)
+        flats = Flat.objects.filter(house_id=house)
+        section_list = list()
+        floor_list = list()
+        flat_list = list()
+        for section in sections:
+            instance = {
+                'id': section.id,
+                'title': section.title
+            }
+            section_list.append(instance)
+        for floor in floors:
+            instance = {
+                'id': floor.id,
+                'title': floor.title
+            }
+            floor_list.append(instance)
+        for flat in flats:
+            instance = {
+                'id': flat.id,
+                'title': flat.number
+            }
+            flat_list.append(instance)
+        return JsonResponse({'section': section_list,
+                             'floor': floor_list,
+                             'flat': flat_list})
+
+
+class MessageAjaxSectionInfo(View):
+    @staticmethod
+    def get(request):
+        section = request.GET.get('section')
+        floor = request.GET.get('floor')
+        flats = Flat.objects.filter(section=section)
+        if floor != 'all':
+            flats = flats.filter(floor=floor)
+        flat_list = list()
+        for flat in flats:
+            instance = {
+                'id': flat.id,
+                'title': flat.number
+            }
+            flat_list.append(instance)
+        return JsonResponse({'flat': flat_list})
+
+
+class MessageDetailView(DetailView):
+    model = Message
+
+
+class MessageDeleteView(DeleteView):
+    model = Message
+
+

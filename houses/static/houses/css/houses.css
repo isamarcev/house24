@@ -246,3 +246,13 @@ table.dataTable tbody tr:hover {
     text-decoration: none;
     color: #72afd2;
 }
+
+.column-order {
+    color: #3c8dbc;
+}
+
+.column-order:hover {
+    cursor: pointer;
+    color: #72afd2;
+
+}

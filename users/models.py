@@ -60,7 +60,20 @@ class Message(models.Model):
     title = models.CharField(max_length=100, null=True, blank=True)
     text = models.TextField(max_length=1000, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
-    sender = models.CharField(max_length=120)
+    message_address_house_id = models.ForeignKey('houses.House',
+                                                 on_delete=models.SET_NULL,
+                                                 null=True, blank=True)
+    message_address_section_id = models.ForeignKey('houses.Section',
+                                                   on_delete=models.SET_NULL,
+                                                   null=True, blank=True)
+    message_address_floor_id = models.ForeignKey('houses.Floor',
+                                                 on_delete=models.SET_NULL,
+                                                 null=True, blank=True)
+    message_address_flat_id = models.ForeignKey('houses.Flat',
+                                                on_delete=models.SET,
+                                                null=True, blank=True)
+    sender = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
+                               null=True, blank=True)
 
     def __str__(self):
         return self.title

@@ -1,18 +1,14 @@
 from django.db.models import Q
-from django.forms import modelformset_factory, inlineformset_factory, \
-    formset_factory
+from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, CreateView, DetailView
 from django.contrib import messages
 from django_datatables_view.base_datatable_view import BaseDatatableView
-from django_serverside_datatable.views import ServerSideDatatableView
-from psycopg2 import IntegrityError
 
 from crm_accounting.models import get_next_account
 
-from users.models import Role
 from .forms import SectionForm, FloorForm, HouseForm, UserForm, FlatForm, \
     PersonalAccountForm
 from .models import *

@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
+
+from houses.models import House
 from . import models
 from .models import Role, CustomUser, Request
 
@@ -248,3 +250,23 @@ class RequestForm(forms.ModelForm):
                 'required': "Это поле обязательно к заполнению"
             },
         }
+
+
+class MessageForm(forms.ModelForm):
+    message_for_deptors = forms.BooleanField()
+    message_address_house_id = forms.ModelChoiceField(
+        queryset=House.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        empty_label="Всем...")
+    class Meta:
+        model = models.Message
+        exclude = ['id', ]
+
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control',
+                                            'placeholder': 'Тема сообщения:'}),
+            'text': forms.Textarea(attrs={'placeholder': 'текст сообщения:'}),
+            'message_address_house_id': forms.Select(
+                attrs={'class': 'form-select'}),
+        }
+

@@ -164,7 +164,7 @@ class InvoiceForm(forms.ModelForm):
 
 
 class InvoiceServiceForm(forms.ModelForm):
-
+    use_required_attribute = False
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')
         super(InvoiceServiceForm, self).__init__(*args, **kwargs)
@@ -176,13 +176,17 @@ class InvoiceServiceForm(forms.ModelForm):
                                   widget=forms.Select(
                                       attrs={'class': 'form-select'}),
                                   # empty_label='Выберите...'
+                                  required=False
                                   )
     service = forms.ModelChoiceField(queryset=Service.objects.all(),
                                      label='Услуга',
                                      # empty_label='Выберите...',
                                      widget=forms.Select(
-                                         attrs={'class': 'form-select'})
+                                         attrs={'class': 'form-select'}),
+                                     required = False
                                      )
+    invoice = forms.ModelChoiceField(queryset=models.Invoice.objects.all(),
+                                     required=False)
 
     class Meta:
         model = models.InvoiceService
@@ -197,6 +201,7 @@ class InvoiceServiceForm(forms.ModelForm):
             'price': 'Цена за ед., грн.',
             'amount': 'Расход'
         }
+
 
 
 InvoiceServiceFormset = modelformset_factory(models.InvoiceService,

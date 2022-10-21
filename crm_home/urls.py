@@ -62,4 +62,5 @@ urlpatterns = [
          views.CounterDataUpdateView.as_view(),
          name='counter_data_update'),
 
+
 ]

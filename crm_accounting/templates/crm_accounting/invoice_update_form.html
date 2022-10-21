@@ -1,7 +1,7 @@
 {% extends 'houses/layout/base_houses.html' %}
 {% load static %}
 {% block title %}
-    Новая квитанция
+    Квитанция
 {% endblock %}
 {% block css %}
     <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
@@ -16,7 +16,7 @@
 {% endblock %}
 {% block content %}
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
-        <h1 style="color: #444; font-size: 24px"> Новая квитанция
+        <h1 style="color: #444; font-size: 24px"> Квитанция
         </h1>
         <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
         margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
@@ -26,7 +26,9 @@
                 <span style="color: #ccc; margin-right: 5px" >></span> Квитанции
                 </a>
             </li>
-            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span> Новая квитанция </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span>
+                <a style="color: #444; text-decoration: none" href="{% url 'crm_accounting:invoice_detail' object.id %}"> Квитанция №{{ object.number }} </a>
+            </li>
         </ul>
     </section>
     <form method="post" style="padding:15px">
@@ -91,13 +93,39 @@
                                         {{ form.section.label_tag }}
                                         <select name="section" id="id_section" class="form-select">
                                             <option value="">Выберите...</option>
+                                            {% for section in sections %}
+                                                {% if section == object.section %}
+                                                    <option value="{{ section.id }}" selected>{{ section }}</option>
+                                                    {% else %}
+                                                        <option value="{{ section.id }}">
+                                                            {{ section }}
+                                                        </option>
+                                                {% endif %}
+                                            {% endfor %}
+
                                         </select>
                                     </div>
                                     <div class="form-group no-margin">
                                         {{ form.flat.label_tag }}
                                         <select name="flat" id="id_flat" class="form-select">
                                             <option value="">Выберите...</option>
+                                            {% for flat in flats %}
+                                                {% if flat == object.flat %}
+                                                    <option value="{{ flat.id }}" selected>{{ flat }}</option>
+                                                    {% else %}
+                                                        <option value="{{ flat.id }}">
+                                                            {{ flat }}
+                                                        </option>
+                                                {% endif %}
+                                            {% endfor %}
                                         </select>
+                                    <div class="errorlist">
+                                        {% if form.errors.flat %}
+                                            {% for field in form.errors.flat %}
+                                                {{ field }}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6">
@@ -110,8 +138,12 @@
                                         {{ form.status }}
                                     </div>
                                     <div class="form-group no-margin">
-                                        {{ form.tariff.label_tag }}
-                                        {{ form.tariff }}
+                                        {{ form.tariff.label_tag }}:
+                                        <a class="link-list" href="{% url 'crm_home:tariff_detail' object.tariff.id %}">
+                                            {{ object.tariff }}
+                                        </a>
+                                        <input type="hidden" name="tariff" id="id_tariff" value="{{ object.tariff.id }}">
+
                                     </div>
                                     <div class="row">
                                         <div class="col-6">
@@ -132,7 +164,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                        </div>
                         <!-- PERSONAL ACCOUNT -->
                         <div class="row">
                             <div class="col-6">
@@ -142,10 +174,26 @@
                                 </div>
                             </div>
                             <p >
-                                <b>Владелец:</b> <span id="owner">не выбран</span>
+                                <b>Владелец:</b> <span id="owner">
+                                {% if object.flat.owner %}
+                                    <a class="link-list" href="{% url 'users:owner_detail' object.flat.owner.id %}">
+                                        {{ object.flat.owner }}
+                                    </a>
+                                    {% else %}
+                                    не выбран
+                                {% endif %}
+                            </span>
                             </p>
                             <p >
-                                <b>Телефон:</b> <span id="phone">не выбран</span>
+                                <b>Телефон:</b> <span id="phone">
+                                {% if object.flat.owner.phone %}
+                                    <a class="link-list" href=tel:+38{{ object.flat.owner.phone }}>
+                                        {{ object.flat.owner.phone }}
+                                    </a>
+                                    {% else %}
+                                    не выбран
+                                {% endif %}
+                            </span>
                             </p>
                         </div>
                         <!-- TABLE SERVICES -->
@@ -165,6 +213,56 @@
                                         </thead>
                                         <tbody id="formset">
                                         {{ service_formset.management_form }}
+                                        {% for service in service_formset %}
+                                            <tr id="{{ service.prefix }}-form">
+                                            {% for hidden in service.hidden_fields %}
+                                                {{ hidden }}
+                                                {% endfor %}
+{#                                                <input type="hidden" name="{{ service.prefix }}-id" id="id_{{ service.prefix }}-id">#}
+                                                <td>
+                                                    <select name="{{ service.prefix }}-service"
+                                                            id="id_{{ service.prefix }}-service_id"
+                                                            class="form-select">
+                                                        <option value="">Выберите...</option>
+                                                        {% for element in services %}
+                                                            {% if service.instance.service == element %}
+                                                                <option value="{{ element.id }}" selected>{{ element }}</option>
+                                                            {% else %}
+                                                                <option value="{{ element.id }}">{{ element }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+{#                                                    {{ service.amount }}#}
+                                                    <input type="text" class="form-control" name="{{ service.prefix }}-amount" value="{{ service.instance.amount }}" onchange="get_total_created({{ forloop.counter0 }})" id="id_{{ service.prefix }}-amount_id">
+                                                </td>
+                                                <td>
+                                                    <select name="{{ service.prefix }}-unit"
+                                                            id="id_{{ service.prefix }}-unit_id"
+                                                            class="form-select">
+                                                        <option value="">Выберите...</option>
+                                                        {% for unit in units %}
+                                                            {% if unit == service.instance.service.unit %}
+                                                                <option value="{{ unit.id }}" selected>{{ unit }}</option>
+                                                            {% else %}
+                                                                <option value="{{ unit.id }}">{{ unit }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="{{ service.prefix }}-price" value="{{ service.instance.price }}" id="id_{{ service.prefix }}-price_id" onchange="get_total_created({{ forloop.counter0 }})" class="form-control">
+
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="{{ service.prefix }}-total" value="{{ service.instance.total }}" id="id_{{ service.prefix }}-total_id" class="form-control total-price">
+                                                </td>
+                                                <td>
+                                                    <button type="button" name="{{ service.prefix }}" id="{{ service.prefix }}-button" class="btn btn-default btn-sm form-row-remove-btn" onclick="delete_service(this.name)" title="Удалить услугу"><i class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
                                         </tbody>
                                         <tbody id="empty_form" style="display: none" >
                                             <tr id="form-__prefix__-form">
@@ -220,7 +318,7 @@
                                                 <td style="min-width: 180px;">
                                                     <div class="h5">
                                                         <input type="hidden" name="amount" id="id_amount">
-                                                        Итого: <b><span id="price-total">0.00</span></b> грн
+                                                        Итого: <b><span id="price-total">{{ object.amount }}</span></b> грн
                                                     </div>
                                                 </td>
                                                 <td style="width: 40px; min-width: 40px;"></td>

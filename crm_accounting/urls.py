@@ -56,6 +56,8 @@ urlpatterns = [
     path('account/invoice/create/', views.main_page,
          name="create_invoice_for_flat"),
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
+    path('invoices/get-ajax-list/', views.InvoiceListViewAjax.as_view(),
+         name='get_invoices_ajax_list'),
     path('invoices/create/', views.InvoiceCreateView.as_view(),
          name='invoice_create'),
     path('invoices/detail/<int:pk>/', views.InvoiceDetailView.as_view(),
@@ -63,7 +65,18 @@ urlpatterns = [
     path('invoices/update/<int:pk>/', views.InvoiceUpdateView.as_view(),
          name='invoice_update'),
     path('invoices/delete/', views.InvoiceDeleteView.as_view(),
-         name='invoice_delete'),
+         name='delete_invoice'),
+    path('invoices/get-section-flat-ajax/', views.SectionAjaxView.as_view(),
+         name='get_section_and_flat'),
+    path('invoices/get-flats-ajax/', views.FlatAjaxList.as_view(),
+         name='invoice_get_flats'),
+    path('invoices/get-info-by-flat/', views.FlatAjaxInfo.as_view(),
+         name='get_info_by_flat'),
+    path('invoices/get-tariff-info/', views.tariff_ajax_info,
+         name="get_tariff_info"),
+
+
+
     #
     path('transactionыаыфав/create/', views.TransactionCreateView.as_view(),
          name='transaction_account_create'),

@@ -1,30 +1,98 @@
-function get_personal_accounts (){
-            const owner_id = ($("#id_owner").val())
-            var empty_value = '<option value="">Выберите...</option>'
-            if (owner_id) {
-                $.ajax({
-                url: urlGet,
+function get_section() {
+    var house_id = ($("#id_house"))
+    var section_id = ($("#id_section"))
+    var flat_id = ($("#id_flat"))
+    var owner = ($('#owner'))
+    var phone = ($('#phone'))
+    var personal_account = ($('#id_personal_account'))
+    var empty_value = '<option value="">Выберите...</option>'
+
+    if (house_id) {
+        $.ajax({
+            url: urlGetSection,
+            type: 'get',
+            data: {
+                'house_id': house_id.val(),
+            },
+            success: (data) => {
+                section_id.empty().append(empty_value)
+                flat_id.empty().append(empty_value)
+                personal_account.empty()
+                owner.html('не выбран')
+                phone.html('не выбран')
+                console.log(data)
+                var sections = "";
+                $(data.data).each(function(index, value) {
+                    sections += "<option value='"+value.section_id+"'>"+value.section_title+"</option>"
+                })
+                section_id.append(sections)
+            }
+        })
+    }
+}
+
+function get_info_by_flat() {
+    var flat_id = ($("#id_flat"))
+    var personal_account = ($('#id_personal_account'))
+    var owner = ($("#owner"))
+    var phone = ($("#phone"))
+    owner.html('не выбран')
+    phone.html('не выбран')
+    personal_account.val('')
+    if (flat_id) {
+        $.ajax({
+                url: urlGetInfoByFlat,
                 type: 'get',
                 data: {
-                    'owner_id': owner_id,
+                    'flat_id': flat_id.val(),
                 },
                 success: (data) => {
-                    var id_personal_account = $('#id_personal_account');
-                    id_personal_account.empty()
-                    id_personal_account.append(empty_value)
                     console.log(data)
-                    var accounts = '';
-                    $(data.accountList).each(function (index, value) {
-                        accounts += "<option value='"+value.id+"'>"+value.account_number+"</option>"
-                    })
-                    id_personal_account.append(accounts)
+                    if (data.data.owner) {
+                        var link = "<a class='link-list' href='../../../users/owner/detail/" + data.data.owner.id + "'>Булгаков Михаил Афанасьевич</a>"
+                        owner.html(link)
+                        phone.html(data.data.owner.phone)
+                    }
+                    if (data.data.personal_account) {
+                        personal_account.val(data.data.personal_account)
+                    }
                 }
-            })
-            } else {
-                $('#id_personal_account').empty()
-                $('#id_personal_account').append(empty_value)
-            }
+        }
+    )
+    }
 }
+
+
+function get_flat() {
+    var section_id = ($("#id_section"))
+    var flat_id = ($("#id_flat"))
+    var personal_account = ($('#id_personal_account'))
+    var empty_value = '<option value="">Выберите...</option>'
+    flat_id.empty().append(empty_value)
+    if (section_id) {
+            $.ajax({
+                url: urlGetFlat,
+                type: 'get',
+                data: {
+                    'section_id': section_id.val(),
+                },
+                success: (data) => {
+                    console.log(data)
+                    var flats = "";
+                    $(data.flats).each(function(index, value) {
+                    flats += "<option value='"+value.flat_id+"'>"+value.flat_title+"</option>"
+                    })
+                    flat_id.append(flats)
+                    var owner = ($('#owner'))
+                    var phone = ($('#phone'))
+                    owner.html('ые выбран')
+                    phone.html('ые выбран')
+                    personal_account.val('')
+                }
+        }
+    )}
+}
+
 
 $(document).ready( function CreateTable() {
         var table = $('#counters').DataTable(
@@ -49,15 +117,7 @@ $(document).ready( function CreateTable() {
                     ],
                 "fnServerParams": function ( aoData ) {
                       aoData.push(
-                          // { "name": 'number', "value": $('#number').val() },
-                          // { "name": 'status', "value": $('#status').val() },
-                          // { "name": 'date_range', "value": $('#date_range').val() },
-                          // { "name": 'house', "value": $('#house').val() },
-                          // { "name": 'section', "value": $('#section').val() },
-                          // { "name": 'flat_number', "value": $('#flat_number').val() },
-                          // { "name": 'service', "value": $('#service').val() },
                           { "name": 'id_flat', "value": $('#id_flat').val() },
-                          // { "name": 'id_service', "value": $('#id_service').val() },
                       );
                 },
                 processing: true,
@@ -95,11 +155,74 @@ $(document).ready( function CreateTable() {
                     {name: "unit", data: 5},
                 ],
             });
+        $('#id_flat').on('change', function () {
+            table.columns(6).search($(this).val()).draw();
+        } );
 
 } );
 
+var totalPrice = $('#price-total')
+console.log(totalPrice)
+
+function get_total_created(form_idx) {
+        var amount = $('#id_form-'+ parseInt(form_idx) + '-amount_id');
+        var price = $('#id_form-'+ parseInt(form_idx) + '-price_id');
+        if (amount.val() && price.val()) {
+            var total = (amount.val() * price.val()).toFixed(2)
+        } else {
+            total = (0).toFixed(2)
+        }
+        $('#id_form-'+ parseInt(form_idx) + '-total_id').val(total)
+    var TotalAmount = $('#id_amount')
+    var nowTotalPrice = 0
+    totalPrice.empty()
+    $('.total-price').each(function () {
+        if ($(this)[0].value) {
+            nowTotalPrice += parseFloat($(this)[0].value)
+        }
+
+    })
+    TotalAmount.val(nowTotalPrice)
+    totalPrice.text(nowTotalPrice.toFixed(2))
+}
+
+function get_total_row(form_idx) {
+        var amount = $('#id_form-'+ parseInt(form_idx.data) + '-amount_id');
+        var price = $('#id_form-'+ parseInt(form_idx.data) + '-price_id');
+        if (amount.val() && price.val()) {
+            var total = (amount.val() * price.val()).toFixed(2)
+        } else {
+            total = (0).toFixed(2)
+        }
+        $('#id_form-'+ parseInt(form_idx.data) + '-total_id').val(total)
+    var TotalAmount = $('#id_amount')
+    var nowTotalPrice = 0
+    totalPrice.empty()
+    $('.total-price').each(function () {
+        if ($(this)[0].value) {
+            nowTotalPrice += parseFloat($(this)[0].value)
+        }
+
+    })
+    TotalAmount.val(nowTotalPrice)
+    totalPrice.text(nowTotalPrice.toFixed(2))
+}
+
+$("#add_service").click(function () {
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+	$('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+	$('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+	$('#id_form-'+ form_idx + '-amount_id').change(form_idx, get_total_row)
+	$('#id_form-'+ form_idx + '-price_id').change(form_idx, get_total_row)
+    $('#id_form-'+ form_idx + '-total_id').addClass('total-price')
+
+})
+
 $(document).ready(function () {
-    $("#id_owner").on('change', get_personal_accounts)
+    $("#id_house").on('change', get_section)
+    $("#id_section").on('change', get_flat)
+    $("#id_flat").on('change', get_info_by_flat)
+
     $('[aria-controls="select2-id_owner-container"]').removeClass("select2-selection select2-selection--single")
     $('body > div.wrapper > div > form > section > div > div > div > div > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > span > span.selection > span').removeClass("select2-selection select2-selection--single")
 })
@@ -145,4 +268,53 @@ $(function () {
 
     })
 
+
+function delete_service(index) {
+    $('.delete-list-service').append('<input type="hidden" value="on" name="' + index  + '-DELETE" id="id_' + index + '-DELETE">');
+    $('#' + index + '-form').css('display', 'none');
+    // $('#id_'+ index + '-total_id').val(0)
+    $('#id_'+ index + '-amount_id').val(0)
+    $('#id_'+ index + '-amount_id').change()
+}
+
+
+$('.set-tariff-services').click(function () {
+    var tariff = $('#id_tariff')
+
+    if (tariff.val()) {
+            $('.form-row-remove-btn').each(function () {
+                if (this.name != 'form-__prefix__') {
+                    this.click()
+                }});
+            $.ajax(
+            {
+                url: urlSetTariff,
+                type: 'get',
+                data: {'tariff': tariff.val()},
+                success: (data) => {
+                    console.log(data)
+                    console.log(data.services)
+                    console.log(data.services.length)
+                    var formset = $('#formset')
+                    var add_buttoon = $("#add_service")
+                    var form_idx = parseInt($('#id_form-TOTAL_FORMS').val());
+                    $(data.services).each(function (index, value) {
+                        add_buttoon.click();
+                        $('#id_form-'+form_idx+`-service_id`).find(`option[value=${value.service_id}]`).prop('selected', true);;
+                        $('#id_form-'+form_idx+`-unit_id`).find(`option[value=${value.unit_id}]`).prop('selected', true);;
+                        $('#id_form-'+form_idx+`-price_id`).val(parseFloat(value.price));
+
+                        form_idx += 1
+
+                    })
+                    $('#id_form-TOTAL_FORMS').val(form_idx);
+                }
+            })
+        }
+         else {
+                alert('Выберите тариф.')
+                tariff.closest('div').addClass('has-error')
+            }
+
+})
 
