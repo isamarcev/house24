@@ -57,7 +57,7 @@ class CustomUser(AbstractUser):
 
 
 class Message(models.Model):
-    title = models.CharField(max_length=100, null=True, blank=True)
+    title = models.CharField(max_length=100)
     text = models.TextField(max_length=1000, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     message_address_house_id = models.ForeignKey('houses.House',
@@ -106,7 +106,9 @@ class Request(models.Model):
 
 
 class MessageUsers(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    message = models.OneToOneField(Message, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+    message = models.ForeignKey(Message,
+                                on_delete=models.CASCADE)
 
 

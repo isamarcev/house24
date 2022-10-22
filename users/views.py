@@ -17,7 +17,7 @@ from django_datatables_view.base_datatable_view import BaseDatatableView
 from houses.models import House, Flat, Section, Floor
 from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm, \
     OwnerUserForm, RequestForm, MessageForm
-from users.models import CustomUser, Role, Request, Message
+from users.models import CustomUser, Role, Request, Message, MessageUsers
 
 
 class LoginUser(LoginView):
@@ -322,6 +322,42 @@ class MessageAjaxList(BaseDatatableView):
 class MessageCreateView(CreateView):
     model = Message
     form_class = MessageForm
+    template_name = 'users/message_form.html'
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST or None)
+        if form_class.is_valid():
+            form_class.save()
+            users = CustomUser.objects.all().prefetch_related(
+                'owner__personal_account__account_flat')
+            message_for_deptors = request.POST.get('message_for_deptors')
+            if message_for_deptors:
+                users = users.filter(flat__personalaccount__balance__lt=0)
+            house = request.POST.get('message_address_house_id')
+            if house:
+                users = users.filter(flat__house=house)
+                section = request.POST.get('message_address_section_id')
+                if section:
+                    users = users.filter(flat__section=section)
+                    floor = request.POST.get('message_address_floor_id')
+                    if floor:
+                        users = users.filter(flat__floor=floor)
+                        flat = request.POST.get('message_address_flat_id')
+                        if flat:
+                            users = users.filter(flat=flat)
+            MessageUsers.objects.bulk_create([MessageUsers(
+                user=user, message=form_class.instance) for user in users])
+            messages.success(request, 'Сообщение отправлено!')
+            return HttpResponseRedirect(reverse_lazy('users:message_list'))
+        else:
+            return render(request, self.template_name, context={
+                'form': form_class
+            })
+
+
+
+
+
 
 
 class MessageAjaxHouseInfo(View):

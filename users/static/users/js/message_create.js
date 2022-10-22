@@ -16,13 +16,17 @@ var house = $('#id_message_address_house_id');
 var section = $('#id_message_address_section_id');
 var floor = $('#id_message_address_floor_id');
 var flat = $('#id_message_address_flat_id');
-var empty_value = "<option value='all'>Всем...</option>";
+var empty_value = "<option value=''>Всем...</option>";
+
+
+
+// AJAX
 
 function get_sections_floors_flats () {
     section.empty().append(empty_value)
     floor.empty().append(empty_value)
     flat.empty().append(empty_value)
-    if (house.val() !== "all") {
+    if (house.val()) {
         $.ajax({
             url: UrlGetSectionsFloorsFlats,
             type: 'GET',
@@ -46,7 +50,7 @@ function get_sections_floors_flats () {
 
 function get_flats_by_section () {
     flat.empty().append(empty_value)
-    if (section.val() !== 'all') {
+    if (section.val()) {
         $.ajax({
             url: UrlGetFlatsBySection,
             type: 'GET',
@@ -67,6 +71,6 @@ $(document).ready(function () {
     house.on('change', get_sections_floors_flats);
     section.on('change', get_flats_by_section);
     floor.on('change', get_flats_by_section);
+    $('#id_title').removeAttr('required')
 })
 
-// AJAX

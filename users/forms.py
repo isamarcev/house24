@@ -253,20 +253,29 @@ class RequestForm(forms.ModelForm):
 
 
 class MessageForm(forms.ModelForm):
-    message_for_deptors = forms.BooleanField()
+    message_for_deptors = forms.BooleanField(required=False)
     message_address_house_id = forms.ModelChoiceField(
         queryset=House.objects.all(),
         widget=forms.Select(attrs={'class': 'form-select'}),
-        empty_label="Всем...")
+        empty_label="Всем...", required=False)
+
     class Meta:
         model = models.Message
         exclude = ['id', ]
 
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control',
-                                            'placeholder': 'Тема сообщения:'}),
+                                            'placeholder': 'Тема сообщения:',
+                                            }),
             'text': forms.Textarea(attrs={'placeholder': 'текст сообщения:'}),
             'message_address_house_id': forms.Select(
                 attrs={'class': 'form-select'}),
         }
+        error_messages = {
+            'title': {
+                'required': 'Это поле обязательно к заполнению!'
+            }
+        }
+
+
 

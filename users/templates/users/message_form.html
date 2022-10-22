@@ -4,7 +4,6 @@
     Новое сообщение
 {% endblock %}
 {% block css %}
-
     <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
 {% endblock %}
 {% block css_after %}
@@ -41,8 +40,8 @@
                                      <div class="form-group">
                                         {{ form.title }}
                                          <div class="errorlist">
-                                            {% if form.errors.owner %}
-                                                {% for field in form.errors.owner %}
+                                            {% if form.errors.title %}
+                                                {% for field in form.errors.title %}
                                                     {{ field }}
                                                 {% endfor %}
                                             {% endif %}
@@ -70,19 +69,19 @@
                                         <label
                                             for="id_message_address_section_id">Секция</label>
                                         <select name="message_address_section_id" id="id_message_address_section_id" class="form-select">
-                                            <option value="all">Всем...</option>
+                                            <option value="">Всем...</option>
                                         </select>
                                     </div>
                                     <div class="form-group no-margin">
                                         <label for="id_message_address_floor_id">Этаж</label>
                                         <select name="message_address_floor_id" id="id_message_address_floor_id" class="form-select">
-                                            <option value="all">Всем...</option>
+                                            <option value="">Всем...</option>
                                         </select>
                                     </div>
                                     <div class="form-group no-margin">
                                         <label for="id_message_address_flat_id">Квартира</label>
                                         <select name="message_address_flat_id" id="id_message_address_flat_id" class="form-select">
-                                            <option value="all">Всем...</option>
+                                            <option value="">Всем...</option>
                                         </select>
                                     </div>
                                 </div>
@@ -112,33 +111,6 @@
         const UrlGetSectionsFloorsFlats = '{% url 'users:message_ajax_info_for_house' %}';
         const UrlGetFlatsBySection = '{% url 'users:message_ajax_info_for_section' %}';
     </script>
-    <script>
-            function ajax_get_flat() {
-                var owner_val = ($('#id_owner').val());
-                var flat_list = ($('#id_flat'))
-                var empty_value = '<option value="">Выберите...</option>'
-                flat_list.empty()
-                flat_list.append(empty_value)
-                if (owner_val) {
-                    $.ajax({
-                        url: '{% url 'users:ajax_user_flats' %}',
-                        type: 'GET',
-                        data: {
-                            'owner_id': owner_val,
-                        },
-                        success: (data) => {
-                            console.log(data)
-                            var flats = '';
-                            $(data.flats).each(function (index, value) {
-                                flats += "<option value='"+value.id+"'>№"+value.number + " " + value.house + "</option>"
-                            })
-                            flat_list.append(flats)
-                        }
-                    })
-                }
-            }
-
-    </script>
-        <script src="{% static 'users/js/message_create.js' %}"></script>
+    <script src="{% static 'users/js/message_create.js' %}"></script>
 
 {% endblock %}
