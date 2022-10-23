@@ -54,8 +54,8 @@ class HouseCreateView(CreateView):
         context['section_formset'] = section_formset
         context['floor_formset'] = floor_formset
         context['users_formset'] = users_formset
-        context['users'] = CustomUser.objects.filter(role=True).select_related(
-            'role')
+        context['users'] = CustomUser.objects.filter(~Q(role=None))\
+            .select_related('role')
         return context
 
     def post(self, request, *args, **kwargs):
@@ -136,8 +136,8 @@ class HouseUpdateView(UpdateView):
         context['section_formset'] = section_formset
         context['floor_formset'] = floor_formset
         context['users_formset'] = users_formset
-        context['users'] = CustomUser.objects.filter(role=True).select_related(
-            'role')
+        context['users'] = CustomUser.objects.filter(~Q(role=None)) \
+            .select_related('role')
         return context
 
     def post(self, request, *args, **kwargs):

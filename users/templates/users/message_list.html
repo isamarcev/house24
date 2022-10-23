@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
 {% endblock %}
 {% block css_after %}
-    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link type="text/css" rel="stylesheet" href="{% static 'users/dist/datatables/datatables.min.css' %}">
     <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
 
 {% endblock %}
@@ -44,27 +44,38 @@
                 <div class="box">
                 <div class="box-header" style="text-align: right; height: 45px">
                     <div class="box-tools" >
-                    <button  type="button" id="reset" class="btn btn-default">
-                        <span class="hidden-xs">Очистить</span>
-                    </button>
+                        <div class="box-search" style="position: relative">
+                            <input type="search" placeholder="Поиск" id="id_search_field" class="form-control">
+                            <i class="fa fa-search" style="position: absolute; top: 10px; right: 10px"></i>
+                        </div>
                 </div>
-                    <input type="hidden" id="id_flat" value="{{ flat.id }}">
-                    <input type="hidden" id="id_service" value="{{ service.id }}">
                 </div>
+                    <div class="box-header">
+                        <span>
+                            <a class="btn btn-default btn-sm btn-delete btn-select" style="width:30px; height: 29px" title="Удалить" >
+                                <input type="checkbox" id="select-on-check-all">
+                            </a>
+                        </span>
+                        <span>
+                            <a class="btn btn-default btn-sm btn-delete " onclick="delete_selected()" title="Удалить" href="#" >
+                                <i class="fa fa-trash " ></i>
+                            </a>
+                        </span>
+                    </div>
                     <div class="box-body" style="padding: 0">
                     {% csrf_token %}
-                        <table id="messages" align="center" style="margin: 0; width: 100%;" class="table table-hover table-responsive linkedRow">
+                        <table id="messages" align="center" style="margin: 0; width: 100%;" class="table table-hover">
                              <thead>
                                   <tr>
-                                      <th tabindex="0"  rowspan="1" colspan="1" >
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 15px" >
                                       </th>
-                                      <th tabindex="0"  rowspan="1" colspan="1" style="min-width: 200px" >
+                                      <th tabindex="0"  rowspan="1" colspan="1"  style="width: 250px; min-width: 150px">
                                           Получатели
                                       </th>
                                       <th tabindex="0"  rowspan="1" colspan="1"  >
                                           Текст
                                       </th>
-                                      <th  tabindex="0"  rowspan="1" colspan="1" style="min-width: 150px" >
+                                      <th  tabindex="0"  rowspan="1" colspan="1" style="width: 130px" >
                                           Дата
                                       </th>
                                   </tr>
@@ -73,6 +84,18 @@
                                   </tbody>
                         </table>
 
+                    </div>
+                    <div class="box-header">
+                        <span>
+                            <a class="btn btn-default btn-sm btn-delete btn-select " style="width:30px; height: 29px" title="Удалить" href="#" >
+                                <input type="checkbox" id="select-on-check-all-bottom" style="z-index: -1000">
+                            </a>
+                        </span>
+                        <span>
+                            <a class="btn btn-default btn-sm btn-delete " title="Удалить" href="#" >
+                                <i class="fa fa-trash " ></i>
+                            </a>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -86,11 +109,12 @@
 {% block script %}
 
     <!-- DATATABLE -->
-    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'users/dist/datatables/datatables.min.js' %}"></script>
 
     <!-- JS -->
     <script>
         const UrlGetAjaxList = '{% url 'users:message_get_ajax_list' %}'
+        const UrlMessageDelete = '{% url 'users:messages_delete' %}'
     </script>
     <script src="{% static 'users/js/message_list.js' %}"></script>
 

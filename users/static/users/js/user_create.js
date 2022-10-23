@@ -57,4 +57,28 @@ for (var y = 0; y < passwords.length; ++y) {
     });
 }
 
+function deleteThisMessage(id) {
+    const result = confirm('Вы уверены, что хотите удалить выбранные сообщения?')
+    if (result) {
+        var csrf = $("input[name=csrfmiddlewaretoken]").val();
+        $.ajax({
+            url: UrlDelete,
+            type: 'post',
+            data: {
+                'id': id,
+                csrfmiddlewaretoken: csrf,
+            },
+            success: (data) => {
+                if (data.success === 'success') {
+                    location.href = SuccessUrl;
+                } else {
+                    alert(data.success)
+                }
+            },
+            errors: (errors) => {
+            console.log(errors)
+        }
+    })}
+}
+
 

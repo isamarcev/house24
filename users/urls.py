@@ -52,18 +52,21 @@ urlpatterns = [
 
     path('messages/get-ajax-house/', views.MessageAjaxHouseInfo.as_view(),
          name='message_ajax_info_for_house'),
+    path('messages/delete/', views.MessageAjaxDelete.as_view(),
+         name='messages_delete'),
+    # path('messages/delete/<int:pk>/', views.MessageDeleteView.as_view(),
+    #      name='messages_delete'),
+
+
 
     path('messages/get-ajax-section/', views.MessageAjaxSectionInfo.as_view(),
          name='message_ajax_info_for_section'),
 
 
-
     path('messages/create/', views.MessageCreateView.as_view(),
          name='message_create'),
     path('messages/detail/<int:pk>/', views.MessageDetailView.as_view(),
-             name='message_detail'),
-    path('messages/delete/', views.MessageDeleteView.as_view(),
-             name='message_delete'),
+         name='message_detail'),
 
 
     # path('accounts/login/', views.LoginUser.as_view(), name='login'),

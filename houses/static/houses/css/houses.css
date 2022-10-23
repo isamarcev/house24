@@ -256,3 +256,19 @@ table.dataTable tbody tr:hover {
     color: #72afd2;
 
 }
+
+.table-hover tbody tr:hover {
+    /*color: #212529;*/
+     background-color: transparent;
+}
+
+
+/*border-top: 1px solid #dee2e6;*/
+
+
+.table>:not(caption)>*>* {
+    /*padding: 0.5rem 0.5rem;*/
+    /*background-color: var(--bs-table-bg);*/
+     border-bottom-width: 0px;
+    /*box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg);*/
+}

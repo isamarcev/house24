@@ -10,22 +10,19 @@ $(document).ready( function CreateTable() {
                 "bFilter": false,
                  "iDisplayLength": 10,
                 "lengthChange": false,
+                'bPaginate': false,
                 "language": {
                     "zeroRecords": "Ничего не найдено",
-                    "info": "Количество квитанций:  _MAX_",
+                    "info": "",
                     'infoFiltered': '',
                     "infoEmpty": "",
-                    "paginate": {
-                        "next":       "След.",
-                        "previous":   "Пред."
-                    },
                   },
                 "aoColumnDefs": [
                     { 'bSortable': false, 'targets': [0, 1, 2, 3] },
                 ],
                 "fnServerParams": function ( aoData ) {
                       aoData.push(
-                          { "name": 'search', "value": $('#search').val() },
+                          { "name": 'search', "value": $('#id_search_field').val() },
                       );
                 },
                 processing: true,
@@ -33,18 +30,13 @@ $(document).ready( function CreateTable() {
                 sAjaxSource: UrlGetAjaxList,
                 columns: [
                     {name: "id", data: null, render: function (data, type, row) {
-                            console.log(row)
-                            console.log(data)
-                        var id = row[8]
+                        var id = row[0]
                             this.data = "<input type='checkbox' " + "class='select-alone'" +
                                    " name='selection-" + id + "' value='"+ id +"'>"
                             var element = $(`input[name='selection-` + id +`']`)
-                            console.log(element)
                             element.click(event, function () {
                                 if (element.is(':checked')) {
                                     DeletionArray.push(element.val());
-
-
                             } else if(!element.is(':checked')) {
                                     let i = DeletionArray.indexOf(element.val())
                                     DeletionArray.splice(i, 1);
@@ -52,50 +44,98 @@ $(document).ready( function CreateTable() {
                             }
                                 event.stopPropagation()
                             } )
-
                             return this.data
                         }},
-                    {name: "number", data: 0},
-                    {name: "status", data: null, render: function (data, type, row) {
-                            console.log(row[1])
-                        if (row[1] === 'Оплачена') {
-                            this.data = `<small class="label label-success">${row[1]}</small>`
-                        } else if (row[1] === 'Неоплачена') {
-                            this.data = `<small class="label label-danger">${row[1]}</small>`
-                        } else if (row[1] === 'Частично оплачена') {
-                            this.data = `<small class="label label-warning">${row[1]}</small>`
+                    {name: "number", data: null, render: function (data, type, row) {
+                        var house = row[4]
+                        if (row[5]) {
+                            house += ', ' + row[5] + ', ';
+                            if (row[6]) {
+                                house += row[6] + ', ';
+                                if (row[7]) {
+                                    house += row[7]
+                                }}}
+                        if (row[4]) {
+                            this.data = '<a class="link-list " title="Удалить" href="detail/'+ row[0] +'">' + house +  '</a>'
                         } else {
-                            this.data = "Не выбран"
+                            this.data = '<a class="link-list " title="Удалить" href="detail/'+ row[0] +'">' + 'Всем' +  '</a>'
                         }
-                            return this.data
+                        return this.data
                         }},
-                    {name: "date", data: 2},
+                    {name: "text", data: null, render: function (data, type, row) {
+                        let header = row[1];
+                        let text = document.createElement('span');
+                        text.innerHTML = row[2];
+                        this.data = '<b>' + header + '</b>' + text.innerText;
+                        return this.data
+                        }},
+                    {name: "date", data: null, render: function (data, type, row) {
+
+                            var myDate = new Date(row[3]);
+                            var minutes = myDate.getMinutes().toString()
+                            if (minutes.length === 1) {
+                                minutes = '0' + minutes
+                            }
+                            var fullDate = myDate.getDate() + '.' + myDate.getMonth() + '.' + myDate.getFullYear() +
+                                ' - ' + myDate.getHours() + ':' + minutes
+                            return fullDate
+                        }},
                 ],
                 "createdRow": function( row, data, dataIndex ) {
-                    var url = 'detail/'+data[1]
+                    var url = 'detail/'+data[0]
                     $(row).attr( 'data-href', url );
                     $(row).on("click", function() {
                         document.location = $(this).data('href');
                         });
             }
             });
-        $('#search').on('change blur', function () {
+        $('#id_search_field').on('change blur', function () {
             table.columns(1).search($(this).val()).draw();
         } );
     } );
 
-$('#select-on-check-all').change(function () {
+$('#select-on-check-all').click(function (event) {
     if ($(this).is(':checked')) {
         DeletionArray = [];
         $('.select-alone').prop('checked', true);
         $('.select-alone').each(function () {
             DeletionArray.push($(this).val());
         })
+        $('#select-on-check-all-bottom').prop('checked', true);
         console.log(DeletionArray)
     } else {
         $('.select-alone').prop('checked', false);
+        $('#select-on-check-all-bottom').prop('checked', false);
         DeletionArray = [];
+        console.log(DeletionArray)
     }
+    event.stopPropagation()
+
+})
+
+$('#select-on-check-all-bottom').click(function (event) {
+    if ($(this).is(':checked')) {
+        DeletionArray = [];
+        $('.select-alone').prop('checked', true);
+        $('.select-alone').each(function () {
+            DeletionArray.push($(this).val());
+        })
+        $('#select-on-check-all').prop('checked', true);
+        console.log(DeletionArray)
+    } else {
+        $('.select-alone').prop('checked', false);
+        $('#select-on-check-all').prop('checked', false);
+        DeletionArray = [];
+        console.log(DeletionArray)
+    }
+    event.stopPropagation()
+
+})
+
+$('.btn-select').on('click', function () {
+    var child = $(this).children('input');
+    child.click()
+
 })
 
 $('tr[data-href]').on("click", function() {
@@ -108,12 +148,12 @@ $(document).ready( function () {
 
 
 function delete_selected() {
-    const result = confirm('Вы уверены, что хотите удалить выбранные?')
+    const result = confirm('Вы уверены, что хотите удалить выбранные сообщения?')
     let Del = DeletionArray
     if (result) {
         var csrf = $("input[name=csrfmiddlewaretoken]").val();
         $.ajax({
-            url: urlInvoiceDelete,
+            url: UrlMessageDelete,
             type: 'post',
             data: {
                 'deleted_list': Del.toString(),
@@ -121,7 +161,7 @@ function delete_selected() {
             },
             success: (data) => {
                 if (data.success === 'success') {
-                    $('#reset').click()
+                    $('#id_search_field').change()
                 } else {
                     alert(data.success)
                 }

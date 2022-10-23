@@ -16,3 +16,23 @@ $('#dropleft').click(function (){
     }
     }
 )
+
+$(function () {
+    var IDEAL = $('#current')
+    console.log(IDEAL.val())
+    // var location = window.location.href;
+    // var cur_url = '/' + location.split('/').pop();
+    //     console.log(location)
+    // console.log(cur_url)
+    // $('#menu-sidebar li').each(function () {
+    //     var element = $(this).children('a')
+    //     var link = element.attr('href');
+    //     if (cur_url === link) {
+    //         $(this).addClass('active')
+    //     } else {
+    //         $(this).removeClass('active')
+    //     }
+    // })
+
+
+})

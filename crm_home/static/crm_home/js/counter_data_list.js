@@ -26,5 +26,5 @@ $('.btn-delete').click(function (event) {
 	if (result) {
 		delete_counter(this.id)
 	}
-	event.stopPropagation()
+	event.stopPropagationS()
 })

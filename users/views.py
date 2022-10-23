@@ -28,7 +28,7 @@ class LoginUser(LoginView):
 
 class UsersListView(ListView):
     model = CustomUser
-    queryset = CustomUser.objects.filter(role=True).order_by('id').select_related('role')
+    queryset = CustomUser.objects.filter(~Q(role=None)).order_by('id').select_related('role')
     context_object_name = 'users'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -312,10 +312,13 @@ class MessageAjaxList(BaseDatatableView):
     # order_columns = ['house', 'section', 'flat', 'service']
 
     def get_initial_queryset(self):
-        return self.model.objects.all()
+        return self.model.objects.all().order_by('-date')
 
     def filter_queryset(self, qs):
-        print(self.request.GET)
+        search_field = self.request.GET.get('search')
+        if search_field:
+            qs = qs.filter(Q(title__icontains=search_field)
+                           | Q(text__icontains=search_field))
         return qs
 
 
@@ -327,6 +330,8 @@ class MessageCreateView(CreateView):
     def post(self, request, *args, **kwargs):
         form_class = self.form_class(request.POST or None)
         if form_class.is_valid():
+            form_class.save(commit=False)
+            form_class.instance.sender = request.user
             form_class.save()
             users = CustomUser.objects.all().prefetch_related(
                 'owner__personal_account__account_flat')
@@ -355,15 +360,9 @@ class MessageCreateView(CreateView):
             })
 
 
-
-
-
-
-
 class MessageAjaxHouseInfo(View):
     @staticmethod
     def get(request):
-        print(request.GET)
         house = request.GET.get('house')
         sections = Section.objects.filter(house_id=house)
         floors = Floor.objects.filter(house_id=house)
@@ -400,7 +399,7 @@ class MessageAjaxSectionInfo(View):
         section = request.GET.get('section')
         floor = request.GET.get('floor')
         flats = Flat.objects.filter(section=section)
-        if floor != 'all':
+        if floor:
             flats = flats.filter(floor=floor)
         flat_list = list()
         for flat in flats:
@@ -416,7 +415,26 @@ class MessageDetailView(DetailView):
     model = Message
 
 
-class MessageDeleteView(DeleteView):
+class MessageAjaxDelete(DeleteView):
     model = Message
 
+    def post(self, request, *args, **kwargs):
+        if request.user.is_superuser or request.user.is_staff:
+            if request.POST.get('id'):
+                message = get_object_or_404(Message, id=request.POST.get('id'))
+                message.delete()
+                return JsonResponse({'success': 'success'})
+            messages_id = request.POST.get('deleted_list').split(',')
+            messages = self.model.objects.filter(id__in=messages_id)
+            messages.delete()
+            return JsonResponse({'success': 'success'})
+        else:
+            return JsonResponse(
+                {'success': "У Вас недостаточно прав для удаления."}
+            )
+
+
+# def delete_message(request):
+#     if request.user.is_superuser or request.user.is_staff:
+#         message_id =
 

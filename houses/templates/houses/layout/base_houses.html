@@ -156,17 +156,17 @@
 
       <!-- Sidebar Menu -->
       <nav class="mt-2" style="width:100%; margin-top: 0">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <ul class="nav nav-pills nav-sidebar flex-column" id="menu-sidebar" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item">
-            <a href="#" style="width: 100%; border-radius: 0" class="nav-link active">
-              <i class="fa fa-line-chart"></i>
-              <p>
-                Статистика
-              </p>
-            </a>
-          </li>
+              <li class="nav-item">
+                <a href="#" style="width: 100%; border-radius: 0" class="nav-link active">
+                  <i class="fa fa-line-chart"></i>
+                  <p>
+                    Статистика
+                  </p>
+                </a>
+              </li>
              <li class="nav-item">
                  <a href="{% url 'crm_accounting:transaction_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-dollar"></i>
