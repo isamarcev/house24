@@ -88,7 +88,8 @@ class Request(models.Model):
     time = models.TimeField(default=datetime.datetime.now)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.PROTECT,
-                              related_name='owner_request')
+                              related_name='owner_request',
+                              null=True)
     description = models.TextField(max_length=1999, blank=True, null=True)
     comment = models.TextField(max_length=1000, blank=True, null=True)
     flat = models.ForeignKey('houses.Flat', on_delete=models.PROTECT)
@@ -101,7 +102,7 @@ class Request(models.Model):
     status = models.CharField(choices=status_request, max_length=50,
                               default=status_request[1][0])
     master = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               on_delete=models.PROTECT)
+                               on_delete=models.PROTECT, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

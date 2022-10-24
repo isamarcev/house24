@@ -12,8 +12,6 @@
     <link rel="stylesheet" href="{% static 'users/css/request.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/clocklet@0.3.0/css/clocklet.min.css">
 <script src="https://cdn.jsdelivr.net/npm/clocklet@0.3.0"></script>
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="{% static 'content/plugins/ckeditor/ckeditor.js' %}"></script>
 
 {% endblock %}
 {% block content %}
@@ -33,38 +31,6 @@
     </section>
     <form method="post" style="padding:15px">
         {% csrf_token %}
-    <div class="row">
-        <div class="col-xs-12 col-md-7 col-lg-6">
-            <div class="page-header-spec" style="align-items: normal; justify-content: flex-start">
-                <div class="form-group" style="margin-bottom: 0px">
-                    <div class="input-group">
-                        <div class="input-group-addon">
-                            №
-                        </div>
-                        {{ form.date }}
-                    </div>
-                    <div class="errorlist">
-                        {% if form.errors.number %}
-                            {% for field in form.errors.number %}
-                                {{ field }}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-                <span class="label-mid" style="vertical-align: center; padding-top: 10px;margin: 0 15px; font-size: 14px">
-                    от
-                </span>
-                <div class="form-group">
-                    <div class="input-group">
-                        {{ form.time }}
-                        <div class="input-group-addon">
-                            <i class="fa fa-clock-o"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- content -->
     <section class="content content-custom" >
         <div class="row">
@@ -72,84 +38,57 @@
                 <div class="box">
                     <div class="box-body">
                             <div class="row">
-                                <div class="col-xs-12">
-                                     <div class="form-group" style="width: 50%; padding: 0 12px 0 0">
-                                        {{ form.owner.label_tag }}
-                                        {{ form.owner }}
-                                         <div class="errorlist">
-                                            {% if form.errors.owner %}
-                                                {% for field in form.errors.owner %}
-                                                    {{ field }}
-                                                {% endfor %}
-                                            {% endif %}
-                                        </div>
-                                        <div class="help-block">Необходимо заполнить "Владелец квартиры"</div>
-                                    </div>
-                                </div>
-                                <div class="col-xs-12 col-sm-6">
-                                    <div class="form-group">
-                                        {{ form.description.label_tag }}
-                                        {{ form.description }}
-                                    </div>
-                                </div>
-                                <div class="col-xs-12 col-sm-6">
-                                    <div class="form-group">
-                                        {{ form.flat.label_tag }}
-                                        <select name="flat" id="id_flat" class="form-select">
-                                            <option value="">Выберите...</option>
-                                        </select>
-                                         <div class="errorlist">
-                                            {% if form.errors.flat %}
-                                                {% for field in form.errors.flat %}
-                                                    {{ field }}
-                                                {% endfor %}
-                                            {% endif %}
-                                        </div>
-                                        <div class="help-block">Необходимо заполнить "Квартира"</div>
-
-                                    </div>
+                                <div class="col-12">
                                     <div class="form-group">
                                         {{ form.type_master.label_tag }}
                                         {{ form.type_master }}
                                     </div>
                                     <div class="form-group">
-                                        {{ form.status.label_tag }}
-                                        {{ form.status }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ form.master.label_tag }}
-                                        <select name="master"
-                                                id="id_master"
-                                                class="form-select">
+                                        {{ form.flat.label_tag }}
+                                        <select name="flat" id="id_flat" class="form-select" required>
                                             <option value="">Выберите...</option>
-                                            {% for master in masters %}
-                                                <option value="{{ master.id }}">{{ master.role }} - {{ master.first_name }} {{ master.father_name }}</option>
+                                            {% for flat in flats %}
+                                                <option value="{{ flat.id }}"> ЖК {{ flat.house }} {{ flat }}</option>
                                             {% endfor %}
                                         </select>
-                                        <div class="errorlist">
-                                            {% if form.errors.master %}
-                                                {% for field in form.errors.master %}
-                                                    {{ field }}
-                                                {% endfor %}
-                                            {% endif %}
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                {{ form.date.label_tag }}
+                                                <div class="input-group">
+                                                    {{ form.date }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                {{ form.time.label_tag }}
+                                                <div class="input-group">
+                                                    {{ form.time }}
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-clock-o"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-xs-12">
                                     <div class="form-group">
-                                        {{ form.comment.label_tag }}
-                                        {{ form.comment }}
+                                        {{ form.description.label_tag }}
+                                        {{ form.description }}
                                     </div>
-                                </div>
-                                <div class="row" style="text-align: right">
-                                    <div class="form-group">
-                                        <a href="{% url 'users:requests_list' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
-                                        ">Отменить</a>
-                                        <button type="submit" class="btn btn-success" name="save">Сохранить</button>
-                                    </div>
-                                    </div>
-                                </div>
+                            </div>
+
+                        </div>
                     </div>
+                    <div class="box-footer" style="padding: 0 10px">
+                        <div class="row" style="text-align: right">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-success" name="save">Отправить заявку</button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -163,36 +102,21 @@
   </script>
 {% endblock %}
 {% block script %}
-
-    <script src="{% static 'users/js/request_create.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
     <script>
-            function ajax_get_flat() {
-                var owner_val = ($('#id_owner').val());
-                var flat_list = ($('#id_flat'))
-                var empty_value = '<option value="">Выберите...</option>'
-                flat_list.empty()
-                flat_list.append(empty_value)
-                if (owner_val) {
-                    $.ajax({
-                        url: '{% url 'users:ajax_user_flats' %}',
-                        type: 'GET',
-                        data: {
-                            'owner_id': owner_val,
-                        },
-                        success: (data) => {
-                            console.log(data)
-                            var flats = '';
-                            $(data.flats).each(function (index, value) {
-                                flats += "<option value='"+value.id+"'>№"+value.number + " " + value.house + "</option>"
-                            })
-                            flat_list.append(flats)
-                        }
-                    })
-                }
-            }
+                $(function () {
+                $("#id_date").datepicker({
+                    showOn: "both",
+                    dateFormat: "yy-mm-dd"
+                });
+                $('.ui-datepicker-trigger').html("<i class='fa fa-calendar'></i>").addClass('btn btn-date').before($("#id_date"))
 
+        })
+                document.getElementById("id_time").addEventListener("clocklet.opening", function (event) {
+            if (DO_NOT_NEED_TIMEPICKER) {
+                event.preventDefault();
+            }
+        });
     </script>
+{#    <script src="{% static 'users/js/request_create.js' %}"></script>#}
 
 {% endblock %}

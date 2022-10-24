@@ -35,7 +35,6 @@ $(document).ready( function CreateTable() {
                     {name: "sender", data: 1},
                     {name: "text", data: 2},
                     {name: "date", data: null, render: function (data, type, row) {
-                            console.log(row);
                             var myDate = row[3].split('-');
                             var myTime = row[4].split(':');
                             var fullDate = myDate[2] + '.' + myDate[1] + '.' + myDate[0] +

@@ -1,0 +1,232 @@
+{% extends 'users/cabinet/layout.html' %}
+{% load static %}
+{% block title %}
+    Профиль
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'users/css/profile.css' %}">
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Профиль
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span> Профиль</li>
+        </ul>
+    </section>
+        {% csrf_token %}
+    <!-- content -->
+    <section class="content " >
+        <div class="row">
+            <div class="col-md-12 col-lg-3">
+                <div class="row">
+                    <div class="col-md-6 col-lg-12">
+                        <div class="box">
+                            <div class="box-body" style="text-align: center">
+                                {% if user.photo %}
+                                    <img src="{{ user.photo.url }}" alt=""
+                                         class="profile-user-img img-responsive-photo img-circle">
+                                {% else %}
+                                    <img src="{% static 'content/img/empty.jpeg' %}" alt=""
+                                     class="profile-user-img img-responsive-photo img-circle">
+                                {% endif %}
+                                <h3 class="header-title" >{{ user }}</h3>
+                                <p>Владелец квартиры</p>
+                                <div class="row" style="margin: 0 5px; padding: 10px 0; border-top: 1px solid #ddd;justify-content: space-between">
+                                    <span style="width: min-content">Телефон</span>
+                                    {% if user.phone %}
+                                    <span style="width: auto"> {{ user.phone }}</span>
+                                        {% else %}
+                                    <span style="width: auto"> Не указан </span>
+                                    {% endif %}
+                                </div>
+                                <div class="row" style="margin: 0 5px; padding: 10px 0; border-top: 1px solid #ddd;justify-content: space-between">
+                                    <span style="width: min-content">Viber</span>
+                                    {% if user.viber %}
+                                    <span style="width: auto"> {{ user.viber }}</span>
+                                        {% else %}
+                                    <span style="width: auto"> Не указан </span>
+                                    {% endif %}
+                                </div>
+                                <div class="row" style="margin: 0 5px; padding: 10px 0; border-top: 1px solid #ddd;justify-content: space-between">
+                                    <span style="width: min-content">Telegram</span>
+                                    {% if user.telegram %}
+                                    <span style="width: auto"> {{ user.telegram }}</span>
+                                        {% else %}
+                                    <span style="width: auto"> Не указан </span>
+                                    {% endif %}
+                                </div>
+                                <div class="row" style="margin: 0 5px; padding: 10px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;justify-content: space-between">
+                                    <span style="width: min-content">Email</span>
+                                    {% if user.email %}
+                                    <span style="width: auto"> {{ user.email }}</span>
+                                        {% else %}
+                                    <span style="width: auto"> Не указан </span>
+                                    {% endif %}
+                                </div>
+                                <div class="row" style="margin: 5px 5px 0 5px"><a href="{% url 'users:user_profile_update' %}" class="btn btn-primary btn-block btn-tariff">Изменить</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-12">
+                        <h3 class="header-title">
+                            Обо мне(заметки)
+                        </h3>
+                        <div class="box">
+                            <div class="box-body">
+                                {% if user.about %}
+                                {{ user.about }}
+                                {% else %}
+                                Не указано
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-9">
+                <h2 class="page-header">
+                    Мои квартиры
+                </h2>
+                {% for flat in flats %}
+                    <div class="box">
+                        <div class="box-body">
+                            <h3 class="box-title">Описание квартиры</h3>
+                            <p>ЖК {{ flat.house }}, {{ flat.house.address }}, кв.№{{ flat }}</p>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-6" style="margin: 20px 0">
+                                    {% if flat.image_1 %}
+                                        <img src="{{ flat.image_1.url }}" class="largeImg" alt="">
+                                    {% else %}
+                                        <img src="{% static 'content/img/empty.jpeg' %}" class="largeImg" alt="">
+                                    {% endif %}
+                                </div>
+                                <div class="col-sm-12 col-md-6" style="margin: 20px 0">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if flat.image_2 %}
+                                                <img src="{{ flat.image_2.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if flat.image_3 %}
+                                                <img src="{{ flat.image_3.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if flat.image_4 %}
+                                                <img src="{{ flat.image_4.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if flat.image_5 %}
+                                                <img src="{{ flat.image_5.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="padding: 20px">
+                                <table style="padding: 10px" class="table table-bordered table-striped table-view">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">
+                                                Описание
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Название дома</td>
+                                            <td>{{ flat.house }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Адрес</td>
+                                            <td>{{ flat.house.address }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>№ квартиры</td>
+                                            <td>{{ flat.number }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Площадь</td>
+                                            {% if flat.area %}
+                                                <td>{{ flat.area }}</td>
+                                                {% else %}
+                                                <td>Не указан</td>
+                                            {% endif %}
+                                        </tr>
+                                        <tr>
+                                            <td>Этаж</td>
+                                            {% if flat.floor %}
+                                                <td>{{ flat.floor }}</td>
+                                                {% else %}
+                                                <td>Не указан</td>
+                                            {% endif %}
+                                        </tr>
+                                        <tr>
+                                            <td>Секция</td>
+                                            {% if flat.section %}
+                                                <td>{{ flat.section }}</td>
+                                                {% else %}
+                                                <td>Не указан</td>
+                                            {% endif %}
+                                        </tr>
+                                        <tr>
+                                            <td>Лицевой счет</td>
+                                            {% if flat.personal_account %}
+                                                <td>{{ flat.personal_account }}</td>
+                                                {% else %}
+                                                <td>Не указан</td>
+                                            {% endif %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </section>
+
+    <div>
+
+    </div>
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+    <script>
+                $(function () {
+                $("#id_date").datepicker({
+                    showOn: "both",
+                    dateFormat: "yy-mm-dd"
+                });
+                $('.ui-datepicker-trigger').html("<i class='fa fa-calendar'></i>").addClass('btn btn-date').before($("#id_date"))
+
+        })
+                document.getElementById("id_time").addEventListener("clocklet.opening", function (event) {
+            if (DO_NOT_NEED_TIMEPICKER) {
+                event.preventDefault();
+            }
+        });
+    </script>
+{#    <script src="{% static 'users/js/request_create.js' %}"></script>#}
+
+{% endblock %}

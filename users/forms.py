@@ -203,7 +203,8 @@ class RequestForm(forms.ModelForm):
     owner = forms.ModelChoiceField(
         widget=forms.Select(attrs={'class': 'form-select'}),
         queryset=CustomUser.objects.filter(role=None),
-        empty_label="Выберите...", label='Владелец квартиры'
+        empty_label="Выберите...", label='Владелец квартиры',
+        required=True
     )
 
     class Meta:
@@ -253,13 +254,22 @@ class RequestForm(forms.ModelForm):
 
 
 class RequestUserForm(forms.ModelForm):
+    type_master = forms.ChoiceField(choices=[("", "Выберите..."),
+                                                 ("Сантехник", "Сантехник"),
+                                                 ("Электрик", "Электрик"),
+                                                 ("Слесарь", "Слесарь"),
+                                                 ("Любой специалист",
+                                                  "Любой специалист")],
+                                    widget=forms.Select(
+                                        attrs={'class': 'form-select'}),
+                                    required=False, label='Тип мастера')
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')
         super(RequestUserForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Request
-        exclude = ['id', 'owner', 'master', 'comment']
+        exclude = ['id', 'master', 'comment', 'status', 'owner']
         widgets = {
             'date': forms.DateInput(attrs={'class': 'form-control'}),
             'time': forms.TimeInput(attrs=({'class': 'form-control',
@@ -270,18 +280,10 @@ class RequestUserForm(forms.ModelForm):
                                                  'rows': '4',
                                                  'placeholder':
                                                      'Опишите проблему'}),
-            'type_master': forms.Select(attrs={'class': 'form-select'},
-                                        choices=[("", "Выберите..."),
-                                                 ("Сантехник", "Сантехник"),
-                                                 ("Электрик", "Электрик"),
-                                                 ("Слесарь", "Слесарь"),
-                                                 ("Любой специалист",
-                                                  "Любой специалист")]),
         }
         labels = {
             'description': "Описание",
             'flat': 'Квартира',
-            'type_master': 'Тип мастера',
             'date': "Дата работ",
             'time': "Время работ",
         }

@@ -65,11 +65,13 @@ urlpatterns = [
          views.RequestUserAjaxDelete.as_view(),
          name='request_user_delete'),
 
-
-
-
-
-
+    #PROFILE
+    path('cabinet/profile/',
+         views.ProfileUserView.as_view(),
+         name='user_profile'),
+    path('cabinet/profile/update',
+         views.ProfileUserView.as_view(),
+         name='user_profile_update'),
 
 
 

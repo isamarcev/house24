@@ -608,11 +608,27 @@ class RequestUserCreateView(CreateView):
     template_name = 'users/cabinet/request_user_form.html'
     form_class = RequestUserForm
 
-    # def get_context_data(self, **kwargs):
-    #     context = super(RequestUserCreate, self).get_context_data()
-    #     # context['flat_l']
+    def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST or None)
+        if form_class.is_valid():
+            form_class.save(commit=False)
+            form_class.instance.owner = request.user
+            form_class.save()
+            return HttpResponseRedirect(reverse_lazy('users:request_user_view'))
+        else:
+            return render(request, self.template_name,
+                          context={'form': form_class})
 
 
+class ProfileUserView(TemplateView):
+    template_name = 'users/cabinet/profile_user_view.html'
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        # context['user'] = CustomUser.objects.get(id=)
+        context['flats'] = Flat.objects.filter(owner=get_user(self.request)).\
+            select_related('house')
+        return context
 
 
 
