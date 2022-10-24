@@ -1,4 +1,4 @@
-{% extends 'houses/layout/base_houses.html' %}
+{% extends 'users/cabinet/layout.html' %}
 {% load static %}
 {% block title %}
     Сообщение
@@ -30,20 +30,20 @@
                 <div class="box">
                 <div class="box-header" >
                     {% csrf_token %}
-                        <h3>{{ object.title }}</h3>
+                        <h3>{{ object.message.title }}</h3>
                     <div class="row" style="justify-content: space-between">
                         <div class="col-6" style="text-align: left">
-                            <h6>От: {{ object.sender }}</h6>
+                            <h6>От: {{ object.message.sender }}</h6>
                         </div>
                         <div class="col-6" style="text-align: right">
-                            <span style="font-size: 12px; color: #999999">{{ object.date|date:"d.m.y - H:s" }}</span>
+                            <span style="font-size: 12px; color: #999999">{{ object.message.date|date:"d.m.y - H:s" }}</span>
                         </div>
                     </div>
                 </div>
                     <div class="box-body">
                         <div  id="mailbox_text" class="mailbox-read-message">
                                 <script>
-                                let textMessage = '{{ object.text }}'
+                                let textMessage = '{{ object.message.text }}'
                                 let textElement = document.createElement('span')
                                 textElement.innerHTML = textMessage
                                 document.getElementById('mailbox_text').innerHTML = textElement.innerText
@@ -64,8 +64,8 @@
 {% endblock %}
 {% block script %}
     <script>
-        const UrlDelete = '{% url 'users:messages_delete' %}'
-        const SuccessUrl = '{% url 'users:message_list' %}'
+        const UrlDelete = '{% url 'users:messages_user_delete' %}'
+        const SuccessUrl = '{% url 'users:messages_view' %}'
     </script>
         <script src="{% static 'users/js/user_create.js' %}"></script>
 {% endblock %}

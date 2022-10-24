@@ -28,6 +28,51 @@ urlpatterns = [
          name='owner_detail'),
     path('owner/delete/', views.OwnerListView.as_view(), name='owner_delete'),
 
+
+    #CABINET
+    path('cabinet/invoices/', views.CabinetInvoicesListView.as_view(),
+         name='invoice_for_users'),
+    path('cabinet/invoices/<int:pk>/', views.CabinetInvoicesDetail.as_view(),
+         name='detail_invoice_for_users'),
+    path('cabinet/invoices/ajax-request/',
+         views.CabinetInvoicesAjaxList.as_view(),
+         name='invoice_for_users_ajax'),
+    path('cabinet/', views.LayoutTemplateView.as_view(), name='layout'),
+
+    #TARIFF
+    path('cabinet/tariff/', views.CabinetTariffForFlatView.as_view(),
+         name='tariff_for_users_flat'),
+    #MESSAGES
+    path('cabinet/messages/', views.MessageUserList.as_view(),
+         name='messages_view'),
+    path('cabinet/messages/ajax-list/', views.MessageUserAjaxList.as_view(),
+         name='messages_user_ajax'),
+    path('cabinet/messages/delete/', views.MessageUserAjaxDelete.as_view(),
+         name='messages_user_delete'),
+    path('cabinet/messages/<int:pk>/', views.MessageUserDetailView.as_view(),
+         name='messages_user_detail'),
+    #REQUESTS
+    path('cabinet/master-request/',
+         views.RequestUserListView.as_view(),
+         name='request_user_view'),
+    path('cabinet/master-request/get-ajax-list/',
+         views.RequestUserAjaxListView.as_view(),
+         name='request_user_ajax_list'),
+    path('cabinet/master-request/create/',
+         views.RequestUserCreateView.as_view(),
+         name='request_user_create'),
+    path('cabinet/master-request/delete/',
+         views.RequestUserAjaxDelete.as_view(),
+         name='request_user_delete'),
+
+
+
+
+
+
+
+
+
     # request
     path('requests/', views.RequestListView.as_view(), name='requests_list'),
     path('requests-get-ajax/', views.RequestGetViewAjax.as_view(),
@@ -43,8 +88,7 @@ urlpatterns = [
     path('requests/detail/<int:pk>/', views.RequestDetailView.as_view(),
          name='requests_detail'),
 
-    # MESSAGE
-
+    # MESSAGES
     path('messages/', views.MessageListView.as_view(),
          name='message_list'),
     path('messages/get-ajax-list/', views.MessageAjaxList.as_view(),
@@ -54,19 +98,16 @@ urlpatterns = [
          name='message_ajax_info_for_house'),
     path('messages/delete/', views.MessageAjaxDelete.as_view(),
          name='messages_delete'),
-    # path('messages/delete/<int:pk>/', views.MessageDeleteView.as_view(),
-    #      name='messages_delete'),
-
-
 
     path('messages/get-ajax-section/', views.MessageAjaxSectionInfo.as_view(),
          name='message_ajax_info_for_section'),
-
 
     path('messages/create/', views.MessageCreateView.as_view(),
          name='message_create'),
     path('messages/detail/<int:pk>/', views.MessageDetailView.as_view(),
          name='message_detail'),
+
+
 
 
     # path('accounts/login/', views.LoginUser.as_view(), name='login'),

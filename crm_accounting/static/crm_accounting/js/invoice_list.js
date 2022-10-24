@@ -241,8 +241,6 @@ $(function() {
             }
             });
             $('#ui-datepicker-div > table').css('display', 'none')
-
-
         });
 
 function delete_selected() {

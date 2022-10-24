@@ -252,6 +252,47 @@ class RequestForm(forms.ModelForm):
         }
 
 
+class RequestUserForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(RequestUserForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Request
+        exclude = ['id', 'owner', 'master', 'comment']
+        widgets = {
+            'date': forms.DateInput(attrs={'class': 'form-control'}),
+            'time': forms.TimeInput(attrs=({'class': 'form-control',
+                                           "data-clocklet": ""}),
+                                    format=('%H:%M')),
+            'description': forms.Textarea(attrs={'class': 'form-control',
+                                                 'style': 'resize: none;',
+                                                 'rows': '4',
+                                                 'placeholder':
+                                                     'Опишите проблему'}),
+            'type_master': forms.Select(attrs={'class': 'form-select'},
+                                        choices=[("", "Выберите..."),
+                                                 ("Сантехник", "Сантехник"),
+                                                 ("Электрик", "Электрик"),
+                                                 ("Слесарь", "Слесарь"),
+                                                 ("Любой специалист",
+                                                  "Любой специалист")]),
+        }
+        labels = {
+            'description': "Описание",
+            'flat': 'Квартира',
+            'type_master': 'Тип мастера',
+            'date': "Дата работ",
+            'time': "Время работ",
+        }
+
+        error_messages = {
+            'flat': {
+                'required': "Это поле обязательно к заполнению"
+            },
+        }
+
+
 class MessageForm(forms.ModelForm):
     message_for_deptors = forms.BooleanField(required=False)
     message_address_house_id = forms.ModelChoiceField(

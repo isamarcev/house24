@@ -91,6 +91,11 @@ def get_next_invoice():
         return new_number
 
 
+status_invoice = [('', 'Выберите...'),
+                  ('Оплачена', 'Оплачена'),
+                  ('Частично оплачена', 'Частично оплачена'),
+                  ('Неоплачена', 'Неоплачена')]
+
 class Invoice(models.Model):
     number = models.CharField(unique=True, default=get_next_invoice,
                               max_length=15)
@@ -102,10 +107,7 @@ class Invoice(models.Model):
     payment_state = models.BooleanField(verbose_name='Проведена',
                                         null=True, blank=True)
     status = models.CharField(max_length=120,
-                              choices=[('', 'Выберите...'),
-                                       ('Оплачена', 'Оплачена'),
-                                       ('Частично оплачена', 'Частично оплачена'),
-                                       ('Неоплачена', 'Неоплачена')],
+                              choices=status_invoice,
                               null=True,
                               default="Неоплачена",
                               blank=True)
@@ -120,9 +122,6 @@ class Invoice(models.Model):
 
     def __str__(self):
         return self.number
-
-
-
 
 
 class Transaction(models.Model):

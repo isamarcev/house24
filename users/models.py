@@ -110,5 +110,5 @@ class MessageUsers(models.Model):
                              on_delete=models.CASCADE)
     message = models.ForeignKey(Message,
                                 on_delete=models.CASCADE)
-
+    read = models.BooleanField(default=False, blank=True)
 

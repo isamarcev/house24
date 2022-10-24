@@ -11,12 +11,15 @@ from django.db.models import Q
 # Create your views here.
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, \
+    DeleteView, TemplateView
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
+from crm_accounting.models import Invoice, status_invoice, InvoiceService
+from crm_home.models import Tariff, TariffService
 from houses.models import House, Flat, Section, Floor
 from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm, \
-    OwnerUserForm, RequestForm, MessageForm
+    OwnerUserForm, RequestForm, MessageForm, RequestUserForm
 from users.models import CustomUser, Role, Request, Message, MessageUsers
 
 
@@ -46,9 +49,13 @@ class AjaxUsersListView(View):
         phone = request.GET['phone']
         email = request.GET['email']
         status_value = request.GET['status']
-        users = CustomUser.objects.filter(Q(first_name__icontains=user) | Q(last_name__icontains=user),
-                                          Q(role__name__icontains=role_name), Q(phone__contains=phone),
-                                          Q(email__icontains=email), Q(status__contains=status_value)).order_by('id')
+        users = CustomUser.objects.filter(Q(first_name__icontains=user)
+                                          | Q(last_name__icontains=user),
+                                          Q(role__name__icontains=role_name),
+                                          Q(phone__contains=phone),
+                                          Q(email__icontains=email),
+                                          Q(status__contains=status_value)).\
+            order_by('id')
         user_list = []
         for user in users:
             instance = {
@@ -94,7 +101,6 @@ class UserUpdateView(UpdateView):
 
     def post(self, request, *args, **kwargs):
         form_class = self.form_class(request.POST, instance=self.get_object())
-        print(form_class.is_valid(), form_class.errors)
         if form_class.is_valid():
             form_class.save(commit=False)
             if len(request.POST.get('password')) == 0:
@@ -298,9 +304,11 @@ class RequestUpdateView(UpdateView):
         return context
 
 
-
 class MessageListView(ListView):
     model = Message
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        return {}
 
 
 class MessageAjaxList(BaseDatatableView):
@@ -309,7 +317,6 @@ class MessageAjaxList(BaseDatatableView):
                'message_address_house_id',
                'message_address_section_id', 'message_address_floor_id',
                'message_address_flat_id']
-    # order_columns = ['house', 'section', 'flat', 'service']
 
     def get_initial_queryset(self):
         return self.model.objects.all().order_by('-date')
@@ -434,7 +441,180 @@ class MessageAjaxDelete(DeleteView):
             )
 
 
-# def delete_message(request):
-#     if request.user.is_superuser or request.user.is_staff:
-#         message_id =
+class LayoutTemplateView(TemplateView):
+    template_name = 'users/cabinet/layout.html'
+
+
+class CabinetInvoicesListView(ListView):
+    model = Invoice
+    template_name = 'users/cabinet/invoice_users.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = dict()
+        context['status'] = status_invoice
+        if self.request.GET.get('flat_id'):
+            context['flat_id'] = self.request.GET.get('flat_id')
+        return context
+
+
+class CabinetInvoicesAjaxList(BaseDatatableView):
+    model = Invoice
+    columns = ['id', 'number', 'date', 'status', 'amount']
+    order_columns = ['date']
+
+    def get_initial_queryset(self):
+        flat_id = self.request.GET.get('flat')
+        user_id = self.request.GET.get('user')
+        qs = self.model.objects.all()
+        if flat_id:
+            qs = qs.filter(flat_id=flat_id)
+        if user_id:
+            qs = qs.filter(flat__owner__id=user_id)
+        return qs
+
+    def filter_queryset(self, qs):
+        date = self.request.GET.get('date')
+        status = self.request.GET.get('status')
+        if status:
+            qs = qs.filter(status=status)
+        if date:
+            date_formatting = datetime.datetime.strptime(date, '%m/%d/%Y')
+            qs = qs.filter(date=date_formatting)
+        return qs
+
+
+class CabinetInvoicesDetail(DetailView):
+    model = Invoice
+    template_name = 'users/cabinet/invoice_users_detail.html'
+    queryset = Invoice.objects.all().\
+        prefetch_related('invoiceservice_set__service__unit')
+
+
+class CabinetTariffForFlatView(TemplateView):
+    model = TariffService
+    template_name = 'users/cabinet/tariff_for_flat.html'
+
+    def get_queryset(self):
+        qs = get_object_or_404(
+            TariffService.objects.select_related(''),
+            tariff=self.request.GET.get('flat_id'))
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        context['object'] = \
+            get_object_or_404(Flat.objects.select_related('house'),
+                              id=self.request.GET.get('flat_id'))
+        context['tariff_services'] = \
+            self.model.objects.\
+                filter(tariff__flat=self.request.GET.get('flat_id')).\
+                select_related('service__unit')
+        return context
+
+# TODO "CHANGE USER in CABINET  FOR REQUEST.USER"
+
+def get_user(request):
+    # return request.user
+    return 12
+
+
+class MessageUserList(TemplateView):
+    template_name = 'users/cabinet/message_users_list.html'
+
+
+class MessageUserAjaxList(BaseDatatableView):
+    model = MessageUsers
+    columns = ['id', 'message.text', 'message.title', 'message.date',
+               'message.sender', 'read']
+
+    def get_initial_queryset(self):
+        return self.model.objects.filter(user=get_user(self.request)).\
+            select_related('message').order_by('-message_id')
+
+    def filter_queryset(self, qs):
+        search_field = self.request.GET.get('search')
+        if search_field:
+            qs = qs.filter(Q(message__title__icontains=search_field)
+                           | Q(message__text__icontains=search_field))
+        return qs
+
+
+class MessageUserAjaxDelete(DeleteView):
+    model = MessageUsers
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('id'):
+            message = get_object_or_404(MessageUsers,
+                                        id=request.POST.get('id'))
+            if message.user is request.user:
+                message.delete()
+                return JsonResponse({'success': 'success'})
+            else:
+                return JsonResponse({'success': 'Это не ваше сообщение'})
+        messages_id = request.POST.get('deleted_list').split(',')
+        messages = self.model.objects.filter(id__in=messages_id)
+        for message in messages:
+            if message.user is request.user:
+                message.delete()
+        return JsonResponse({'success': 'success'})
+
+
+class MessageUserDetailView(DetailView):
+    template_name = 'users/cabinet/message_user_detail.html'
+
+    def get_queryset(self):
+        qs = MessageUsers.objects.filter(user=get_user(self.request)).\
+            select_related('message')
+        return qs
+
+    def get_context_data(self, **kwargs):
+        message = self.object
+        if not message.read:
+            message.read = True
+            message.save()
+        return super().get_context_data()
+
+
+class RequestUserListView(TemplateView):
+    template_name = 'users/cabinet/request_user_list.html'
+
+
+class RequestUserAjaxListView(BaseDatatableView):
+    model = Request
+    columns = ['id', 'type_master', 'description', 'date', 'time',
+               'status']
+
+    def get_initial_queryset(self):
+        return self.model.objects.filter(owner_id=get_user(self.request))\
+            .order_by('-id')
+
+
+class RequestUserAjaxDelete(DeleteView):
+    model = Request
+
+    def post(self, request, *args, **kwargs):
+        master_request_id = request.POST.get('id')
+        master_request = get_object_or_404(Request, id=master_request_id)
+        if any([master_request.owner is request.user,
+                request.user.is_superuser]):
+            master_request.delete()
+            return JsonResponse({'success': 'success'})
+        else:
+            return JsonResponse({'success': 'Это не ваш запрос!'})
+
+
+class RequestUserCreateView(CreateView):
+    model = Request
+    template_name = 'users/cabinet/request_user_form.html'
+    form_class = RequestUserForm
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(RequestUserCreate, self).get_context_data()
+    #     # context['flat_l']
+
+
+
+
+
+
 

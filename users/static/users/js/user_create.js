@@ -58,7 +58,7 @@ for (var y = 0; y < passwords.length; ++y) {
 }
 
 function deleteThisMessage(id) {
-    const result = confirm('Вы уверены, что хотите удалить выбранные сообщения?')
+    const result = confirm('Вы уверены, что хотите удалить сообщение?')
     if (result) {
         var csrf = $("input[name=csrfmiddlewaretoken]").val();
         $.ajax({
