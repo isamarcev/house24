@@ -215,8 +215,8 @@
                                         {{ service_formset.management_form }}
                                         {% for service in service_formset %}
                                             <tr id="{{ service.prefix }}-form">
-                                            {% for hidden in service.hidden_fields %}
-                                                {{ hidden }}
+                                                {% for hidden in service.hidden_fields %}
+                                                    {{ hidden }}
                                                 {% endfor %}
 {#                                                <input type="hidden" name="{{ service.prefix }}-id" id="id_{{ service.prefix }}-id">#}
                                                 <td>
@@ -317,7 +317,7 @@
                                                 </td>
                                                 <td style="min-width: 180px;">
                                                     <div class="h5">
-                                                        <input type="hidden" name="amount" id="id_amount">
+                                                        <input type="hidden" name="amount" id="id_amount" >
                                                         Итого: <b><span id="price-total">{{ object.amount }}</span></b> грн
                                                     </div>
                                                 </td>

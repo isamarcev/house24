@@ -54,7 +54,7 @@ $(document).ready( function CreateTable() {
             "lengthChange": false,
             "language": {
                 "zeroRecords": "Ничего не найдено",
-                "info": "Количество квартир:  _MAX_",
+                "info": "Количество транзаций:  _MAX_",
                 'infoFiltered': '',
                 "infoEmpty": "",
                 "paginate": {

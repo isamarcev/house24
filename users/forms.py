@@ -1,11 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
-from django.contrib.auth.hashers import make_password
-
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV2Invisible, ReCaptchaV2Checkbox
 from houses.models import House
 from . import models
 from .models import Role, CustomUser, Request
+from home24.settings import RECAPTCHA_PUBLIC_KEY, RECAPTCHA_PRIVATE_KEY
 
 
 class RegisterUserForm(UserCreationForm):
@@ -14,16 +15,22 @@ class RegisterUserForm(UserCreationForm):
 
 
 class LoginUserForm(AuthenticationForm):
-    username = forms.CharField(label='Login', widget=forms.TextInput(attrs={'class': 'form-input',
-                                                                            'placeholder': 'Email или ID'}))
-    password = forms.CharField(label='Password Input', widget=forms.PasswordInput(attrs={'class': 'form-input',
-                                                                                         'placeholder': 'Пароль'}))
-
-
-class BaseModelForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('label_suffix', '')
-        super(BaseModelForm, self).__init__(*args, **kwargs)
+    username = forms.CharField(label='Login', widget=forms.TextInput(
+        attrs={'class': 'form-input', 'placeholder': 'Email или ID'}))
+    password = forms.CharField(label='Password Input',
+                               widget=forms.PasswordInput(
+                                   attrs={'class': 'form-input',
+                                          'placeholder': 'Пароль'}))
+    remember_me = forms.BooleanField(required=False,
+                                     widget=forms.CheckboxInput(
+                                         attrs={'checked': 'checked'}))
+    captcha = ReCaptchaField(widget=ReCaptchaV2Invisible, private_key=RECAPTCHA_PRIVATE_KEY, public_key=RECAPTCHA_PUBLIC_KEY)
+    # (
+    #     attrs={
+    #         'data-theme': 'dark',
+    #         'data-size': 'compact',
+    #     }
+    # ))
 
 
 class CustomUserForm(forms.ModelForm):
@@ -52,7 +59,6 @@ class CustomUserForm(forms.ModelForm):
             'email': 'Email(логин)'
         }
 
-
     def clean_password(self):
         password = self.cleaned_data.get('password')
         if not self.instance:
@@ -65,8 +71,15 @@ class CustomUserForm(forms.ModelForm):
             raise ValidationError(
                 'Пароль не может быть меньше 8 символов.'
             )
+
         return password
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password")
@@ -183,6 +196,13 @@ class OwnerUserForm(forms.ModelForm):
                 'Пароль не может быть меньше 8 символов.'
             )
         return password
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password")

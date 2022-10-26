@@ -48,7 +48,43 @@
 
     <section class="content" style="padding-top: 15px">
     <div class="row">
-        <div class="col-sm-12" style="text-align: right; padding: 0 15px">
+        <div class="col-xs-12 col-md-3">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ cashbox_state }} грн.</h3>
+                    <p>Состояние кассы</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-dollar"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-3">
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h3>{{ sum_accounts_balance }} грн.</h3>
+                    <p>Баланс по счетам</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-dollar"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-3">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>{{ invoices_dobts }} грн.</h3>
+                    <p>Задолженность по счетам</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-dollar"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-3" style="text-align: right; padding: 0 15px">
             <div class="dropdown">
               <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Выберите действие

@@ -5,12 +5,14 @@ from users.models import CustomUser, MessageUsers
 
 # TODO 'Change request USER_ID -> request.user.id
 
+
 def user_info(request):
     request_path_list = request.path.split('/')
     if request_path_list[1] == 'users' and request_path_list[2] == 'cabinet':
-        flats = Flat.objects.filter(owner_id=12).\
+        flats = Flat.objects.filter(owner_id=request.user.id).\
             select_related('house')
-        unread_message = MessageUsers.objects.filter(user_id=12, read=False).\
+        unread_message = MessageUsers.objects.\
+            filter(user_id=request.user.id, read=False).\
             order_by('-message_id')
         return {
             'flats': flats,

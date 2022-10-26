@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 
+from django.conf.global_settings import AUTHENTICATION_BACKENDS
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -46,7 +48,16 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'psycopg2',
     'debug_toolbar',
+    'captcha'
 
+]
+
+RECAPTCHA_PUBLIC_KEY = '6Lfvo68iAAAAAEx4E9ak4CNYZxYJtOZIy0HLFrSA'
+RECAPTCHA_PRIVATE_KEY = '6Lfvo68iAAAAAAuZIavLFo5iqXTSE8fzNO6mncuh'
+
+AUTHENTICATION_BACKENDS = [
+    'users.authentication.EmailAuthentication',
+    'users.authentication.IdAuthentication',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'

@@ -76,7 +76,6 @@ def get_next_invoice():
         values_list = list()
         for item in number_list:
             values_list.append(item['number'])
-
         def check_instance(numbers, values, step=1):
             new_number = str(int(numbers[0]['number']) + step).zfill(11)
             if new_number in values:
@@ -96,6 +95,7 @@ status_invoice = [('', 'Выберите...'),
                   ('Частично оплачена', 'Частично оплачена'),
                   ('Неоплачена', 'Неоплачена')]
 
+
 class Invoice(models.Model):
     number = models.CharField(unique=True, default=get_next_invoice,
                               max_length=15)
@@ -103,7 +103,7 @@ class Invoice(models.Model):
     house = models.ForeignKey('houses.House', on_delete=models.CASCADE)
     section = models.ForeignKey('houses.Section', on_delete=models.CASCADE)
     flat = models.ForeignKey('houses.Flat', on_delete=models.CASCADE)
-    personal_account = models.CharField(max_length=50)
+    personal_account = models.CharField(max_length=50, null=True, blank=True)
     payment_state = models.BooleanField(verbose_name='Проведена',
                                         null=True, blank=True)
     status = models.CharField(max_length=120,
@@ -149,11 +149,14 @@ class Transaction(models.Model):
 
 
 class InvoiceService(models.Model):
-    invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT, null=True)
-    service = models.ForeignKey(Service, on_delete=models.PROTECT, null=True)
-    price = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True)
-    amount = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True)
-    total = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True)
+    price = models.DecimalField(decimal_places=2, max_digits=10, null=True,
+                                blank=True)
+    amount = models.DecimalField(decimal_places=2, max_digits=10, null=True,
+                                 blank=True)
+    total = models.DecimalField(decimal_places=2, max_digits=10, null=True,
+                                blank=True)
 
     def __str__(self):
         return f'{self.invoice} {self.service}'

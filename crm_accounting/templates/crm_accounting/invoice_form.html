@@ -86,18 +86,39 @@
                                     <div class="form-group no-margin">
                                         {{ form.house.label_tag }}
                                         {{ form.house }}
+                                        <div class="errorlist">
+                                            {% if form.errors.house %}
+                                                {% for field in form.errors.house %}
+                                                    {{ field }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                     <div class="form-group no-margin">
                                         {{ form.section.label_tag }}
                                         <select name="section" id="id_section" class="form-select">
                                             <option value="">Выберите...</option>
                                         </select>
+                                        <div class="errorlist">
+                                            {% if form.errors.section %}
+                                                {% for field in form.errors.section %}
+                                                    {{ field }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                     <div class="form-group no-margin">
                                         {{ form.flat.label_tag }}
                                         <select name="flat" id="id_flat" class="form-select">
                                             <option value="">Выберите...</option>
                                         </select>
+                                        <div class="errorlist">
+                                            {% if form.errors.flat %}
+                                                {% for field in form.errors.flat %}
+                                                    {{ field }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6">
@@ -139,6 +160,13 @@
                                 <div class="form-group">
                                     {{ form.personal_account.label_tag }}
                                     {{ form.personal_account }}
+                                    <div class="errorlist">
+                                        {% if form.errors.personal_account %}
+                                            {% for field in form.errors.personal_account %}
+                                                {{ field }}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                             <p >

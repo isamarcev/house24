@@ -1,6 +1,6 @@
 import datetime
 
-from django.contrib.auth import logout
+from django.contrib.auth import login as auth_login
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
@@ -10,10 +10,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 # Create your views here.
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, \
     DeleteView, TemplateView
 from django_datatables_view.base_datatable_view import BaseDatatableView
+from django.contrib.auth import logout as auth_logout
 
 from crm_accounting.models import Invoice, status_invoice, InvoiceService
 from crm_home.models import Tariff, TariffService
@@ -23,10 +28,71 @@ from users.forms import LoginUserForm, RegisterUserForm, CustomUserForm, \
 from users.models import CustomUser, Role, Request, Message, MessageUsers
 
 
+
+def get_checkbox_answer(self, form):
+    remember_me = form.cleaned_data.get('remember_me')
+    if not remember_me:
+        self.request.session.set_expiry(0)
+        self.request.session.modified = True
+
+
 class LoginUser(LoginView):
     form_class = LoginUserForm
     template_name = 'users/login_user.html'
-    success_url = reverse_lazy('crm_home:roles')
+
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(csrf_protect)
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated and self.request.user.is_staff:
+            return HttpResponseRedirect(reverse_lazy('users:message_list'))
+        elif self.request.user.is_authenticated and not self.request.user.is_staff:
+            return HttpResponseRedirect(reverse_lazy('users:user_profile'))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('users:user_profile')
+
+    def form_valid(self, form):
+        ''' Check remember me checkbox from form'''
+        get_checkbox_answer(self, form)
+        return super(LoginUser, self).form_valid(form)
+
+
+class LoginAdminUser(LoginView):
+    form_class = LoginUserForm
+    template_name = 'users/login_admin_user.html'
+    # redirect_authenticated_user = reverse_lazy('users:layout')
+
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(csrf_protect)
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated and self.request.user.is_staff:
+            return HttpResponseRedirect(reverse_lazy('users:message_list'))
+        elif self.request.user.is_authenticated and not self.request.user.is_staff:
+            return HttpResponseRedirect(reverse_lazy('users:user_profile'))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('users:users')
+
+    def form_valid(self, form):
+        ''' Check remember me checkbox from form'''
+        get_checkbox_answer(self, form)
+        return super(LoginAdminUser, self).form_valid(form)
+
+
+class LogoutUser(LogoutView):
+
+    def get_success_url(self):
+        return reverse_lazy('content:main')
+
+    @method_decorator(csrf_protect)
+    def post(self, request, *args, **kwargs):
+        """Logout may be done via POST."""
+        auth_logout(request)
+        return HttpResponseRedirect(reverse_lazy('content:main'))
 
 
 class UsersListView(ListView):
@@ -625,9 +691,8 @@ class ProfileUserView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = dict()
-        # context['user'] = CustomUser.objects.get(id=)
-        context['flats'] = Flat.objects.filter(owner=get_user(self.request)).\
-            select_related('house')
+        context['flats'] = Flat.objects.filter(owner=self.request.user).\
+            select_related('floor', 'house', 'section')
         return context
 
 

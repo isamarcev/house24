@@ -1,13 +1,15 @@
+from decimal import Decimal
+
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.forms import modelformset_factory
 
 from crm_home.models import Unit, Service
 from houses.models import House, Flat
 from users.models import CustomUser
 from . import models
-from .models import PersonalAccount
+from .models import PersonalAccount, get_next_invoice, get_next_account
 
 
 class PersonalAccountForm(forms.ModelForm):
@@ -83,7 +85,6 @@ class TransactionForm(forms.ModelForm):
         super(TransactionForm, self).__init__(*args, **kwargs)
         self.fields['manager'].empty_label = 'Выберите...'
 
-
     class Meta:
         model = models.Transaction
         exclude = ['id', ]
@@ -124,6 +125,7 @@ class TransactionForm(forms.ModelForm):
                 raise ValidationError(
                     'Номер должен состоять из цифр.'
                 )
+        return number
 
 
 class InvoiceForm(forms.ModelForm):
@@ -161,6 +163,88 @@ class InvoiceForm(forms.ModelForm):
             'payment_state': 'Проведена',
             'flat': 'Квартира',
         }
+
+        error_messages = {
+            'number': {
+                'unique': "Квитанцция с таким номером уже существует"
+            },
+            'house': {
+                'blank': "Это поле обязательно к заполнению.",
+                'required' :"Это поле обязательно к заполнению."
+            },
+            'section': {
+                'blank': "Это поле обязательно к заполнению.",
+                'required':"Это поле обязательно к заполнению."
+
+        },
+            'flat': {
+                'blank': "Это поле обязательно к заполнению.",
+                'required':"Это поле обязательно к заполнению."
+            },
+        }
+
+    def clean_personal_account(self):
+        personal_account = self.cleaned_data.get('personal_account')
+        if not personal_account:
+            personal_account = get_next_account()
+        flat = self.cleaned_data.get('flat')
+        if flat.personal_account:
+            if flat.personal_account.account_number == personal_account:
+                return personal_account
+            else:
+                return flat.personal_account.account_number
+        else:
+            new_account = PersonalAccount.objects.create(
+                account_number=personal_account)
+            new_account.save()
+            flat.personal_account = new_account
+            new_account.flat = flat
+            return personal_account
+
+    def calculate_invoice(self, form_class, **kwargs):
+        """Calculate balance of PERSONAL ACCOUNT"""
+        type_of_form = kwargs.get('type')
+        instance_status = kwargs.get('status')
+        instance_payment_state = kwargs.get('payment_state')
+        form_status = form_class.instance.status
+        form_payment_state = form_class.instance.payment_state
+        account = form_class.instance.flat.personal_account
+        qwer = models.Transaction.objects.filter(personal_account=account,
+                                                 payment_state__type='in',
+                                                 completed=True).\
+            aggregate(Sum('amount')).get('amount__sum')
+        print(qwer)
+        rewq = models.Invoice.objects.filter(personal_account=account,
+                                             payment_state=True,
+                                             status='Оплачена').\
+            aggregate(Sum('amount')).get('amount__sum')
+        if not rewq:
+            rewq = 0
+        if not qwer:
+            qwer = 0
+        operation = qwer - rewq
+        print(operation)
+        account.balance = operation
+        # # account.balance =
+        # # income_for_account = PersonalAccount.objects.filter(id=form_status.instance.flat.personal_account.id)
+        # if type_of_form == 'update':
+        #     if instance_status == form_status and \
+        #         instance_payment_state == form_payment_state:
+        #         pass
+        #     elif form_status:
+        #         if form_payment_state == 'Оплачена':
+        #             print(form_payment_state, 'PAID')
+        #             account.balance = account.balance - form_class.instance.amount
+        #         elif form_payment_state != 'Оплачена':
+        #             print(form_payment_state, 'NOPAID')
+        #             account.balance = account.balance + form_class.instance.amount
+        #     elif not form_status:
+        #         account.balance = account.balance + form_class.instance.amount
+        # elif type_of_form == 'create':
+        #     if form_status and form_payment_state == 'Оплачена':
+        #         account.balance = account - form_class.instance.amount
+        account.save()
+
 
 
 class InvoiceServiceForm(forms.ModelForm):

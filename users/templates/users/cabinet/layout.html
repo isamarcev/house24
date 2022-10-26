@@ -98,9 +98,9 @@
                             <!-- Menu Footer-->
                             <li class="user-footer">
                                 <div class="pull-left">
-                                    <a class="btn btn-default btn-flat" href="/admin/user-admin/update-my">Профиль</a>                                </div>
+                                    <a class="btn btn-default btn-flat" href="{% url 'users:user_profile' %}">Профиль</a>                                </div>
                                 <div class="pull-right">
-                                    <a class="btn btn-default btn-flat" href="/admin/site/logout" data-method="post">Выход</a>                                </div>
+                                    <a class="btn btn-default btn-flat" href="{% url 'users:logout' %}" data-method="post">Выход</a>                                </div>
                             </li>
                         </ul>
       </li>

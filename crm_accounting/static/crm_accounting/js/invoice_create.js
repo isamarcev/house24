@@ -49,7 +49,7 @@ function get_info_by_flat() {
                 success: (data) => {
                     console.log(data)
                     if (data.data.owner) {
-                        var link = "<a class='link-list' href='../../../users/owner/detail/" + data.data.owner.id + "'>Булгаков Михаил Афанасьевич</a>"
+                        var link = "<a class='link-list' href='../../../users/owner/detail/" + data.data.owner.id + "'>" + data.data.owner.owner + "</a>"
                         owner.html(link)
                         phone.html(data.data.owner.phone)
                     }
@@ -265,6 +265,8 @@ $(function () {
 
             });
         $('body > div.wrapper > div > form > section > div > div > div > div > div:nth-child(1) > div:nth-child(2) > div.row > div:nth-child(2) > div > div > button').html("<i class='fa fa-calendar'></i>").addClass('btn btn-date').after($("#id_period_end"));
+
+        $('#id_amount').val(parseInt(totalPrice.text()))
 
     })
 

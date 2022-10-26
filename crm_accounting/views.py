@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.db.models import Q
+from django.db.models.aggregates import Sum
 from django.forms import modelformset_factory
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -21,6 +22,25 @@ from .models import get_next_transaction, PersonalAccount
 
 def main_page(request, pk):
     pass
+
+
+def get_statistics(context):
+    """Balance personal accounts, depts and cahsbox`s state """
+    income = models.Transaction.objects. \
+        filter(payment_state__type='in').aggregate(Sum('amount'))
+    outcome = models.Transaction.objects. \
+        filter(payment_state__type='out').aggregate(Sum('amount'))
+    cashbox_state = income['amount__sum'] - outcome['amount__sum']
+    sum_personal_accounts = models.PersonalAccount.objects.all().aggregate(
+        Sum('balance'))
+    context['cashbox_state'] = cashbox_state
+    context['sum_accounts_balance'] = sum_personal_accounts.get('balance__sum')
+    invoices_dopts = models.Invoice.objects.filter(
+        payment_state=True,status__in=['Неоплачена', 'Частично оплачена']). \
+        aggregate(Sum('amount'))
+    context['invoices_dobts'] = invoices_dopts.get('amount__sum')
+    return context
+
 
 
 class AccountCreateView(CreateView):
@@ -81,6 +101,7 @@ class AccountListView(ListView):
         context = dict()
         context['houses'] = House.objects.all()
         context['owner'] = CustomUser.objects.all()
+        context = get_statistics(context)
         return context
 
 
@@ -174,6 +195,37 @@ def get_users(request):
         return JsonResponse({'owner': owner_info}, status=200)
 
 
+def calculate_balance(form_class, **kwargs):
+    """Check the form Transaction for checkbox and calculate account balance"""
+    form_class.save(commit=False)
+    form_type = kwargs.get('type')
+    payment_state = form_class.instance.payment_state.type
+
+    if form_type == 'update' and payment_state == 'in':
+        completed_instance = kwargs.get('completed')
+        completed_instance_form = form_class.instance.completed
+        account = models.PersonalAccount.objects.get(
+            id=form_class.instance.personal_account.id)
+        if completed_instance == completed_instance_form:
+            pass
+        elif completed_instance_form:
+            operation = account.balance + form_class.instance.amount
+            account.balance = operation
+            account.save()
+        elif not completed_instance_form:
+            operation = account.balance - form_class.instance.amount
+            account.balance = operation
+            account.save()
+    elif form_type == 'create' and payment_state == 'in':
+        account = models.PersonalAccount.objects.get(
+            id=form_class.instance.personal_account.id)
+        if form_class.instance.completed:
+            operation = account.balance + form_class.instance.amount
+            account.balance = operation
+            account.save()
+    form_class.save()
+
+
 class TransactionCreateView(CreateView):
     model = models.Transaction
     form_class = forms.TransactionForm
@@ -186,12 +238,15 @@ class TransactionCreateView(CreateView):
         type_of_transaction = self.request.GET.get('type')
         context['manager'] = self.request.user
         instance_id = self.request.GET.get('transaction_id')
+        if kwargs.get('form'):
+            context['form'] = kwargs['form']
+        else:
+            context['form'] = self.form_class()
         if instance_id:
             transaction = models.Transaction.objects.select_related('manager',
                                                                     'owner'). \
                 get(pk=instance_id)
             initial = {
-                # 'number': get_next_transaction,
                 'payment_state': transaction.payment_state,
                 'comment': transaction.comment,
                 'owner': transaction.owner,
@@ -203,16 +258,22 @@ class TransactionCreateView(CreateView):
             context['form'] = self.form_class(initial=initial)
             type_of_transaction = transaction.payment_state.type
             context['manager'] = transaction.manager
-        else:
-            context['form'] = self.form_class()
         if type_of_transaction == 'in':
             context['type'] = 'приходная ведомость'
         elif type_of_transaction == 'out':
             context['type'] = 'расходная ведомость'
         context['payment_states'] = PaymentState.objects.filter(
             type=type_of_transaction)
-        print(context)
         return context
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.form_class(request.POST or None)
+        if form_class.is_valid():
+            calculate_balance(form_class, type='create')
+            return HttpResponseRedirect(self.success_url)
+        else:
+            return render(request, 'crm_accounting/transaction_form.html',
+                          context={'form': form_class})
 
 
 def get_personal_accounts_ajax(request):
@@ -237,6 +298,7 @@ class TransactionListView(ListView):
         context = dict()
         context['owners'] = CustomUser.objects.filter(role=None)
         context['payment_states'] = PaymentState.objects.all()
+        context = get_statistics(context)
         return context
 
 
@@ -307,8 +369,8 @@ class DeleteTransaction(DeleteView):
             transaction.delete()
             return JsonResponse({'success': 'success'})
         else:
-            return JsonResponse({
-                                    'success': 'Удаление счета доступно только старшему персоналу!'})
+            return JsonResponse({'success': 'Удаление счета доступно '
+                                            'только старшему персоналу!'})
 
 
 class TransactionUpdateView(UpdateView):
@@ -320,7 +382,10 @@ class TransactionUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         instance = self.get_object()
         context = dict()
-        context['form'] = self.form_class(instance=instance)
+        if kwargs.get('form'):
+            context['form'] = kwargs['form']
+        else:
+            context['form'] = self.form_class(instance=instance)
         context['object'] = instance
         instance = context['form'].instance
         type_of_transaction = instance.payment_state.type
@@ -333,6 +398,19 @@ class TransactionUpdateView(UpdateView):
         context['manager_list'] = CustomUser.objects.filter(~Q(role=None)). \
             select_related('role')
         return context
+
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        completed_instance = instance.completed
+        form_class = self.form_class(request.POST or None, instance=instance)
+        if form_class.is_valid():
+            calculate_balance(form_class, type='update',
+                              completed=completed_instance)
+            return HttpResponseRedirect(self.success_url)
+        else:
+            return render(request,
+                          'crm_accounting/transaction_update_form.html',
+                          context={'form': form_class})
 
 
 class TransactionDetailView(DetailView):
@@ -354,6 +432,11 @@ class TransactionDetailView(DetailView):
 class InvoiceListView(ListView):
     model = models.Invoice
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(InvoiceListView, self).get_context_data()
+        context = get_statistics(context)
+        return context
+
 
 class InvoiceListViewAjax(BaseDatatableView):
     model = models.Invoice
@@ -364,7 +447,8 @@ class InvoiceListViewAjax(BaseDatatableView):
 
     def get_initial_queryset(self):
         return self.model.objects.all().select_related('house', 'section',
-                                                       'flat__owner')
+                                                       'flat__owner').\
+            order_by('-id')
 
     def filter_queryset(self, qs):
         number = self.request.GET.get('number')
@@ -421,10 +505,12 @@ class InvoiceCreateView(CreateView):
                     if service.total:
                         service.invoice = form_class.instance
                         service.save()
+            form_class.calculate_invoice(form_class, type='create')
             return HttpResponseRedirect(reverse_lazy
                                         ('crm_accounting:invoice_list'))
-        return self.render_to_response(self.get_context_data(form=form_class,
-                                                             service_formset=service_formset))
+        return render(request, 'crm_accounting/invoice_form.html',
+                      context={'form':form_class,
+                               'service_formset':service_formset})
 
 
 class InvoiceDetailView(DetailView):
@@ -447,11 +533,16 @@ class InvoiceUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         # context = super().get_context_data()
         context = dict()
+        if kwargs.get('form'):
+            context['form'] = kwargs['form']
+            self.object = kwargs['form'].instance
+
+        else:
+            context['form'] = self.form_class(instance=self.object)
         context['object'] = self.object
         context['sections'] = Section.objects.filter(house=self.object.house)
         context['flats'] = Flat.objects.filter\
             (section_id=self.object.section.id)
-        context['form'] = self.form_class(instance=self.object)
         context['service_formset'] = self.service_formset(
             queryset=models.InvoiceService.objects.filter(
                 invoice=self.object))
@@ -461,11 +552,15 @@ class InvoiceUpdateView(UpdateView):
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
+        status = instance.status
+        payment_state = instance.payment_state
         form_class = self.form_class(request.POST or None,
                                      instance=instance)
         service_formset = self.service_formset(
             request.POST or None,
             queryset=models.InvoiceService.objects.filter(invoice=instance))
+        print(form_class.is_valid(), form_class.errors)
+        print(service_formset.is_valid(), service_formset.errors)
         if all([form_class.is_valid(), service_formset.is_valid()]):
             form_class.save()
             service_formset.save(commit=False)
@@ -479,11 +574,15 @@ class InvoiceUpdateView(UpdateView):
                 if all([service[0].total, service[0].service]):
                     service[0].save()
             service_formset.save()
+            form_class.calculate_invoice(form_class, type='update',
+                                         status=status,
+                                         payment_state=payment_state)
             messages.success(request, "Квитанция изменена")
             return HttpResponseRedirect(reverse_lazy
                                         ('crm_accounting:invoice_list'))
-        return render(request, self.template_name, self.get_context_data(form=form_class,
-                                                             service_formset=service_formset))
+        return render(request, self.template_name,
+                      self.get_context_data(form=form_class,
+                                            service_formset=service_formset))
 
 
 class InvoiceDeleteView(DeleteView):
@@ -537,10 +636,9 @@ class FlatAjaxInfo(View):
                                   f'{flat.owner.last_name}',
                          'phone': flat.owner.phone,
                          'id': flat.owner.id}
-        personal_account = PersonalAccount.objects.filter(flat=flat)
-        if personal_account.exists():
-            data['personal_account'] = PersonalAccount\
-                .objects.get(flat=flat).account_number
+        if flat.personal_account:
+            data['personal_account'] = flat.personal_account.account_number
+
         return JsonResponse({'data': data})
 
 
