@@ -42,7 +42,6 @@ def get_statistics(context):
     return context
 
 
-
 class AccountCreateView(CreateView):
     model = models.PersonalAccount
     form_class = forms.PersonalAccountForm
@@ -505,7 +504,7 @@ class InvoiceCreateView(CreateView):
                     if service.total:
                         service.invoice = form_class.instance
                         service.save()
-            form_class.calculate_invoice(form_class, type='create')
+            form_class.calculate_invoice(form_class)
             return HttpResponseRedirect(reverse_lazy
                                         ('crm_accounting:invoice_list'))
         return render(request, 'crm_accounting/invoice_form.html',
@@ -531,36 +530,32 @@ class InvoiceUpdateView(UpdateView):
     queryset = model.objects.all().select_related('flat__section__house')
 
     def get_context_data(self, **kwargs):
-        # context = super().get_context_data()
         context = dict()
         if kwargs.get('form'):
             context['form'] = kwargs['form']
             self.object = kwargs['form'].instance
-
         else:
             context['form'] = self.form_class(instance=self.object)
         context['object'] = self.object
         context['sections'] = Section.objects.filter(house=self.object.house)
-        context['flats'] = Flat.objects.filter\
-            (section_id=self.object.section.id)
+        context['flats'] = Flat.objects.filter(
+            section_id=self.object.section.id)
         context['service_formset'] = self.service_formset(
             queryset=models.InvoiceService.objects.filter(
                 invoice=self.object))
         context['services'] = forms.Service.objects.all()
         context['units'] = forms.Unit.objects.all()
+        print(context['service_formset'])
         return context
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
-        status = instance.status
-        payment_state = instance.payment_state
+        print(request.POST, instance)
         form_class = self.form_class(request.POST or None,
                                      instance=instance)
         service_formset = self.service_formset(
-            request.POST or None,
+            request.POST,
             queryset=models.InvoiceService.objects.filter(invoice=instance))
-        print(form_class.is_valid(), form_class.errors)
-        print(service_formset.is_valid(), service_formset.errors)
         if all([form_class.is_valid(), service_formset.is_valid()]):
             form_class.save()
             service_formset.save(commit=False)
@@ -572,11 +567,12 @@ class InvoiceUpdateView(UpdateView):
                 service.delete()
             for service in service_formset.changed_objects:
                 if all([service[0].total, service[0].service]):
+                    service[0].invoice = form_class.instance
                     service[0].save()
+                else:
+                    service[0].delete()
             service_formset.save()
-            form_class.calculate_invoice(form_class, type='update',
-                                         status=status,
-                                         payment_state=payment_state)
+            form_class.calculate_invoice(form_class)
             messages.success(request, "Квитанция изменена")
             return HttpResponseRedirect(reverse_lazy
                                         ('crm_accounting:invoice_list'))

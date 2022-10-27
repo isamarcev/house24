@@ -165,14 +165,14 @@ var totalPrice = $('#price-total')
 console.log(totalPrice)
 
 function get_total_created(form_idx) {
-        var amount = $('#id_form-'+ parseInt(form_idx) + '-amount_id');
-        var price = $('#id_form-'+ parseInt(form_idx) + '-price_id');
+        var amount = $('#id_form-'+ parseInt(form_idx) + '-amount');
+        var price = $('#id_form-'+ parseInt(form_idx) + '-price');
         if (amount.val() && price.val()) {
             var total = (amount.val() * price.val()).toFixed(2)
         } else {
             total = (0).toFixed(2)
         }
-        $('#id_form-'+ parseInt(form_idx) + '-total_id').val(total)
+        $('#id_form-'+ parseInt(form_idx) + '-total').val(total)
     var TotalAmount = $('#id_amount')
     var nowTotalPrice = 0
     totalPrice.empty()
@@ -187,14 +187,15 @@ function get_total_created(form_idx) {
 }
 
 function get_total_row(form_idx) {
-        var amount = $('#id_form-'+ parseInt(form_idx.data) + '-amount_id');
-        var price = $('#id_form-'+ parseInt(form_idx.data) + '-price_id');
+    console.log(form_idx.data)
+        var amount = $('#id_form-'+ parseInt(form_idx.data) + '-amount');
+        var price = $('#id_form-'+ parseInt(form_idx.data) + '-price');
         if (amount.val() && price.val()) {
             var total = (amount.val() * price.val()).toFixed(2)
         } else {
             total = (0).toFixed(2)
         }
-        $('#id_form-'+ parseInt(form_idx.data) + '-total_id').val(total)
+        $('#id_form-'+ parseInt(form_idx.data) + '-total').val(total)
     var TotalAmount = $('#id_amount')
     var nowTotalPrice = 0
     totalPrice.empty()
@@ -212,9 +213,9 @@ $("#add_service").click(function () {
     var form_idx = $('#id_form-TOTAL_FORMS').val();
 	$('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
 	$('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-	$('#id_form-'+ form_idx + '-amount_id').change(form_idx, get_total_row)
-	$('#id_form-'+ form_idx + '-price_id').change(form_idx, get_total_row)
-    $('#id_form-'+ form_idx + '-total_id').addClass('total-price')
+	$('#id_form-'+ form_idx + '-amount').change(form_idx, get_total_row)
+	$('#id_form-'+ form_idx + '-price').change(form_idx, get_total_row)
+    $('#id_form-'+ form_idx + '-total').addClass('total-price')
 
 })
 
@@ -275,8 +276,9 @@ function delete_service(index) {
     $('.delete-list-service').append('<input type="hidden" value="on" name="' + index  + '-DELETE" id="id_' + index + '-DELETE">');
     $('#' + index + '-form').css('display', 'none');
     // $('#id_'+ index + '-total_id').val(0)
-    $('#id_'+ index + '-amount_id').val(0)
-    $('#id_'+ index + '-amount_id').change()
+    $('#id_'+ index + '-amount').val(0)
+    $('#id_'+ index + '-amount').change()
+    $('#id_'+ index + '-total').removeClass('total-price')
 }
 
 
@@ -284,6 +286,8 @@ $('.set-tariff-services').click(function () {
     var tariff = $('#id_tariff')
 
     if (tariff.val()) {
+            totalPrice.text(0)
+        $('#id_amount').val(0)
             $('.form-row-remove-btn').each(function () {
                 if (this.name != 'form-__prefix__') {
                     this.click()
@@ -302,9 +306,9 @@ $('.set-tariff-services').click(function () {
                     var form_idx = parseInt($('#id_form-TOTAL_FORMS').val());
                     $(data.services).each(function (index, value) {
                         add_buttoon.click();
-                        $('#id_form-'+form_idx+`-service_id`).find(`option[value=${value.service_id}]`).prop('selected', true);;
-                        $('#id_form-'+form_idx+`-unit_id`).find(`option[value=${value.unit_id}]`).prop('selected', true);;
-                        $('#id_form-'+form_idx+`-price_id`).val(parseFloat(value.price));
+                        $('#id_form-'+form_idx+`-service`).find(`option[value=${value.service_id}]`).prop('selected', true);;
+                        $('#id_form-'+form_idx+`-unit`).find(`option[value=${value.unit_id}]`).prop('selected', true);;
+                        $('#id_form-'+form_idx+`-price`).val(parseFloat(value.price));
 
                         form_idx += 1
 

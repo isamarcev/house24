@@ -15,6 +15,8 @@
 
 {% endblock %}
 {% block content %}
+            <input type="hidden" id="link-id" value="invoice">
+
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
         <h1 style="color: #444; font-size: 24px"> Новая квитанция
         </h1>
@@ -180,7 +182,7 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <div class="table-responsive no-padding">
-                                    <table class="table table-bordered table-hover table-responsive table-striped linkedRow">
+                                    <table class="table table-bordered table-hover table-striped linkedRow">
                                         <thead>
                                             <tr>
                                                 <th style="min-width: 200px">Услуга</th>
@@ -199,7 +201,7 @@
                                                 <input type="hidden" name="form-__prefix__-id" id="id_form-__prefix__-id">
                                                 <td>
                                                     <select name="form-__prefix__-service"
-                                                            id="id_form-__prefix__-service_id"
+                                                            id="id_form-__prefix__-service"
                                                             class="form-select">
                                                         <option value="">Выберите...</option>
                                                         {% for service in services %}
@@ -208,11 +210,11 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="form-__prefix__-amount" id="id_form-__prefix__-amount_id">
+                                                    <input type="text" class="form-control" name="form-__prefix__-amount" id="id_form-__prefix__-amount">
                                                 </td>
                                                 <td>
                                                     <select name="form-__prefix__-unit"
-                                                            id="id_form-__prefix__-unit_id"
+                                                            id="id_form-__prefix__-unit"
                                                             class="form-select">
                                                         <option value="">Выберите...</option>
                                                         {% for unit in units %}
@@ -221,10 +223,10 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="form-__prefix__-price" id="id_form-__prefix__-price_id" class="form-control">
+                                                    <input type="text" name="form-__prefix__-price" id="id_form-__prefix__-price" class="form-control">
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="form-__prefix__-total" id="id_form-__prefix__-total_id" class="form-control">
+                                                    <input type="text" name="form-__prefix__-total" id="id_form-__prefix__-total" class="form-control">
                                                 </td>
                                                 <td>
                                                     <button type="button" name="form-__prefix__" id="form-__prefix__-button" class="btn btn-default btn-sm form-row-remove-btn" onclick="delete_service(this.name)" title="Удалить услугу"><i class="fa fa-trash"></i></button>
@@ -276,7 +278,7 @@
         <div class="box-header with-border" style="border-top: 3px solid #d2d6de">
                 <h3 class="box-title">Показания счетчиков</h3>
         </div>
-        <table id="counters" align="center" style="margin: 0; width: 100%; padding: 4px 4px 10px 4px" class="table table-bordered table-hover table-responsive table-striped linkedRow">
+        <table id="counters" align="center" style="margin: 0; width: 100%; padding: 4px 4px 10px 4px" class="table table-bordered table-hover  table-striped linkedRow">
              <thead>
                   <tr>
                       <th tabindex="0"  rowspan="1" colspan="1" style="width: 140px; min-width: 140px" >

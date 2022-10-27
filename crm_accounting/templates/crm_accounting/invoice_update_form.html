@@ -15,6 +15,8 @@
 
 {% endblock %}
 {% block content %}
+            <input type="hidden" id="link-id" value="invoice">
+
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
         <h1 style="color: #444; font-size: 24px"> Квитанция
         </h1>
@@ -200,7 +202,7 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <div class="table-responsive no-padding">
-                                    <table class="table table-bordered table-hover table-responsive table-striped linkedRow">
+                                    <table class="table table-bordered table-hover table-striped linkedRow">
                                         <thead>
                                             <tr>
                                                 <th style="min-width: 200px">Услуга</th>
@@ -221,7 +223,7 @@
 {#                                                <input type="hidden" name="{{ service.prefix }}-id" id="id_{{ service.prefix }}-id">#}
                                                 <td>
                                                     <select name="{{ service.prefix }}-service"
-                                                            id="id_{{ service.prefix }}-service_id"
+                                                            id="id_{{ service.prefix }}-service"
                                                             class="form-select">
                                                         <option value="">Выберите...</option>
                                                         {% for element in services %}
@@ -235,11 +237,11 @@
                                                 </td>
                                                 <td>
 {#                                                    {{ service.amount }}#}
-                                                    <input type="text" class="form-control" name="{{ service.prefix }}-amount" value="{{ service.instance.amount }}" onchange="get_total_created({{ forloop.counter0 }})" id="id_{{ service.prefix }}-amount_id">
+                                                    <input type="text" class="form-control" name="{{ service.prefix }}-amount" value="{{ service.instance.amount }}" onchange="get_total_created({{ forloop.counter0 }})" id="id_{{ service.prefix }}-amount">
                                                 </td>
                                                 <td>
                                                     <select name="{{ service.prefix }}-unit"
-                                                            id="id_{{ service.prefix }}-unit_id"
+                                                            id="id_{{ service.prefix }}-unit"
                                                             class="form-select">
                                                         <option value="">Выберите...</option>
                                                         {% for unit in units %}
@@ -252,11 +254,11 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="{{ service.prefix }}-price" value="{{ service.instance.price }}" id="id_{{ service.prefix }}-price_id" onchange="get_total_created({{ forloop.counter0 }})" class="form-control">
+                                                    <input type="text" name="{{ service.prefix }}-price" value="{{ service.instance.price }}" id="id_{{ service.prefix }}-price" onchange="get_total_created({{ forloop.counter0 }})" class="form-control">
 
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="{{ service.prefix }}-total" value="{{ service.instance.total }}" id="id_{{ service.prefix }}-total_id" class="form-control total-price">
+                                                    <input type="text" name="{{ service.prefix }}-total" value="{{ service.instance.total }}" id="id_{{ service.prefix }}-total" class="form-control total-price">
                                                 </td>
                                                 <td>
                                                     <button type="button" name="{{ service.prefix }}" id="{{ service.prefix }}-button" class="btn btn-default btn-sm form-row-remove-btn" onclick="delete_service(this.name)" title="Удалить услугу"><i class="fa fa-trash"></i></button>
@@ -269,7 +271,7 @@
                                                 <input type="hidden" name="form-__prefix__-id" id="id_form-__prefix__-id">
                                                 <td>
                                                     <select name="form-__prefix__-service"
-                                                            id="id_form-__prefix__-service_id"
+                                                            id="id_form-__prefix__-service"
                                                             class="form-select">
                                                         <option value="">Выберите...</option>
                                                         {% for service in services %}
@@ -278,11 +280,11 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="form-__prefix__-amount" id="id_form-__prefix__-amount_id">
+                                                    <input type="text" class="form-control" name="form-__prefix__-amount" id="id_form-__prefix__-amount">
                                                 </td>
                                                 <td>
                                                     <select name="form-__prefix__-unit"
-                                                            id="id_form-__prefix__-unit_id"
+                                                            id="id_form-__prefix__-unit"
                                                             class="form-select">
                                                         <option value="">Выберите...</option>
                                                         {% for unit in units %}
@@ -291,10 +293,10 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="form-__prefix__-price" id="id_form-__prefix__-price_id" class="form-control">
+                                                    <input type="text" name="form-__prefix__-price" id="id_form-__prefix__-price" class="form-control">
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="form-__prefix__-total" id="id_form-__prefix__-total_id" class="form-control">
+                                                    <input type="text" name="form-__prefix__-total" id="id_form-__prefix__-total" class="form-control">
                                                 </td>
                                                 <td>
                                                     <button type="button" name="form-__prefix__" id="form-__prefix__-button" class="btn btn-default btn-sm form-row-remove-btn" onclick="delete_service(this.name)" title="Удалить услугу"><i class="fa fa-trash"></i></button>
@@ -346,7 +348,7 @@
         <div class="box-header with-border" style="border-top: 3px solid #d2d6de">
                 <h3 class="box-title">Показания счетчиков</h3>
         </div>
-        <table id="counters" align="center" style="margin: 0; width: 100%; padding: 4px 4px 10px 4px" class="table table-bordered table-hover table-responsive table-striped linkedRow">
+        <table id="counters" align="center" style="margin: 0; width: 100%; padding: 4px 4px 10px 4px" class="table table-bordered table-hover  table-striped linkedRow">
              <thead>
                   <tr>
                       <th tabindex="0"  rowspan="1" colspan="1" style="width: 140px; min-width: 140px" >

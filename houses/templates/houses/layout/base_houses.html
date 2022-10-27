@@ -164,7 +164,7 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
               <li class="nav-item">
-                <a href="#" style="width: 100%; border-radius: 0" class="nav-link active">
+                <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
                   <i class="fa fa-line-chart"></i>
                   <p>
                     Статистика
@@ -172,58 +172,58 @@
                 </a>
               </li>
              <li class="nav-item">
-                 <a href="{% url 'crm_accounting:transaction_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'crm_accounting:transaction_list' %}" style="width: 100%; border-radius: 0" class="nav-link" id="transaction">
                     <i class="fa fa-dollar"></i>
                      <p>Касса</p>
                  </a>
              </li>
 
              <li class="nav-item">
-                 <a href="{% url 'crm_accounting:invoice_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'crm_accounting:invoice_list' %}" id="invoice" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-files-o"></i>
                      <p>Квитанция на оплату</p>
                  </a>
              </li>
              <li class="nav-item">
-                 <a href="{% url 'crm_accounting:account_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'crm_accounting:account_list' %}" id="personal_account" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-credit-card"></i>
                      <p>Лицевые счета</p>
                  </a>
              </li>
 
             <li class="nav-item">
-                 <a href="{% url 'houses:flat_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'houses:flat_list' %}" id="flat-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-key"></i>
                      <p>Квартиры</p>
                  </a>
              </li>
             <li class="nav-item">
-                 <a href="{% url 'users:owner_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'users:owner_list' %}" id="owner-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-users"></i>
                      <p>Владельцы квартир</p>
                  </a>
              </li>
             <li class="nav-item">
-                 <a href="{% url 'houses:house_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'houses:house_list' %}"  id="house-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-building"></i>
                      <p>Дома</p>
                  </a>
              </li>
 
             <li class="nav-item">
-                 <a href="{% url 'users:message_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'users:message_list' %}" id="message-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-envelope-o"></i>
                      <p>Сообщения</p>
                  </a>
              </li>
             <li class="nav-item">
-                 <a href="{% url 'users:requests_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'users:requests_list' %}" id="request-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-wrench"></i>
                      <p>Заявки на вызов мастера</p>
                  </a>
              </li>
             <li class="nav-item">
-                 <a href="{% url 'crm_home:counter_data_list' %}" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'crm_home:counter_data_list' %}" id="counter-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-dashboard"></i>
                      <p>Показания счетчиков</p>
                  </a>
@@ -231,7 +231,7 @@
 
 
             <li class="nav-item" >
-                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                 <a href="#" style="width: 100%; border-radius: 0; " id="content-link" class="nav-link">
                     <i class="fa fa-desktop"></i>
                      <p style="align-items: center">Управление сайтом
                         <i class="right fas fa-angle-left" style="top: 1rem"></i>
@@ -267,7 +267,7 @@
             </li>
 
             <li class="nav-item" >
-                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                 <a href="#" style="width: 100%; border-radius: 0; " id="settings-link" class="nav-link">
                     <i class="fa fa-desktop"></i>
                      <p style="align-items: center">Настройки системы
                         <i class="right fas fa-angle-left" style="top: 1rem"></i>

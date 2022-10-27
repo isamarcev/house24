@@ -18,6 +18,8 @@
 
 {% endblock %}
 {% block content %}
+                <input type="hidden" id="link-id" value="owner-link">
+
      {% for message in messages %}
         {% if message.tags == 'success' %}
             <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>

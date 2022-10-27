@@ -201,54 +201,31 @@ class InvoiceForm(forms.ModelForm):
             new_account.flat = flat
             return personal_account
 
-    def calculate_invoice(self, form_class, **kwargs):
+    @staticmethod
+    def calculate_invoice(form_class):
         """Calculate balance of PERSONAL ACCOUNT"""
-        type_of_form = kwargs.get('type')
-        instance_status = kwargs.get('status')
-        instance_payment_state = kwargs.get('payment_state')
-        form_status = form_class.instance.status
-        form_payment_state = form_class.instance.payment_state
         account = form_class.instance.flat.personal_account
-        qwer = models.Transaction.objects.filter(personal_account=account,
-                                                 payment_state__type='in',
-                                                 completed=True).\
+        income_balance = models.Transaction.objects.filter(
+            personal_account=account,
+            payment_state__type='in',
+            completed=True).\
             aggregate(Sum('amount')).get('amount__sum')
-        print(qwer)
-        rewq = models.Invoice.objects.filter(personal_account=account,
-                                             payment_state=True,
-                                             status='Оплачена').\
+        outcome_balance = models.Invoice.objects.filter(
+            personal_account=account,
+            payment_state=True,
+            status='Оплачена').\
             aggregate(Sum('amount')).get('amount__sum')
-        if not rewq:
-            rewq = 0
-        if not qwer:
-            qwer = 0
-        operation = qwer - rewq
-        print(operation)
-        account.balance = operation
-        # # account.balance =
-        # # income_for_account = PersonalAccount.objects.filter(id=form_status.instance.flat.personal_account.id)
-        # if type_of_form == 'update':
-        #     if instance_status == form_status and \
-        #         instance_payment_state == form_payment_state:
-        #         pass
-        #     elif form_status:
-        #         if form_payment_state == 'Оплачена':
-        #             print(form_payment_state, 'PAID')
-        #             account.balance = account.balance - form_class.instance.amount
-        #         elif form_payment_state != 'Оплачена':
-        #             print(form_payment_state, 'NOPAID')
-        #             account.balance = account.balance + form_class.instance.amount
-        #     elif not form_status:
-        #         account.balance = account.balance + form_class.instance.amount
-        # elif type_of_form == 'create':
-        #     if form_status and form_payment_state == 'Оплачена':
-        #         account.balance = account - form_class.instance.amount
+        if not income_balance:
+            income_balance = 0
+        if not outcome_balance:
+            outcome_balance = 0
+        account.balance = income_balance - outcome_balance
         account.save()
-
 
 
 class InvoiceServiceForm(forms.ModelForm):
     use_required_attribute = False
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')
         super(InvoiceServiceForm, self).__init__(*args, **kwargs)
