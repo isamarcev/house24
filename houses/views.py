@@ -3,21 +3,45 @@ from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, UpdateView, CreateView, DetailView
+from django.views.generic import ListView, UpdateView, CreateView, DetailView, \
+    TemplateView
 from django.contrib import messages
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
-from crm_accounting.models import get_next_account
+from crm_accounting.models import get_next_account, PersonalAccount
 
 from .forms import SectionForm, FloorForm, HouseForm, UserForm, FlatForm, \
     PersonalAccountForm
 from .models import *
+from crm_accounting.views import get_statistics
+from users.models import CustomUser, Request
+
 
 
 # Create your views here.
 
 def main_page(request):
     return render(request, 'houses/layout/base_houses.html')
+
+
+class StatisticView(TemplateView):
+    template_name = 'houses/statistics.html'
+
+    def get_context_data(self):
+        context = dict()
+        context = get_statistics(context)
+        context['houses_count'] = House.objects.all().count()
+        context['active_users'] = CustomUser.objects.filter(role=None,
+                                                            status='Активен')
+        context['active_request_masters'] = Request.objects.filter(
+            status="В работе").count()
+        context['new_request_masters'] = Request.objects.filter(
+            status="Новое").count()
+        context['flats_count'] = Flat.objects.all().count()
+        context['personal_accounts_count'] = PersonalAccount.objects.all().\
+            count()
+        return context
+
 
 
 class HousesListView(ListView):

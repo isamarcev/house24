@@ -1,0 +1,29 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+     Статистика
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_home/css/counter_create.css' %}">
+
+{% endblock %}
+{% block content %}
+        <input type="hidden" id="link-id" value="statistics">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Статистика
+        </h1>
+    </section>
+    <section class="content">
+        <h2 class="page-header">В вашем обслуживании</h2>
+    </section>
+
+{% endblock %}
+{% block script %}
+    <script src="{% static 'crm_accounting/js/account_create.js' %}"></script>
+
+{% endblock %}
