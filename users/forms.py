@@ -24,7 +24,7 @@ class LoginUserForm(AuthenticationForm):
     remember_me = forms.BooleanField(required=False,
                                      widget=forms.CheckboxInput(
                                          attrs={'checked': 'checked'}))
-    captcha = ReCaptchaField(widget=ReCaptchaV2Invisible, private_key=RECAPTCHA_PRIVATE_KEY, public_key=RECAPTCHA_PUBLIC_KEY)
+    # captcha = ReCaptchaField(widget=ReCaptchaV2Invisible, private_key=RECAPTCHA_PRIVATE_KEY, public_key=RECAPTCHA_PUBLIC_KEY)
     # (
     #     attrs={
     #         'data-theme': 'dark',

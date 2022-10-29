@@ -18,8 +18,129 @@
         <h1 style="color: #444; font-size: 24px"> Статистика
         </h1>
     </section>
-    <section class="content">
-        <h2 class="page-header">В вашем обслуживании</h2>
+    <section class="content" style="padding: 15px ">
+        <h2 class="page-header" style="font-size: 22px; margin: 10px 0 20px 0">В вашем обслуживании</h2>
+    <div class="row">
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>{{ houses_count }}</h3>
+                    <p>Домов</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-building"></i>
+                </div>
+                <a href="{% url 'houses:house_list' %}" class="small-box-footer">
+                    Перейти в дома <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>{{ active_users.count }}</h3>
+                    <p>Активных владельцев</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-users"></i>
+                </div>
+                <a href="{% url 'users:owner_list' %}" class="small-box-footer">
+                    Перейти к владельцам <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+
+                    <h3>
+                        {% if active_request_masters %}
+                            {{ active_request_masters }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p>Заявок мастера в работе</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-wrench"></i>
+                </div>
+                <a href="{% url 'users:requests_list' %}" class="small-box-footer">
+                    Перейти в заявки <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>
+                        {% if flats_count %}
+                            {{ flats_count }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p>Квартир</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-key"></i>
+                </div>
+                <a href="{% url 'houses:flat_list' %}" class="small-box-footer">
+                    Перейти в квартиры <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>
+                        {% if personal_accounts_count %}
+                            {{ personal_accounts_count }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p>Лицевых счетов</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-child"></i>
+                </div>
+                <a href="{% url 'crm_accounting:account_list' %}" class="small-box-footer">
+                    Перейти к счетам <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3>
+                        {% if new_request_masters %}
+                            {{ new_request_masters }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p>Новых заявок мастера</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-user-plus"></i>
+                </div>
+                <a href="{% url 'users:requests_list' %}" class="small-box-footer">
+                    Перейти в заявки <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-7 col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">График погашения квитанций</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
     </section>
 
 {% endblock %}

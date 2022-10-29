@@ -43,7 +43,6 @@ class StatisticView(TemplateView):
         return context
 
 
-
 class HousesListView(ListView):
     model = House
 
