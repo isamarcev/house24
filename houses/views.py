@@ -1,4 +1,5 @@
-from django.db.models import Q
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.db.models import Q, Sum
 from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -8,7 +9,7 @@ from django.views.generic import ListView, UpdateView, CreateView, DetailView, \
 from django.contrib import messages
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
-from crm_accounting.models import get_next_account, PersonalAccount
+from crm_accounting.models import get_next_account, PersonalAccount, Invoice
 
 from .forms import SectionForm, FloorForm, HouseForm, UserForm, FlatForm, \
     PersonalAccountForm
@@ -40,6 +41,27 @@ class StatisticView(TemplateView):
         context['flats_count'] = Flat.objects.all().count()
         context['personal_accounts_count'] = PersonalAccount.objects.all().\
             count()
+        month_list = [number for number in range(1, 13)]
+        debts_per_month = [Invoice.objects.
+                      filter(date__month=number, status='Неоплачена').
+                      aggregate(Sum('amount'))
+                      for number in month_list]
+        print(debts_per_month)
+        debts_per_month_value = []
+        for i in debts_per_month:
+            if i.get('amount__sum'):
+                debts_per_month_value.append(int(i.get('amount__sum')))
+            else:
+                debts_per_month_value.append(0)
+        payed_per_month = [Invoice.objects.
+                      filter(date__month=number, status='Оплачена').
+                      aggregate(Sum('amount')).get('amount__sum')
+                      for number in month_list]
+        print(payed_per_month)
+        print(debts_per_month_value)
+        context['debts_per_month'] = debts_per_month_value
+        context['payed_per_month'] = payed_per_month
+        # context['debts_per_month']
         return context
 
 
