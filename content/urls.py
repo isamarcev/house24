@@ -16,10 +16,6 @@ urlpatterns = [
     path('tariff/change/', views.TariffUpdateView.as_view(), name='tariff-change'),
     path('contacts/change/', views.ContactsUpdateView.as_view(), name='contacts-change'),
 
-    # path('-change/', views.AboutUpdateView.as_view(), name='about-change'),
-
-
-
     # delete_gallery
     path('delete-gallery/<int:pk>/', views.delete_gallery, name='delete-gallery'),
     path('delete-additional-gallery/<int:pk>/', views.delete_additional_gallery, name='delete-add-gallery'),

@@ -12,9 +12,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 
+from django.conf.global_settings import AUTHENTICATION_BACKENDS
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -47,13 +48,21 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'psycopg2',
     'debug_toolbar',
+    'captcha'
 
+]
+
+RECAPTCHA_PUBLIC_KEY = '6Lfvo68iAAAAAEx4E9ak4CNYZxYJtOZIy0HLFrSA'
+RECAPTCHA_PRIVATE_KEY = '6Lfvo68iAAAAAAuZIavLFo5iqXTSE8fzNO6mncuh'
+
+AUTHENTICATION_BACKENDS = [
+    'users.authentication.EmailAuthentication',
+    'users.authentication.IdAuthentication',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
-    # 'debug_toolbar'
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -71,13 +80,19 @@ INTERNAL_IPS = [
     'localhost',
 ]
 
-
 ROOT_URLCONF = 'home24.urls'
+
+PROJECT_DIR = Path(__file__).resolve().parent
 
 TEMPLATES = [
     {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'DIRS': [PROJECT_DIR / 'jinjatemplates'],
+        'APP_DIRS': True,
+    },
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templatessss']
+        'DIRS': [BASE_DIR / 'templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -86,13 +101,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'users.context_processors.users_context.user_info',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'home24.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -126,7 +141,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -137,7 +151,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/

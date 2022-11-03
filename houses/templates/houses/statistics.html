@@ -1,0 +1,223 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+     Статистика
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_home/css/counter_create.css' %}">
+
+{% endblock %}
+{% block content %}
+        <input type="hidden" id="link-id" value="statistics">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Статистика
+        </h1>
+    </section>
+    <section class="content" style="padding: 15px ">
+        <h2 class="page-header" style="font-size: 22px; margin: 10px 0 20px 0">В вашем обслуживании</h2>
+    <div class="row">
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>{{ houses_count }}</h3>
+                    <p>Домов</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-building"></i>
+                </div>
+                <a href="{% url 'houses:house_list' %}" class="small-box-footer">
+                    Перейти в дома <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>{{ active_users.count }}</h3>
+                    <p>Активных владельцев</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-users"></i>
+                </div>
+                <a href="{% url 'users:owner_list' %}" class="small-box-footer">
+                    Перейти к владельцам <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+
+                    <h3>
+                        {% if active_request_masters %}
+                            {{ active_request_masters }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p>Заявок мастера в работе</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-wrench"></i>
+                </div>
+                <a href="{% url 'users:requests_list' %}" class="small-box-footer">
+                    Перейти в заявки <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>
+                        {% if flats_count %}
+                            {{ flats_count }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p>Квартир</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-key"></i>
+                </div>
+                <a href="{% url 'houses:flat_list' %}" class="small-box-footer">
+                    Перейти в квартиры <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>
+                        {% if personal_accounts_count %}
+                            {{ personal_accounts_count }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p>Лицевых счетов</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-child"></i>
+                </div>
+                <a href="{% url 'crm_accounting:account_list' %}" class="small-box-footer">
+                    Перейти к счетам <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3>
+                        {% if new_request_masters %}
+                            {{ new_request_masters }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p>Новых заявок мастера</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-user-plus"></i>
+                </div>
+                <a href="{% url 'users:requests_list' %}" class="small-box-footer">
+                    Перейти в заявки <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-7 col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">График погашения квитанций</h3>
+                </div>
+                <div class="chart"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                <canvas id="barChart" style="height: 114px; width: 619px; display: block;" width="412" height="76" class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </section>
+
+{% endblock %}
+{% block script %}
+    <script src="{% static 'crm_accounting/js/account_create.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        let newArray = [{{ debts_per_month }}];
+        console.log(newArray)
+
+    </script>
+    <script>
+        console.log(typeof '{{ debts_per_month }}');
+        console.log('{{ payed_per_month }}');
+
+    var data = {
+    labels: ["янв., ", "февр.,", "март.,", 'апр.,', 'май,', 'июнь,', 'июль,', 'авг.,', 'сент.,', 'окт.,', 'нояб.,', 'дек.,'],
+    datasets: [
+        {
+            label: "Задолженность",
+            backgroundColor: "red",
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        },
+        {
+            label: "Погашение задолженности",
+            backgroundColor: "green",
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        }
+    ]
+};
+    var myBarChart = new Chart('barChart', {
+    type: 'bar',
+    data: data,
+    options: {
+        barValueSpacing: 20,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    min: 0,
+                }
+            }]
+        }
+    }
+});
+    var data_1 = {
+    labels: ["янв., ", "февр.,", "март.,", 'апр.,', 'май,', 'июнь,', 'июль,', 'авг.,', 'сент.,', 'окт.,', 'нояб.,', 'дек.,'],
+    datasets: [
+        {
+            label: "Приход",
+            backgroundColor: "green",
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 50.0, 0, 0],
+        },
+        {
+            label: "Расход",
+            backgroundColor: "red",
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 30.0, 0, 0]
+        }
+    ]
+};
+    var myBarChart_1 = new Chart('barChart_1', {
+    type: 'bar',
+    data: data_1,
+    options: {
+        barValueSpacing: 20,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    min: 0,
+                }
+            }]
+        }
+    }
+});
+</script>
+
+{% endblock %}

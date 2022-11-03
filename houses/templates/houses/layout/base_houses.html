@@ -23,7 +23,9 @@
         <link href="{% static 'houses/css/bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'houses/css/style.css' %}" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" rel="stylesheet">
- <style>
+ {% block css_after %}
+ {% endblock %}
+    <style>
       .nav-pills {
           --bs-nav-pills-link-active-color: #000000;
           --bs-nav-pills-link-active-bg: #e1f1ea;
@@ -109,20 +111,24 @@
       <li class="nav-item" style="height: 50px; text-align: center;">
         <a class="nav-link" data-toggle="dropdown" style="height: 50px;border-bottom: 1px solid #d2d6de;" href="#" role="button">
           <i class="fa fa-user-circle text-purple"></i>
-            <span>User's name</span>
+            <span>{{ user }}</span>
         </a>
-          <ul class="dropdown-menu" id="dropdown_user" style="position: absolute; right: 0!important;left: auto!important;">
+          <ul class="dropdown-menu" id="dropdown_user" style="position: absolute; right: 0!important;left: auto!important; padding: 0">
                             <!-- User image -->
-                            <li class="user-header">
-                                <span><i class="fa fa-user-circle text-purple bg-gray-light img-circle"></i></span>
-                                <p> user.name </p>
+                            <li class="user-header" style="text-align: center; background-color: orange">
+                                {% if user.photo %}
+                                    <img src="{{ user.photo.url }}" alt="Фото пользователя" style="width: 100px; height: 100px; border-radius: 50%">
+                                    {% else %}
+                                    <img src="{% static 'content/img/empty.jpeg' %}" alt="Фото пользователя" style="width: 100px; border-radius: 50%; height: 100px">
+                                {% endif %}
+                                <p> {{ user.first_name }} {{ user.father_name }}({{ user.role }}) </p>
                             </li>
                             <!-- Menu Footer-->
                             <li class="user-footer">
-                                <div class="pull-left">
-                                    <a class="btn btn-default btn-flat" href="/admin/user-admin/update-my">Профиль</a>                                </div>
-                                <div class="pull-right">
-                                    <a class="btn btn-default btn-flat" href="/admin/site/logout" data-method="post">Выход</a>                                </div>
+                                <div class="pull-left" style="float:left">
+                                    <a class="btn btn-default btn-flat" href="{% url 'users:user_update' user.id %}">Профиль</a>                                </div>
+                                <div class="pull-right" style="float:right">
+                                    <a class="btn btn-default btn-flat" href="{% url 'users:logout' %}" data-method="post">Выход</a>                                </div>
                             </li>
                         </ul>
       </li>
@@ -154,70 +160,70 @@
 
       <!-- Sidebar Menu -->
       <nav class="mt-2" style="width:100%; margin-top: 0">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <ul class="nav nav-pills nav-sidebar flex-column" id="menu-sidebar" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item">
-            <a href="#" style="width: 100%; border-radius: 0" class="nav-link active">
-              <i class="fa fa-line-chart"></i>
-              <p>
-                Статистика
-              </p>
-            </a>
-          </li>
+              <li class="nav-item">
+                <a href="{% url 'houses:statistics' %}" style="width: 100%; border-radius: 0" id="statistics" class="nav-link">
+                  <i class="fa fa-line-chart"></i>
+                  <p>
+                    Статистика
+                  </p>
+                </a>
+              </li>
              <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'crm_accounting:transaction_list' %}" style="width: 100%; border-radius: 0" class="nav-link" id="transaction">
                     <i class="fa fa-dollar"></i>
                      <p>Касса</p>
                  </a>
              </li>
 
              <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'crm_accounting:invoice_list' %}" id="invoice" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-files-o"></i>
                      <p>Квитанция на оплату</p>
                  </a>
              </li>
              <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'crm_accounting:account_list' %}" id="personal_account" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-credit-card"></i>
                      <p>Лицевые счета</p>
                  </a>
              </li>
 
             <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'houses:flat_list' %}" id="flat-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-key"></i>
                      <p>Квартиры</p>
                  </a>
              </li>
             <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'users:owner_list' %}" id="owner-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-users"></i>
                      <p>Владельцы квартир</p>
                  </a>
              </li>
             <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'houses:house_list' %}"  id="house-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-building"></i>
                      <p>Дома</p>
                  </a>
              </li>
 
             <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'users:message_list' %}" id="message-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-envelope-o"></i>
                      <p>Сообщения</p>
                  </a>
              </li>
             <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'users:requests_list' %}" id="request-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-wrench"></i>
                      <p>Заявки на вызов мастера</p>
                  </a>
              </li>
             <li class="nav-item">
-                 <a href="#" style="width: 100%; border-radius: 0" class="nav-link">
+                 <a href="{% url 'crm_home:counter_data_list' %}" id="counter-link" style="width: 100%; border-radius: 0" class="nav-link">
                     <i class="fa fa-dashboard"></i>
                      <p>Показания счетчиков</p>
                  </a>
@@ -225,7 +231,7 @@
 
 
             <li class="nav-item" >
-                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                 <a href="#" style="width: 100%; border-radius: 0; " id="content-link" class="nav-link">
                     <i class="fa fa-desktop"></i>
                      <p style="align-items: center">Управление сайтом
                         <i class="right fas fa-angle-left" style="top: 1rem"></i>
@@ -252,12 +258,6 @@
                     </a>
                   </li>
                     <li class="nav-item">
-                    <a href="{% url 'content:tariff-change' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Тарифы</p>
-                    </a>
-                  </li>
-                    <li class="nav-item">
                     <a href="{% url 'content:contacts-change' %}" class="nav-link">
                       <i class="far fa-circle nav-icon"></i>
                       <p>Контакты</p>
@@ -267,7 +267,7 @@
             </li>
 
             <li class="nav-item" >
-                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                 <a href="#" style="width: 100%; border-radius: 0; " id="settings-link" class="nav-link">
                     <i class="fa fa-desktop"></i>
                      <p style="align-items: center">Настройки системы
                         <i class="right fas fa-angle-left" style="top: 1rem"></i>
@@ -276,37 +276,37 @@
             </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'crm_home:set_services' %}" class="nav-link">
                       <i class="fa fa-briefcase"></i>
                       <p>Услуги</p>
                     </a>
                   </li>
                     <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'crm_home:tariffs' %}" class="nav-link">
                       <i class="fa fa-money"></i>
                       <p>Тарифы</p>
                     </a>
                   </li>
                     <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'crm_home:roles' %}" class="nav-link">
                       <i class="fa fa-user nav-icon"></i>
                       <p>Роли</p>
                     </a>
                   </li>
                     <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'users:users' %}" class="nav-link">
                       <i class="fa fa-user-plus nav-icon"></i>
                       <p>Пользователи</p>
                     </a>
                   </li>
                     <li class="nav-item">
-                    <a href="№" class="nav-link">
+                    <a href="{% url 'crm_home:requisites' %}" class="nav-link">
                       <i class="fa fa-credit-card"></i>
                       <p>Платежные реквизиты</p>
                     </a>
                   </li>
                     <li class="nav-item">
-                    <a href="№" class="nav-link">
+                    <a href="{% url 'crm_home:payment_states' %}" class="nav-link">
                       <i class="fa fa-list-ol"></i>
                       <p>Статьи платежей</p>
                     </a>
@@ -335,7 +335,7 @@
         <!-- ASIDE SECOND-->
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper" style="min-height: 805px; background-color: #ecf0f5">
+  <div class="content-wrapper" style="min-height: 805px; padding-bottom: 30px; background-color: #ecf0f5">
  {% block content %}
 
     {% endblock %}

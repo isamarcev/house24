@@ -1,0 +1,122 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+     Сообщения
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="{% static 'users/dist/datatables/datatables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
+
+{% endblock %}
+{% block content %}
+        <input type="hidden" id="link-id" value="message-link">
+
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Сообщения
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;">
+                <span style="color: #ccc; margin-right: 5px" >></span>
+                 Сообщения
+            </li>
+        </ul>
+    </section>
+
+    <section class="content" style="padding-top: 15px">
+    <div class="row">
+        <div class="col-sm-12" style="text-align: right; padding: 0 15px">
+            <a class="btn btn-success" href="{% url 'users:message_create' %}">Отправить сообщение</a>
+        </div>
+    </div>
+    </section>
+
+    <!-- content -->
+    <section class="content content-custom" >
+    {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                <div class="box-header" style="text-align: right; height: 45px">
+                    <div class="box-tools" >
+                        <div class="box-search" style="position: relative">
+                            <input type="search" placeholder="Поиск" id="id_search_field" class="form-control">
+                            <i class="fa fa-search" style="position: absolute; top: 10px; right: 10px"></i>
+                        </div>
+                </div>
+                </div>
+                    <div class="box-header">
+                        <span>
+                            <a class="btn btn-default btn-sm btn-delete btn-select" style="width:30px; height: 29px" title="Удалить" >
+                                <input type="checkbox" id="select-on-check-all">
+                            </a>
+                        </span>
+                        <span>
+                            <a class="btn btn-default btn-sm btn-delete " onclick="delete_selected()" title="Удалить" href="#" >
+                                <i class="fa fa-trash " ></i>
+                            </a>
+                        </span>
+                    </div>
+                    <div class="box-body" style="padding: 0">
+                    {% csrf_token %}
+                        <table id="messages" align="center" style="margin: 0; width: 100%;" class="table table-hover">
+                             <thead>
+                                  <tr>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 15px" >
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1"  style="width: 250px; min-width: 150px">
+                                          Получатели
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1"  >
+                                          Текст
+                                      </th>
+                                      <th  tabindex="0"  rowspan="1" colspan="1" style="width: 130px" >
+                                          Дата
+                                      </th>
+                                  </tr>
+                                  </thead>
+                                  <tbody>
+                                  </tbody>
+                        </table>
+
+                    </div>
+                    <div class="box-header">
+                        <span>
+                            <a class="btn btn-default btn-sm btn-delete btn-select " style="width:30px; height: 29px" title="Удалить" href="#" >
+                                <input type="checkbox" id="select-on-check-all-bottom" style="z-index: -1000">
+                            </a>
+                        </span>
+                        <span>
+                            <a class="btn btn-default btn-sm btn-delete " title="Удалить" href="#" >
+                                <i class="fa fa-trash " ></i>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div>
+
+    </div>
+
+{% endblock %}
+{% block script %}
+
+    <!-- DATATABLE -->
+    <script src="{% static 'users/dist/datatables/datatables.min.js' %}"></script>
+
+    <!-- JS -->
+    <script>
+        const UrlGetAjaxList = '{% url 'users:message_get_ajax_list' %}'
+        const UrlMessageDelete = '{% url 'users:messages_delete' %}'
+    </script>
+    <script src="{% static 'users/js/message_list.js' %}"></script>
+
+{% endblock %}

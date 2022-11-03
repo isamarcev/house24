@@ -1,0 +1,152 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{% static 'crm_home/css/crm_roles.css' %}">
+{% endblock %}
+{% block content %}
+                        <input type="hidden" id="link-id" value="settings-link">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Роли </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 10px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_home:roles' %}" style="color: #444; text-decoration: none">> <span style="color: #ccc; margin-right: 5px" >></span> Роли</a></li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-body">
+                        <form method="post">
+                        {% csrf_token %}
+                        <table id="roles" class="table table-bordered table-hover table-responsive table-striped linkedRow">
+                             <thead>
+                                  <tr>
+                                      <th  tabindex="0" rowspan="1" colspan="1" >
+                                        Роль
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1" >
+                                        Статистика
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Касса
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Квитанция на оплату
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Лицевые счета
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Квартиры
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Владельцы квартир
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Дома
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Сообщение
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Заявки вызова мастера
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Счетчики
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Управление сайтом
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Услуги
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Тарифы
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Роли
+                                      </th>
+                                      <th tabindex="0" rowspan="1" colspan="1" >
+                                        Пользователи
+                                      </th>
+                                      <th class="" tabindex="0" rowspan="1" colspan="1" >
+                                        Платежные реквизиты
+                                      </th>
+                                  </tr>
+                                  </thead>
+                                  <tbody>
+                                  {{ roles_formset.management_form }}
+                                    {% for object in roles_formset %}
+                                        {% for hidden_field in object.hidden_fields %}
+                                            {{ hidden_field }}
+                                        {% endfor %}
+                                        <tr>
+                                            <td>{{ object.instance.name }}</td>
+                                            <td>{{ object.statistics }}</td>
+                                            <td>{{ object.cashbox }}</td>
+                                            <td>{{ object.invoice }}</td>
+                                            <td>{{ object.personal_account }}</td>
+                                            <td>{{ object.flat }}</td>
+                                            <td>{{ object.owner }}</td>
+                                            <td>{{ object.house }}</td>
+                                            <td>{{ object.message }}</td>
+                                            <td>{{ object.application }}</td>
+                                            <td>{{ object.meter }}</td>
+                                            <td>{{ object.site_management }}</td>
+                                            <td>{{ object.service }}</td>
+                                            <td>{{ object.tariff }}</td>
+                                            <td>{{ object.role }}</td>
+                                            <td>{{ object.users }}</td>
+                                            <td>{{ object.requisites }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                  </tbody>
+                        </table>
+                        <div class="form-group" style="text-align: right; margin-top: 20px">
+                            <a href="{% url 'crm_home:roles' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;border-radius: 3px;">Отменить</a>
+                            <button type="submit" class="btn btn-success" id="btn-save">Сохранить</button>
+                    </div>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+{% block script %}
+        <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+    <script>
+    $(document).ready( function () {
+        $('#roles').DataTable(
+            {
+                "order": [],
+                "bInfo": false,
+                "bPaginate": false,
+                "bFilter": false,
+                "scrollX": true,
+                "aoColumnDefs": [
+                    { 'bSortable': false, 'aTargets': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] }
+                    ]
+            }
+        );
+    } );
+    </script>
+    <script src="{% static 'crm_home/js/crm_tariff.js' %}"></script>
+
+{% endblock %}

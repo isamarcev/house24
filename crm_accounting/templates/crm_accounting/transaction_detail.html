@@ -1,0 +1,183 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    {{ type }}
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'crm_home/css/counter_create.css' %}">
+        <input type="hidden" id="link-id" value="transaction">
+
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">     {{ type }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_accounting:transaction_list' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Платежи
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span>{{ type }} №{{ object.number }}</li>
+        </ul>
+    </section>
+    <form method="post" style="padding:15px">
+        {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec" style="align-items: normal; justify-content: flex-start; margin-bottom: 0">
+                <div class="form-group" style="margin-bottom: 0; width: 45%">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            №
+                        </div>
+                        <div class="input-group-addon" style="width:75%; text-align: left">
+                            {{ object.number }}
+                        </div>
+                    </div>
+                </div>
+                <span class="label-mid" style="vertical-align: center; padding-top: 8px;margin: 0 auto 0 0; font-size: 14px">
+                    от
+                </span>
+                <div class="form-group" style="width: 45%">
+                    <div class="input-group" >
+                        <div class="input-group-addon" style="width:75%; text-align: left">
+                            {{ object.date|date:'d.m.Y' }}
+                        </div>
+                        <div class="input-group-addon">
+                            <i class='fa fa-calendar' ></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-body">
+                <div class="box-header" style="position: relative; height: 42px; padding: 0!important; margin-bottom: 10px!important;">
+                    <h3 class="box-title">
+                        {{ type }}
+                    </h3>
+                    <div class="box-tools">
+                        <a href="{% url 'crm_accounting:transaction_create' %}?transaction_id={{ object.id }}" class="btn btn-default btn-sm">
+                            <span class="hidden-xs">Копировать</span>
+                        </a>
+                        {% if user.is_superuser %}
+                        <a href="{% url 'crm_accounting:delete_transaction'%}?transaction_id={{ object.id }}" class="btn btn-default btn-sm">
+                            <span class="hidden-xs">Удалить</span>
+                        </a>
+                        {% else %}
+                        <a href="#" onclick="alert('У Вас нет прав для удаления ведомости.')" disabled="" class="btn btn-default btn-sm">
+                            <span class="hidden-xs">Удалить</span>
+                        </a>
+                        {% endif %}
+
+                        <a href="{% url 'crm_accounting:transaction_update' object.id %}" style="padding: 4px 8px!important;" class="btn btn-tariff btn-sm">
+                            <span class="hidden-xs">Редактировать ведомость</span>
+                        </a>
+                        <a href="#" class="btn btn-default btn-sm">
+                            <span class="hidden-xs">Выгрузить в Excel</span>
+                        </a>
+        </div>
+                </div>
+                                <div class="col-sm-12">
+                        <table class="table table-bordered table-striped table-view" >
+                    <tbody>
+                        <tr>
+                            <td class="user-label">Владелец квартиры</td>
+                            <td style="width: 60%">
+                                {% if object.owner %}
+                                    <a class="link-list" href="{% url 'users:owner_detail' object.owner.id %}">
+                                        {{ object.owner }}
+                                    </a>
+                                {% else %}
+                                Не указано
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Лицевой счет</td>
+                            <td>{% if object.personal_account %}
+                                    <a class="link-list" href="{% url 'crm_accounting:detail_account' object.personal_account.id %}">
+                                        {{ object.personal_account }}
+                                    </a>
+                                {% else %}
+                                Не указано
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Статья</td>
+                                <td>{{ object.payment_state }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Квитанция</td>
+                            <td style="color: red">НЕ ПОНЯТНО ПОКА</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">УСЛУГА</td>
+                            <td style="color: red">ТОЖЕ НЕ ПОНЯТНО ПОКА</td>
+                        </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Менеджер</td>
+                            <td style="width: 60%">
+                                {% if object.manager %}
+                                    <a class="link-list" href="{% url 'users:user_detail' object.manager.id %}">
+                                        {{ object.manager }}
+                                    </a>
+                                {% else %}
+                                Не указано
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Сумма</td>
+                            <td style="width: 60%">
+                                {% if type == 'Приходная ведомость'%}
+                                    <span style="color: #00a65a">{{ object.amount }}</span>
+                                    {% else %}
+                                    <span style="color: red">{{ object.amount }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Статус</td>
+                                <td>
+                                {% if object.comment %}
+                                    {{ object.comment }}
+                                    {% else %}
+                                    Не выбран
+                                {% endif %}
+                                    </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                    </div>
+                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </form>
+    <div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'crm_accounting/js/account_create.js' %}"></script>
+{% endblock %}

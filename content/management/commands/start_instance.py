@@ -1,6 +1,8 @@
 from django.core.management import BaseCommand
 
 from content.models import About, Block, Main, Seo, ServicePage, AboutService, Contacts
+from crm_home.models import Requisites
+from users.models import Role
 
 
 class Command(BaseCommand):
@@ -46,3 +48,12 @@ class Command(BaseCommand):
         seo_contacts.save()
         contacts = Contacts.objects.create(title='Contacts', seo=seo_contacts, text='COntacts text')
         contacts.save()
+        roles = Role.objects.bulk_create([
+            Role(name='Директор'),
+            Role(name='Управляющий'),
+            Role(name='Бухгалтер'),
+            Role(name='Сантехник'),
+            Role(name='Электрик'),
+        ])
+
+        requisites = Requisites.objects.create(title='ABC oj', info='Hello world')

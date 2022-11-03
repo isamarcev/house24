@@ -1,0 +1,71 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Сообщение
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'users/css/owner_create.css' %}">
+{% endblock %}
+{% block content %}
+        <input type="hidden" id="link-id" value="message-link">
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Сообщение
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'users:message_list' %}" style="color: #444; text-decoration: none"> <span style="color: #ccc; margin-right: 5px" >></span> Владельцы квартир </a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Сообщение </li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                <div class="box-header" >
+                    {% csrf_token %}
+                        <h3>{{ object.title }}</h3>
+                    <div class="row" style="justify-content: space-between">
+                        <div class="col-6" style="text-align: left">
+                            <h6>От: {{ object.sender }}</h6>
+                        </div>
+                        <div class="col-6" style="text-align: right">
+                            <span style="font-size: 12px; color: #999999">{{ object.date|date:"d.m.y - H:s" }}</span>
+                        </div>
+                    </div>
+                </div>
+                    <div class="box-body">
+                        <div  id="mailbox_text" class="mailbox-read-message">
+                                <script>
+                                let textMessage = '{{ object.text }}'
+                                let textElement = document.createElement('span')
+                                textElement.innerHTML = textMessage
+                                document.getElementById('mailbox_text').innerHTML = textElement.innerText
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer" style="padding: 10px">
+                    <a onclick="deleteThisMessage({{ object.id }})">
+                        <button type="button" class="btn btn-default"><i class="fa fa-trash-o"></i> Удалить</button>
+                    </a>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+        const UrlDelete = '{% url 'users:messages_delete' %}'
+        const SuccessUrl = '{% url 'users:message_list' %}'
+    </script>
+        <script src="{% static 'users/js/user_create.js' %}"></script>
+{% endblock %}

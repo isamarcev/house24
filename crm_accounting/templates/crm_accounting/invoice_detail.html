@@ -1,0 +1,293 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Квитанция
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'crm_home/css/counter_create.css' %}">
+
+{% endblock %}
+{% block content %}
+        <input type="hidden" id="link-id" value="invoice">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Квитанция
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_accounting:invoice_list' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Квитанции
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span>Квитанция №{{ object.number }}</li>
+        </ul>
+    </section>
+    <form method="post" style="padding:15px">
+        {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec" style="align-items: normal; justify-content: flex-start; margin-bottom: 0">
+                <div class="form-group" style="margin-bottom: 0; width: 45%">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            №
+                        </div>
+                        <div class="input-group-addon" style="width:75%; text-align: left">
+                            {{ object.number }}
+                        </div>
+                    </div>
+                </div>
+                <span class="label-mid" style="vertical-align: center; padding-top: 8px;margin: 0 auto 0 0; font-size: 14px">
+                    от
+                </span>
+                <div class="form-group" style="width: 45%">
+                    <div class="input-group" >
+                        <div class="input-group-addon" style="width:75%; text-align: left">
+                            {{ object.date|date:'d.m.Y' }}
+                        </div>
+                        <div class="input-group-addon">
+                            <i class='fa fa-calendar' ></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="padding-bottom: 20px" class="box">
+                    <div class="box-body">
+                <div class="box-header" style="position: relative; height: 42px; padding: 0!important; margin-bottom: 10px!important;">
+                    <h3 class="box-title">
+                        Просмотр квитанции
+                    </h3>
+                    <div class="box-tools">
+                        <a href="!#" class="btn btn-default btn-sm">
+                            <span class="hidden-xs">Печать</span>
+                        </a>
+                        <a href="#" class="btn btn-default btn-sm">
+                            <span class="hidden-xs">Отправить на имейл</span>
+                        </a>
+                        <a href="{% url 'crm_accounting:invoice_update' object.id %}" style="padding: 4px 8px!important;" class="btn btn-tariff btn-sm">
+                            <span class="hidden-xs">Редактировать квитанцию</span>
+                        </a>
+
+                    </div>
+                </div>
+                        <div class="col-sm-12">
+                <table class="table table-bordered table-striped table-view" >
+            <tbody>
+                <tr>
+                    <td class="user-label">Проведена</td>
+                    <td style="width: 60%">
+                        {% if object.payment_state %}
+                            <small class="label-success">
+                                Проведена
+                            </small>
+                        {% else %}
+                        <small class="label-danger">
+                                Не проведена
+                            </small>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="user-label">Статус</td>
+                    <td>{% if object.status == 'Оплачена' %}
+                            <small class="label-success">
+                                Оплачена
+                            </small>
+                        {% elif object.status == 'Частично оплачена' %}
+                            <small class="label-warning">
+                                Частично оплачена
+                            </small>
+                        {% elif object.status == 'Неоплачена' %}
+                            <small class="label-danger">
+                                Неоплачена
+                            </small>
+                        {% else %}
+                            Не выбрано
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="user-label">Период</td>
+                        <td>{{ object.period_start|date:'d.m.Y' }} - {{ object.period_end|date:'d.m.Y' }}</td>
+                </tr>
+                <tr>
+                    <td class="user-label">Владелец</td>
+                    <td >
+                        <a class="link-list" href="{% url 'users:owner_detail' object.flat.owner.id %}">
+                            {{ object.flat.owner }}
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="user-label">Лицевой счет</td>
+                    <td>
+                        {% if object.flat.personal_account.id %}
+                            <a class="link-list" href="{% url 'crm_accounting:detail_account' object.flat.personal_account.id %}">
+                                {{ object.personal_account }}
+                        </a>
+                        {% else %}
+                        Не указано
+                        {% endif %}
+                    </td>
+                </td>
+                </tr>
+                <tr>
+                    <td class="user-label">Телефон</td>
+                    <td style="width: 60%">
+                        {% if object.flat.owner.phone %}
+                                {{ object.flat.owner.phone }}
+                            {% else %}
+                            Не указано
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="user-label">Дом</td>
+                    <td style="width: 60%">
+                        {% if object.house %}
+                            <a class="link-list" href="{% url 'houses:house_detail' object.house.id %}">
+                            {{ object.house }}
+                        </a>
+                            {% else %}
+                            Не указано
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="user-label">Квартира</td>
+                        <td style="width: 60%">
+                        {% if object.flat %}
+                            <a class="link-list" href="{% url 'houses:flat_detail' object.flat.id %}">
+                            {{ object.flat.number }}
+                        </a>
+                            {% else %}
+                            Не указано
+                        {% endif %}
+                        </td>
+                </tr>
+            <tr>
+                    <td class="user-label">Секция</td>
+                        <td style="width: 60%">
+                        {% if object.section %}
+                            {{ object.section }}
+                            {% else %}
+                            Не указано
+                        {% endif %}
+                        </td>
+                </tr>
+            <tr>
+                    <td class="user-label">Тариф</td>
+                        <td style="width: 60%">
+                        {% if object.tariff %}
+                            <a class="link-list" href="{% url 'crm_home:tariff_detail' object.tariff.id %}">
+                                {{ object.tariff }}
+                            </a>
+                            {% else %}
+                            Не указано
+                        {% endif %}
+                        </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <table id="users" style="padding-bottom: 40px;" class="table table-bordered table-striped table-view">
+                             <thead>
+                                  <tr>
+                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                          #
+                                      </th>
+                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Услуга
+                                      </th>
+                                      <th tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Кол-во потребления(расход)
+                                      </th>
+                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1" >
+                                          Ед.изм.
+                                      </th>
+                                      <th tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Цена за ед., грн
+                                      </th>
+                                      <th tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Стоимость, грн
+                                      </th>
+                                  </tr>
+                             </thead>
+                            <tbody>
+                            {% if object.invoiceservice_set.all %}
+                                {% for service in object.invoiceservice_set.all %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        {{ service.service }}
+                                    </td>
+                                    <td>
+                                        {{ service.amount }}
+                                    </td>
+                                    <td>
+                                        {{ service.service.unit }}
+                                    </td>
+                                    <td>
+                                        {{ service.price }}
+                                    </td>
+                                    <td>
+                                        {{ service.total }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="6">
+                                    Нет ни одной услуги!
+                                </td>
+                            </tr>
+                            {% endif %}
+                            </tbody>
+                            <tfoor>
+                                {% if object.invoiceservice_set.all %}
+                                <tr style="height: 40px!important;">
+                                    <td  style="height: 40px!important;" colspan="5"></td>
+                                    <td style="height: 40px!important;">
+                                        <b>Итого: {{ object.amount }}</b>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tfoor>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </form>
+    <div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'crm_accounting/js/account_create.js' %}"></script>
+    <style>
+    .table-striped tbody tr:nth-of-type(odd) {
+    /* background-color: rgba(0,0,0,.05); */
+        background-color: transparent;
+}
+    </style>
+{% endblock %}
