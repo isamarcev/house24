@@ -1,7 +1,7 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.db.models import Q
 from django.db.models.aggregates import Sum
-from django.forms import modelformset_factory
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
@@ -14,11 +14,21 @@ from houses.models import Section, Flat, House
 from users.models import CustomUser
 from . import models
 from . import forms
-from .models import get_next_transaction, PersonalAccount
 
 
-# Create your views here.
+class AdminPermissionMixin(LoginRequiredMixin, UserPassesTestMixin):
+    login_url = reverse_lazy('users:admin-login')
+    redirect_field_name = 'redirect_to'
 
+    def test_func(self):
+        if self.request.user.role:
+            return getattr(self.request.user.role,
+                           str(self.check_permission_name))
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.role:
+            return HttpResponseRedirect(reverse_lazy('users:user_profile'))
+        return super().handle_no_permission()
 
 def main_page(request, pk):
     pass
@@ -42,11 +52,12 @@ def get_statistics(context):
     return context
 
 
-class AccountCreateView(CreateView):
+class AccountCreateView(AdminPermissionMixin, CreateView):
     model = models.PersonalAccount
     form_class = forms.PersonalAccountForm
     success_url = reverse_lazy('crm_accounting:account_list')
     template_name = 'crm_accounting/personalaccount_form.html'
+    check_permission_name = 'personal_account'
 
     def post(self, request, *args, **kwargs):
         form_class = self.form_class(request.POST or None)
@@ -62,11 +73,12 @@ class AccountCreateView(CreateView):
                           context={'form': form_class})
 
 
-class PersonalAccountUpdateView(UpdateView):
+class PersonalAccountUpdateView(AdminPermissionMixin, UpdateView):
     model = models.PersonalAccount
     template_name = 'crm_accounting/personalaccount_update_form.html'
     form_class = forms.PersonalAccountForm
     success_url = reverse_lazy('crm_accounting:account_list')
+    check_permission_name = 'personal_account'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -74,7 +86,6 @@ class PersonalAccountUpdateView(UpdateView):
         context['sections'] = Section.objects.filter(house=account.house)
         context['flats'] = Flat.objects.filter(section=account.section). \
             order_by('number')
-        print(context)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -92,9 +103,10 @@ class PersonalAccountUpdateView(UpdateView):
                           context={'form': form_class})
 
 
-class AccountListView(ListView):
+class AccountListView(AdminPermissionMixin, ListView):
     model = models.PersonalAccount
     queryset = None
+    check_permission_name = 'personal_account'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = dict()
@@ -145,6 +157,7 @@ class AccountListViewAjax(BaseDatatableView):
 
 class DeletePersonalAccount(DeleteView):
     model = models.PersonalAccount
+    check_permission_name = 'personal_account'
 
     def post(self, request, *args, **kwargs):
         personal_account = self.model.objects.get(
@@ -157,9 +170,10 @@ class DeletePersonalAccount(DeleteView):
                 {'success': 'Удаление счета доступно только Директору'})
 
 
-class PersonalAccountDetailView(DetailView):
+class PersonalAccountDetailView(AdminPermissionMixin, DetailView):
     model = models.PersonalAccount
     template_name = 'crm_accounting/personalaccount_detail.html'
+    check_permission_name = 'personal_account'
 
 
 def get_flats(request):
@@ -225,10 +239,11 @@ def calculate_balance(form_class, **kwargs):
     form_class.save()
 
 
-class TransactionCreateView(CreateView):
+class TransactionCreateView(AdminPermissionMixin, CreateView):
     model = models.Transaction
     form_class = forms.TransactionForm
     success_url = reverse_lazy('crm_accounting:transaction_list')
+    check_permission_name = 'cashbox'
 
     def get_context_data(self, **kwargs):
         context = dict()
@@ -289,9 +304,10 @@ def get_personal_accounts_ajax(request):
     return JsonResponse({'accountList': account_list})
 
 
-class TransactionListView(ListView):
+class TransactionListView(AdminPermissionMixin, ListView):
     model = models.Transaction
     queryset = None
+    check_permission_name = 'cashbox'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = dict()
@@ -353,6 +369,7 @@ class TransactionListViewAjax(BaseDatatableView):
 class DeleteTransaction(DeleteView):
     model = models.Transaction
 
+
     def get(self, request, *args, **kwargs):
         transaction = self.model.objects.get(
             pk=request.GET.get('transaction')
@@ -372,11 +389,13 @@ class DeleteTransaction(DeleteView):
                                             'только старшему персоналу!'})
 
 
-class TransactionUpdateView(UpdateView):
+class TransactionUpdateView(AdminPermissionMixin, UpdateView):
     model = models.Transaction
     form_class = forms.TransactionForm
     success_url = reverse_lazy('crm_accounting:transaction_list')
     template_name = 'crm_accounting/transaction_update_form.html'
+    check_permission_name = 'cashbox'
+
 
     def get_context_data(self, **kwargs):
         instance = self.get_object()
@@ -412,8 +431,9 @@ class TransactionUpdateView(UpdateView):
                           context={'form': form_class})
 
 
-class TransactionDetailView(DetailView):
+class TransactionDetailView(AdminPermissionMixin, DetailView):
     model = models.Transaction
+    check_permission_name = 'cashbox'
 
     def get_queryset(self):
         return self.model.objects.all(). \
@@ -428,8 +448,10 @@ class TransactionDetailView(DetailView):
         return context
 
 
-class InvoiceListView(ListView):
+class InvoiceListView(AdminPermissionMixin, ListView):
     model = models.Invoice
+    check_permission_name = 'invoice'
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(InvoiceListView, self).get_context_data()
@@ -478,10 +500,12 @@ class InvoiceListViewAjax(BaseDatatableView):
         return qs
 
 
-class InvoiceCreateView(CreateView):
+class InvoiceCreateView(AdminPermissionMixin, CreateView):
     model = models.Invoice
     service_formset = forms.InvoiceServiceFormset
     form_class = forms.InvoiceForm
+    check_permission_name = 'invoice'
+
 
     def get_context_data(self, **kwargs):
         context = super(InvoiceCreateView, self).get_context_data()
@@ -512,8 +536,10 @@ class InvoiceCreateView(CreateView):
                                'service_formset':service_formset})
 
 
-class InvoiceDetailView(DetailView):
+class InvoiceDetailView(AdminPermissionMixin, DetailView):
     model = models.Invoice
+    check_permission_name = 'invoice'
+
 
     def get_queryset(self):
         queryset = models.Invoice.objects.all().\
@@ -522,12 +548,13 @@ class InvoiceDetailView(DetailView):
         return queryset
 
 
-class InvoiceUpdateView(UpdateView):
+class InvoiceUpdateView(AdminPermissionMixin, UpdateView):
     model = models.Invoice
     template_name = 'crm_accounting/invoice_update_form.html'
     service_formset = forms.InvoiceServiceFormset
     form_class = forms.InvoiceForm
     queryset = model.objects.all().select_related('flat__section__house')
+    check_permission_name = 'invoice'
 
     def get_context_data(self, **kwargs):
         context = dict()
@@ -545,12 +572,10 @@ class InvoiceUpdateView(UpdateView):
                 invoice=self.object))
         context['services'] = forms.Service.objects.all()
         context['units'] = forms.Unit.objects.all()
-        print(context['service_formset'])
         return context
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
-        print(request.POST, instance)
         form_class = self.form_class(request.POST or None,
                                      instance=instance)
         service_formset = self.service_formset(

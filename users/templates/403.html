@@ -1,0 +1,24 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+     Ошибка доступа
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_home/css/counter_create.css' %}">
+
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Ошибка прав доступа
+        </h1>
+    </section>
+    <section class="content" style="padding: 15px ">
+        <h2 class="page-header" style="font-size: 22px; margin: 10px 0 20px 0">Обратитесь к директору для изменения этой ситуации!</h2>
+    </section>
+{% endblock %}
+{% block script %}
+{% endblock %}

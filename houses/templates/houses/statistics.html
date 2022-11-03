@@ -142,8 +142,58 @@
                 </div>
             </div>
         </div>
-
+        <div class="col-lg-4 col-md-5 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-money"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Задолженность по счетам, грн</span>
+                    <span class="info-box-number">
+                        {% if invoices_dobts %}
+                            {{ invoices_dobts }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="info-box">
+                <span class="info-box-icon bg-blue"><i class="fa fa-money"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Баланс по счетам, грн</span>
+                    <span class="info-box-number">
+                       {% if sum_accounts_balance %}
+                            {{ sum_accounts_balance }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-money"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Состояние кассы, грн</span>
+                    <span class="info-box-number">
+                        {% if cashbox_state %}
+                            {{ cashbox_state }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">График приходов и расходов по кассе, грн</h3>
+                    </div>
+                    <canvas id="barChart1" style="height: 114px; width: 619px; display: block;" width="412" height="76" class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
     </section>
 
 {% endblock %}
@@ -152,26 +202,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
-        let newArray = [{{ debts_per_month }}];
-        console.log(newArray)
-
+        let debtsPerMonth = {{ debts_per_month }};
+        let payedPerMonth = {{ payed_per_month }};
+        let incomePerMonth = {{ income_per_month }};
+        let outcomePerMonth = {{ outcome_per_month }};
     </script>
     <script>
-        console.log(typeof '{{ debts_per_month }}');
-        console.log('{{ payed_per_month }}');
-
     var data = {
     labels: ["янв., ", "февр.,", "март.,", 'апр.,', 'май,', 'июнь,', 'июль,', 'авг.,', 'сент.,', 'окт.,', 'нояб.,', 'дек.,'],
     datasets: [
         {
             label: "Задолженность",
             backgroundColor: "red",
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            data: debtsPerMonth,
         },
         {
             label: "Погашение задолженности",
             backgroundColor: "green",
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: payedPerMonth,
         }
     ]
 };
@@ -195,16 +243,16 @@
         {
             label: "Приход",
             backgroundColor: "green",
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 50.0, 0, 0],
+            data: incomePerMonth,
         },
         {
             label: "Расход",
             backgroundColor: "red",
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 30.0, 0, 0]
+            data: outcomePerMonth
         }
     ]
 };
-    var myBarChart_1 = new Chart('barChart_1', {
+    var myBarChart_1 = new Chart('barChart1', {
     type: 'bar',
     data: data_1,
     options: {

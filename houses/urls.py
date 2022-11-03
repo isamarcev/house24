@@ -1,7 +1,14 @@
 from django.urls import path, include
+from django.views.defaults import permission_denied, page_not_found
+
 from . import views
 
+
+
+
 app_name = 'houses'
+
+
 urlpatterns = [
     path('main/', views.main_page, name='main'),
 

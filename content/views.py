@@ -7,19 +7,21 @@ from crm_home.models import Tariff
 from . import forms
 from .models import *
 from django.views.generic import DetailView, UpdateView, DeleteView
+from crm_accounting import views as account_views
 
 
 def main_page(request):
     return render(request, 'content/layout/base.html')
 
 
-class MainUpdateView(UpdateView):
+class MainUpdateView(account_views.AdminPermissionMixin, UpdateView):
     form_class = forms.MainForm
     template_name = 'content/admin_main_page/admin_main_page.html'
     blocks = Block.objects.prefetch_related('main')
     seo = Seo.objects.prefetch_related('main')
     formset = modelformset_factory(Block, forms.BlockForm, max_num=6, fields=('header', 'description', 'image',))
     success_url = reverse_lazy('content:main-change')
+    check_permission_name = 'site_management'
 
     def get_object(self, queryset=None):
         return Main.objects.first()
@@ -47,11 +49,12 @@ class MainUpdateView(UpdateView):
 #         redirect + messeges framework прокидывать
 
 
-class AboutUpdateView(UpdateView):
+class AboutUpdateView(account_views.AdminPermissionMixin, UpdateView):
     form_class = forms.AboutForm
     success_url = reverse_lazy('content:about-change')
     template_name = 'content/edit_pages/about_us.html'
     formset = modelformset_factory(Document, forms.DocumentForm, extra=0, can_delete=True, fields=('document','title',))
+    check_permission_name = 'site_management'
 
     def get_object(self, queryset=None):
         return About.objects.first()
@@ -93,12 +96,14 @@ class AboutUpdateView(UpdateView):
         return super().post(request, *args, **kwargs)
 
 
-class ServicesUpdateView(UpdateView):
+class ServicesUpdateView(account_views.AdminPermissionMixin, UpdateView):
     success_url = reverse_lazy('content:services-change')
     template_name = 'content/edit_pages/services.html'
     formset_service = modelformset_factory(AboutService, forms.ServiceForm,
                                       extra=0, can_delete=True, fields=('title', 'text', 'image'))
     form_class = forms.ServicePageForm
+    check_permission_name = 'site_management'
+
 
     def get_object(self, queryset=None):
         return ServicePage.objects.first()
@@ -131,17 +136,12 @@ class ServicesUpdateView(UpdateView):
         return HttpResponseRedirect(self.success_url)
 
 
-
-class TariffUpdateView(UpdateView):
-    # queryset = Tariff.objects.all()
-    pass
-
-
-class ContactsUpdateView(UpdateView):
+class ContactsUpdateView(account_views.AdminPermissionMixin, UpdateView):
     template_name = 'content/edit_pages/contacts.html'
     form_class = forms.ContactsForm
     success_url = reverse_lazy('content:contacts-change')
     queryset = Contacts.objects.first()
+    check_permission_name = 'site_management'
 
     def get_object(self, queryset=None):
         obj = Contacts.objects.first()

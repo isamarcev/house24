@@ -13,7 +13,6 @@ urlpatterns = [
     path('about/change/', views.AboutUpdateView.as_view(), name='about-change'),
     path('services/change/', views.ServicesUpdateView.as_view(), name='services-change'),
     path('delete-service/<int:pk>/', views.delete_service, name='delete-service'),
-    path('tariff/change/', views.TariffUpdateView.as_view(), name='tariff-change'),
     path('contacts/change/', views.ContactsUpdateView.as_view(), name='contacts-change'),
 
     # delete_gallery
