@@ -25,6 +25,8 @@ from houses.models import Section, Flat, House
 from users.models import CustomUser
 from . import models
 from . import forms
+from .services import xls_invoices
+from .services.xls_invoices import print_invoice
 
 
 class AdminPermissionMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -571,7 +573,6 @@ class InvoiceCreateView(AdminPermissionMixin, CreateView):
     form_class = forms.InvoiceForm
     check_permission_name = 'invoice'
 
-
     def get_context_data(self, **kwargs):
         context = super(InvoiceCreateView, self).get_context_data()
         date_service = {'form-TOTAL_FORMS': '0',
@@ -682,100 +683,6 @@ class InvoiceDeleteView(DeleteView):
             return JsonResponse({'success': 'У Вас нет прав для удаления!'})
 
 
-def print_invoice(request):
-    invoice = get_object_or_404(models.Invoice,
-                                id=request.GET.get('invoice_id'))
-    data = {
-        'total': invoice.amount,
-        'invoiceNumber': invoice.number,
-        'accountBalance': invoice.flat.personal_account.balance,
-        'accountNumber': invoice.flat.personal_account.account_number,
-        'invoiceMonth': f'{invoice.period_start.strftime("%d.%m")} '
-                        f'- {invoice.period_end.strftime("%d.%m")}',
-        'invoiceDate': invoice.date.strftime('%d.%m.%Y'),
-        'invoiceAddress': f'{invoice.flat.owner} '
-                          f'{invoice.flat.house.address} '
-                          f'квартира №{invoice.flat.number}',
-        'debt': invoice.flat.personal_account.balance - invoice.amount,
-        '%payCompany%': f'{Requisites.objects.first()}'
-    }
-
-    template = load_workbook('tpl-44.xlsx')
-    sheet = template.active
-    for row in sheet.iter_rows():
-        for cell in row:
-            if cell.value in data.keys():
-                sheet[cell.coordinate] = data[cell.value]
-    start_service = 19
-
-    thin = Side(border_style="thin", color="000000")
-    services = invoice.invoiceservice_set.all()
-    for obj in services:
-        sheet.insert_rows(start_service)
-
-        sheet[f'A{start_service}'] = obj.service.name
-        sheet[f'A{start_service}'].border = Border(top=thin, left=thin,
-                                                   right=thin, bottom=thin)
-        sheet[f'A{start_service}'].font = Font(size=12, italic=False,
-                                               color="000000")
-        sheet.merge_cells(f'A{start_service}:B{start_service}')
-
-        sheet[f'C{start_service}'] = obj.invoice.tariff.name
-        sheet[f'C{start_service}'].border = Border(top=thin, left=thin,
-                                                   right=thin, bottom=thin)
-        sheet[f'C{start_service}'].font = Font(size=12, italic=False,
-                                               color="000000")
-        sheet[f'C{start_service}'].alignment = Alignment(horizontal='right',
-                                                         vertical='bottom')
-        sheet.merge_cells(f'C{start_service}:D{start_service}')
-
-        sheet[f'E{start_service}'] = obj.service.unit.title
-        sheet[f'E{start_service}'].border = Border(top=thin, left=thin,
-                                                   right=thin, bottom=thin)
-        sheet[f'E{start_service}'].font = Font(size=12, italic=False,
-                                               color="000000")
-        sheet[f'E{start_service}'].alignment = Alignment(horizontal='right',
-                                                         vertical='bottom')
-        sheet.merge_cells(f'E{start_service}:F{start_service}')
-
-        sheet[f'G{start_service}'] = obj.amount
-        sheet[f'G{start_service}'].border = Border(top=thin, left=thin,
-                                                   right=thin, bottom=thin)
-        sheet[f'G{start_service}'].font = Font(size=12, italic=False,
-                                               color="000000")
-        sheet[f'G{start_service}'].alignment = Alignment(horizontal='right',
-                                                         vertical='bottom')
-        sheet.merge_cells(f'G{start_service}:H{start_service}')
-
-        sheet[f'I{start_service}'] = obj.total
-        sheet[f'I{start_service}'].border = Border(top=thin, left=thin,
-                                                   right=thin, bottom=thin)
-        sheet[f'I{start_service}'].font = Font(size=12, italic=False,
-                                               color="000000")
-        sheet[f'I{start_service}'].alignment = Alignment(horizontal='right',
-                                                         vertical='bottom')
-        sheet.merge_cells(f'I{start_service}:K{start_service}')
-
-        start_service += 1
-
-    sheet.merge_cells(f'A{start_service}:B{start_service}')
-    sheet.merge_cells(f'C{start_service}:D{start_service}')
-    sheet.merge_cells(f'E{start_service}:F{start_service}')
-    sheet.merge_cells(f'G{start_service}:H{start_service}')
-    sheet.merge_cells(f'I{start_service}:K{start_service}')
-
-    with NamedTemporaryFile(prefix='.xlsx') as tmp:
-        temp_path = tmp.name
-        template.save(temp_path)
-        tmp.seek(0)
-        stream = tmp.read()
-    filepath = os.path.join(BASE_DIR, temp_path)
-    response = HttpResponse(stream, content_type=filepath)
-    response['Content-Disposition'] \
-        = "attachment; filename=%s" % f'{invoice.number}.xlsx'
-    return response
-
-
 class TemplatesUpdateView(TemplateView):
     template_name = 'crm_accounting/template_update_view.html'
 
@@ -785,16 +692,59 @@ class TemplatesUpdateView(TemplateView):
         context['form_template'] = forms.TemplateForm
         return context
 
+    def get(self, request):
+        delete_id = request.GET.get('delete_id')
+        default_id = request.GET.get('default_id')
+        if delete_id:
+            models.Template.objects.filter(id=delete_id).delete()
+        if default_id:
+            templates = models.Template.objects.all()
+            for template in templates:
+                if template.id == int(default_id):
+                    template.default = True
+                else:
+                    template.default = False
+                template.save()
+        return super().get(self)
+
     def post(self, request):
         form_template = forms.TemplateForm(request.POST, request.FILES)
         if form_template.is_valid():
             form_template.save()
-            return HttpResponseRedirect(reverse_lazy('crm_accounting:invoice_list'))
+            return HttpResponseRedirect(
+                reverse_lazy('crm_accounting:invoice_list'))
         else:
             return render(request, self.template_name, context={
                 'templates': models.Template.objects.all(),
                 'form_template': form_template
             })
+
+
+class TemplatePrintView(DetailView):
+    template_name = 'crm_accounting/template_print_view.html'
+    model = models.Invoice
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        invoice = self.get_object()
+        context['object'] = invoice
+        context['templates'] = forms.TemplatePrint(initial={'template': models.Template.objects.filter(default=True).first()})
+        return context
+
+    def post(self, request, *args, **kwargs):
+        template_id = request.POST.get('template')
+        invoice = self.get_object()
+        if 'action_download' in request.POST.keys():
+            return print_invoice(invoice, template_id)
+        if 'action_send_email' in request.POST.keys():
+            if print_invoice(invoice, template_id, email=True):
+                messages.success(request, 'Письмо успешно отправлено.')
+            else:
+                messages.error(request, 'У владельца не указана почта')
+            return HttpResponseRedirect(
+                reverse_lazy('crm_accounting:invoice_list'))
+
+
 
 class SectionAjaxView(View):
     @staticmethod

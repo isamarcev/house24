@@ -76,7 +76,7 @@ urlpatterns = [
          name='get_info_by_flat'),
     path('invoices/get-tariff-info/', views.tariff_ajax_info,
          name="get_tariff_info"),
-    path('invoices/print/', views.print_invoice,
+    path('invoices/print/<int:pk>/', views.TemplatePrintView.as_view(),
          name='print_invoice'),
     path('invoices/template/', views.TemplatesUpdateView.as_view(),
          name='update_templates'),

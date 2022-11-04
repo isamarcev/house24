@@ -298,3 +298,6 @@ class TemplateForm(forms.ModelForm):
             return file_name
         return name
 
+class TemplatePrint(forms.Form):
+    template = forms.ModelChoiceField(queryset=models.Template.objects.all(),
+                                      widget=forms.RadioSelect)

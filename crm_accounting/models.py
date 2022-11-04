@@ -173,5 +173,8 @@ class Template(models.Model):
     default = models.BooleanField(null=True, blank=True, default=False)
 
     def __str__(self):
-        return self.name
+        if self.default:
+            return f'{self.name} (по-умолчанию)'
+        else:
+            return f'{self.name}'
 
