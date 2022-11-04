@@ -72,7 +72,7 @@
                         Просмотр квитанции
                     </h3>
                     <div class="box-tools">
-                        <a href="!#" class="btn btn-default btn-sm">
+                        <a href="{% url 'crm_accounting:print_invoice' %}?invoice_id={{ object.id }}" class="btn btn-default btn-sm">
                             <span class="hidden-xs">Печать</span>
                         </a>
                         <a href="#" class="btn btn-default btn-sm">

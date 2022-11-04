@@ -78,6 +78,9 @@ class Requisites(models.Model):
     title = models.CharField(max_length=100)
     info = models.TextField(max_length=1000)
 
+    def __str__(self):
+        return f'{self.title} {self.info}'
+
 
 class PaymentState(models.Model):
     title = models.CharField(max_length=100)

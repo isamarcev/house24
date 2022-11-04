@@ -165,3 +165,13 @@ class InvoiceService(models.Model):
         verbose_name_plural = 'Квитанции с услугами'
         verbose_name = 'Квитанция с услугами'
 
+
+class Template(models.Model):
+    file = models.FileField(upload_to='media/templates_invoice/', null=True,
+                            blank=True)
+    name = models.CharField(max_length=20, default='New template')
+    default = models.BooleanField(null=True, blank=True, default=False)
+
+    def __str__(self):
+        return self.name
+

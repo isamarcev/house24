@@ -87,7 +87,7 @@
                         <a href="{% url 'crm_accounting:transaction_update' object.id %}" style="padding: 4px 8px!important;" class="btn btn-tariff btn-sm">
                             <span class="hidden-xs">Редактировать ведомость</span>
                         </a>
-                        <a href="#" class="btn btn-default btn-sm">
+                        <a href="{% url 'crm_accounting:export_transaction' %}?transaction_id={{ object.id }}" class="btn btn-default btn-sm">
                             <span class="hidden-xs">Выгрузить в Excel</span>
                         </a>
         </div>
@@ -154,7 +154,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="user-label">Статус</td>
+                            <td class="user-label">Комментарий</td>
                                 <td>
                                 {% if object.comment %}
                                     {{ object.comment }}

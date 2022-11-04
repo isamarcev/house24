@@ -1,3 +1,7 @@
+import mimetypes
+import os
+from tempfile import NamedTemporaryFile
+
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.db.models import Q
@@ -6,10 +10,17 @@ from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView, \
-    ListView, DeleteView, View
+    ListView, DeleteView, View, TemplateView
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from datetime import datetime
-from crm_home.models import PaymentState, TariffService
+
+from openpyxl.reader.excel import load_workbook
+from openpyxl.styles import Side, Border, Font, Alignment
+from openpyxl.utils import get_column_letter
+from openpyxl.workbook import Workbook
+
+from crm_home.models import PaymentState, TariffService, Requisites
+from home24.settings import BASE_DIR
 from houses.models import Section, Flat, House
 from users.models import CustomUser
 from . import models
@@ -326,7 +337,6 @@ def filter_qs_daterange(date, qs):
     return qs
 
 
-
 class TransactionListViewAjax(BaseDatatableView):
     model = models.Transaction
     columns = ['number', 'date', 'completed', 'payment_state',
@@ -448,10 +458,65 @@ class TransactionDetailView(AdminPermissionMixin, DetailView):
         return context
 
 
+def download_file(request):
+    transaction_id = request.GET.get('transaction_id')
+    transaction = get_object_or_404(models.Transaction.objects.
+                                    select_related('payment_state',
+                                                   'owner',
+                                                   'manager'),
+                                    id=transaction_id)
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'rabge names'
+    ws['A1'] = 'Платеж'
+    ws['A2'] = 'Дата'
+    ws['A3'] = 'Владелец квартиры'
+    ws['A4'] = 'Лицевой счет'
+    ws['A5'] = 'Приход/расход'
+    ws['A6'] = 'Статус'
+    ws['A7'] = 'Статья'
+    ws['A8'] = 'Квитанция'
+    ws['A9'] = 'Услуга'
+    ws['A10'] = 'Сумма'
+    ws['A11'] = 'Валюта'
+    ws['A12'] = 'Комментарий'
+    ws['A13'] = 'Менеджер'
+    ws['B1'] = f'#{transaction.number}'
+    ws['B2'] = f'{transaction.date}'
+    if transaction.owner:
+        ws['B3'] = f'{transaction.owner}'
+    if transaction.personal_account:
+        ws['B4'] = f'{transaction.personal_account}'
+    if transaction.payment_state.type == 'in':
+        ws['B5'] = f'Приход'
+    else:
+        ws['B5'] = f'Расход'
+    if transaction.completed:
+        ws['B6'] = "Проведен"
+    else:
+        ws['B6'] = 'Не проведен'
+    ws['B7'] = f'{transaction.payment_state.title}'
+    ws['B8'] = ''
+    ws['B9'] = ''
+    ws['B10'] = transaction.amount
+    ws['B11'] = 'UAH'
+    ws['B12'] = transaction.comment
+    ws['B13'] = f'{transaction.manager}'
+    with NamedTemporaryFile(prefix='.xlsx') as tmp:
+        temp_path = tmp.name
+        wb.save(temp_path)
+        tmp.seek(0)
+        stream = tmp.read()
+    filepath = os.path.join(BASE_DIR, temp_path)
+    response = HttpResponse(stream, content_type=filepath)
+    response['Content-Disposition'] \
+        = "attachment; filename=%s" % f'{transaction.number}.xlsx'
+    return response
+
+
 class InvoiceListView(AdminPermissionMixin, ListView):
     model = models.Invoice
     check_permission_name = 'invoice'
-
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(InvoiceListView, self).get_context_data()
@@ -540,7 +605,6 @@ class InvoiceDetailView(AdminPermissionMixin, DetailView):
     model = models.Invoice
     check_permission_name = 'invoice'
 
-
     def get_queryset(self):
         queryset = models.Invoice.objects.all().\
             select_related('flat__personal_account', 'flat__owner', ).\
@@ -617,6 +681,120 @@ class InvoiceDeleteView(DeleteView):
         else:
             return JsonResponse({'success': 'У Вас нет прав для удаления!'})
 
+
+def print_invoice(request):
+    invoice = get_object_or_404(models.Invoice,
+                                id=request.GET.get('invoice_id'))
+    data = {
+        'total': invoice.amount,
+        'invoiceNumber': invoice.number,
+        'accountBalance': invoice.flat.personal_account.balance,
+        'accountNumber': invoice.flat.personal_account.account_number,
+        'invoiceMonth': f'{invoice.period_start.strftime("%d.%m")} '
+                        f'- {invoice.period_end.strftime("%d.%m")}',
+        'invoiceDate': invoice.date.strftime('%d.%m.%Y'),
+        'invoiceAddress': f'{invoice.flat.owner} '
+                          f'{invoice.flat.house.address} '
+                          f'квартира №{invoice.flat.number}',
+        'debt': invoice.flat.personal_account.balance - invoice.amount,
+        '%payCompany%': f'{Requisites.objects.first()}'
+    }
+
+    template = load_workbook('tpl-44.xlsx')
+    sheet = template.active
+    for row in sheet.iter_rows():
+        for cell in row:
+            if cell.value in data.keys():
+                sheet[cell.coordinate] = data[cell.value]
+    start_service = 19
+
+    thin = Side(border_style="thin", color="000000")
+    services = invoice.invoiceservice_set.all()
+    for obj in services:
+        sheet.insert_rows(start_service)
+
+        sheet[f'A{start_service}'] = obj.service.name
+        sheet[f'A{start_service}'].border = Border(top=thin, left=thin,
+                                                   right=thin, bottom=thin)
+        sheet[f'A{start_service}'].font = Font(size=12, italic=False,
+                                               color="000000")
+        sheet.merge_cells(f'A{start_service}:B{start_service}')
+
+        sheet[f'C{start_service}'] = obj.invoice.tariff.name
+        sheet[f'C{start_service}'].border = Border(top=thin, left=thin,
+                                                   right=thin, bottom=thin)
+        sheet[f'C{start_service}'].font = Font(size=12, italic=False,
+                                               color="000000")
+        sheet[f'C{start_service}'].alignment = Alignment(horizontal='right',
+                                                         vertical='bottom')
+        sheet.merge_cells(f'C{start_service}:D{start_service}')
+
+        sheet[f'E{start_service}'] = obj.service.unit.title
+        sheet[f'E{start_service}'].border = Border(top=thin, left=thin,
+                                                   right=thin, bottom=thin)
+        sheet[f'E{start_service}'].font = Font(size=12, italic=False,
+                                               color="000000")
+        sheet[f'E{start_service}'].alignment = Alignment(horizontal='right',
+                                                         vertical='bottom')
+        sheet.merge_cells(f'E{start_service}:F{start_service}')
+
+        sheet[f'G{start_service}'] = obj.amount
+        sheet[f'G{start_service}'].border = Border(top=thin, left=thin,
+                                                   right=thin, bottom=thin)
+        sheet[f'G{start_service}'].font = Font(size=12, italic=False,
+                                               color="000000")
+        sheet[f'G{start_service}'].alignment = Alignment(horizontal='right',
+                                                         vertical='bottom')
+        sheet.merge_cells(f'G{start_service}:H{start_service}')
+
+        sheet[f'I{start_service}'] = obj.total
+        sheet[f'I{start_service}'].border = Border(top=thin, left=thin,
+                                                   right=thin, bottom=thin)
+        sheet[f'I{start_service}'].font = Font(size=12, italic=False,
+                                               color="000000")
+        sheet[f'I{start_service}'].alignment = Alignment(horizontal='right',
+                                                         vertical='bottom')
+        sheet.merge_cells(f'I{start_service}:K{start_service}')
+
+        start_service += 1
+
+    sheet.merge_cells(f'A{start_service}:B{start_service}')
+    sheet.merge_cells(f'C{start_service}:D{start_service}')
+    sheet.merge_cells(f'E{start_service}:F{start_service}')
+    sheet.merge_cells(f'G{start_service}:H{start_service}')
+    sheet.merge_cells(f'I{start_service}:K{start_service}')
+
+    with NamedTemporaryFile(prefix='.xlsx') as tmp:
+        temp_path = tmp.name
+        template.save(temp_path)
+        tmp.seek(0)
+        stream = tmp.read()
+    filepath = os.path.join(BASE_DIR, temp_path)
+    response = HttpResponse(stream, content_type=filepath)
+    response['Content-Disposition'] \
+        = "attachment; filename=%s" % f'{invoice.number}.xlsx'
+    return response
+
+
+class TemplatesUpdateView(TemplateView):
+    template_name = 'crm_accounting/template_update_view.html'
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        context['templates'] = models.Template.objects.all()
+        context['form_template'] = forms.TemplateForm
+        return context
+
+    def post(self, request):
+        form_template = forms.TemplateForm(request.POST, request.FILES)
+        if form_template.is_valid():
+            form_template.save()
+            return HttpResponseRedirect(reverse_lazy('crm_accounting:invoice_list'))
+        else:
+            return render(request, self.template_name, context={
+                'templates': models.Template.objects.all(),
+                'form_template': form_template
+            })
 
 class SectionAjaxView(View):
     @staticmethod
