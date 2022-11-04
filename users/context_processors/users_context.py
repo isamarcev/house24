@@ -1,9 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from houses.models import Flat
-from users.models import CustomUser, MessageUsers
-
-# TODO 'Change request USER_ID -> request.user.id
+from users.models import MessageUsers
 
 
 def user_info(request):

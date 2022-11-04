@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -532,9 +532,39 @@ class LayoutTemplateView(TemplateView):
     template_name = 'users/cabinet/layout.html'
 
 
+class CabinetStatisticView(TemplateView):
+    template_name = 'users/cabinet/statistics_for_flat.html'
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        flat = get_object_or_404(Flat.objects.filter(owner=self.request.user).
+                                 select_related('personal_account'),
+                                 id=self.request.GET.get('flat_id'))
+        context['personal_account'] = flat.personal_account
+        context['flat'] = flat
+        month_list = [number for number in range(1, 13)]
+        payed_per_month = [Invoice.objects.
+                           filter(flat=flat,
+                                  date__month=number,
+                                  status='Оплачена').
+                           aggregate(Sum('amount'))
+                           for number in month_list]
+        payed_per_month_value = []
+        for month in payed_per_month:
+            if month.get('amount__sum'):
+                payed_per_month_value.append(int(month.get('amount__sum')))
+        if payed_per_month_value:
+            context['average_per_month'] = sum(payed_per_month_value) / \
+                                           len(payed_per_month_value)
+        return context
+
+
 class CabinetInvoicesListView(ListView):
     model = Invoice
     template_name = 'users/cabinet/invoice_users.html'
+
+    def get_queryset(self):
+        return self.model.objects.filter(flat__owner=self.request.user)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = dict()
@@ -552,7 +582,7 @@ class CabinetInvoicesAjaxList(BaseDatatableView):
     def get_initial_queryset(self):
         flat_id = self.request.GET.get('flat')
         user_id = self.request.GET.get('user')
-        qs = self.model.objects.all()
+        qs = self.model.objects.filter(flat__owner=self.request.user)
         if flat_id:
             qs = qs.filter(flat_id=flat_id)
         if user_id:
@@ -573,7 +603,9 @@ class CabinetInvoicesAjaxList(BaseDatatableView):
 class CabinetInvoicesDetail(DetailView):
     model = Invoice
     template_name = 'users/cabinet/invoice_users_detail.html'
-    queryset = Invoice.objects.all().\
+
+    def get_queryset(self):
+        return Invoice.objects.filter(flat__owner=self.request.user).\
         prefetch_related('invoiceservice_set__service__unit')
 
 
@@ -583,26 +615,23 @@ class CabinetTariffForFlatView(TemplateView):
 
     def get_queryset(self):
         qs = get_object_or_404(
-            TariffService.objects.select_related(''),
+            TariffService.objects
+            .filter(tariff__flat__owner=self.request.user)
+            .select_related(''),
             tariff=self.request.GET.get('flat_id'))
         return qs
 
     def get_context_data(self, **kwargs):
         context = dict()
         context['object'] = \
-            get_object_or_404(Flat.objects.select_related('house'),
+            get_object_or_404(Flat.objects.filter(owner=self.request.user)
+                              .select_related('house'),
                               id=self.request.GET.get('flat_id'))
         context['tariff_services'] = \
             self.model.objects.\
                 filter(tariff__flat=self.request.GET.get('flat_id')).\
                 select_related('service__unit')
         return context
-
-# TODO "CHANGE USER in CABINET  FOR REQUEST.USER"
-
-def get_user(request):
-    # return request.user
-    return 12
 
 
 class MessageUserList(TemplateView):
@@ -615,7 +644,7 @@ class MessageUserAjaxList(BaseDatatableView):
                'message.sender', 'read']
 
     def get_initial_queryset(self):
-        return self.model.objects.filter(user=get_user(self.request)).\
+        return self.model.objects.filter(user=self.request.user).\
             select_related('message').order_by('-message_id')
 
     def filter_queryset(self, qs):
@@ -631,7 +660,8 @@ class MessageUserAjaxDelete(DeleteView):
 
     def post(self, request, *args, **kwargs):
         if request.POST.get('id'):
-            message = get_object_or_404(MessageUsers,
+            message = get_object_or_404(MessageUsers.objects
+                                        .filter(user=self.request.user),
                                         id=request.POST.get('id'))
             if message.user is request.user:
                 message.delete()
@@ -650,7 +680,7 @@ class MessageUserDetailView(DetailView):
     template_name = 'users/cabinet/message_user_detail.html'
 
     def get_queryset(self):
-        qs = MessageUsers.objects.filter(user=get_user(self.request)).\
+        qs = MessageUsers.objects.filter(user=self.request.user).\
             select_related('message')
         return qs
 
@@ -672,7 +702,7 @@ class RequestUserAjaxListView(BaseDatatableView):
                'status']
 
     def get_initial_queryset(self):
-        return self.model.objects.filter(owner_id=get_user(self.request))\
+        return self.model.objects.filter(owner_id=self.request.user.id)\
             .order_by('-id')
 
 

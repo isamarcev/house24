@@ -167,7 +167,7 @@ class InvoiceService(models.Model):
 
 
 class Template(models.Model):
-    file = models.FileField(upload_to='media/templates_invoice/', null=True,
+    file = models.FileField(upload_to='templates_invoice/', null=True,
                             blank=True)
     name = models.CharField(max_length=20, default='New template')
     default = models.BooleanField(null=True, blank=True, default=False)

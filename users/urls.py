@@ -32,6 +32,9 @@ urlpatterns = [
 
 
     #CABINET
+
+    path('cabinet/statistic/', views.CabinetStatisticView.as_view(),
+         name='statistic_user_view'),
     path('cabinet/invoices/', views.CabinetInvoicesListView.as_view(),
          name='invoice_for_users'),
     path('cabinet/invoices/<int:pk>/', views.CabinetInvoicesDetail.as_view(),
@@ -53,6 +56,7 @@ urlpatterns = [
          name='messages_user_delete'),
     path('cabinet/messages/<int:pk>/', views.MessageUserDetailView.as_view(),
          name='messages_user_detail'),
+
     #REQUESTS
     path('cabinet/master-request/',
          views.RequestUserListView.as_view(),

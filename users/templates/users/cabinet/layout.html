@@ -144,7 +144,7 @@
                 <ul class="nav nav-treeview">
                     {% for flat in flats %}
                           <li class="nav-item">
-                            <a href="{% url 'crm_home:set_services' %}" class="nav-link">
+                            <a href="{% url 'users:statistic_user_view' %}?flat_id={{ flat.id }}" class="nav-link">
                               <i class="fa fa-building-o"></i>
                               <p>{{ flat.house }}, кв.{{ flat.number }}</p>
                             </a>
