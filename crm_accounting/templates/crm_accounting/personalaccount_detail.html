@@ -33,10 +33,10 @@
                 <div class="box-header" style="position: relative; height: 42px">
                     <h3 class="box-title">Просмотр лицевого счета</h3>
                     <div class="box-tools">
-                            <a style="height: 31px" href="{% url 'crm_accounting:transaction_account_create' %}?flat_id={{ object.id }}" class="btn btn-default btn-sm">
+                            <a style="height: 31px" href="{% url 'crm_accounting:transaction_create' %}?flat_id={{ object.flat.id }}&type=in" class="btn btn-default btn-sm">
                     <span class="hidden-xs"><i class="fa fa-dollar"></i> Принять платеж</span>
                 </a>
-                <a style="height: 31px" href="{% url 'crm_accounting:create_invoice_for_flat' %}?flat_id={{ object.id }}" class="btn btn-default btn-sm">
+                <a style="height: 31px" href="{% url 'crm_accounting:invoice_create' %}?personal_account={{ object.id }}" class="btn btn-default btn-sm">
                     <span class="hidden-xs"><i class="fa fa-files-o"></i> Оформить квитанцию</span>
                 </a>
                         <a href="{% url 'crm_accounting:account_update' object.id %}" class="btn btn-tariff btn-sm">
@@ -94,14 +94,14 @@
                             {% else %}
                             Не привязана квартира
                             {% endif %}
-                        </td>
+                            </td>
                         </tr>
                         <tr>
                             <td class="user-label">Остаток, грн.</td>
                                 {% if object.balance > 0 %}
                                 <td style="color: #00a65a;">
                                     {{ object.balance }}
-                                <td>
+                                </td>
                                     {% elif object.balance < 0 %}
                                 <td style="color: orangered">
                                     {{ object.balance }}
@@ -117,8 +117,8 @@
                 </table>
                     <div>
                     <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_home:flat_counter_list' %}?flat_id={{ object.flat.id }}">Посмотреть показания счетчиков</a></p>
-                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:transaction_account_detail' %}/?account={{ object.personal_account.id }}">Посмотреть приходы</a></p>
-                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:invoices_for_flat' object.id %}">Посмотреть квитанции</a></p>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:transaction_list' %}?account_id={{ object.id }}">Посмотреть приходы</a></p>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:invoice_list' %}?flat_id={{ object.flat.id }}">Посмотреть квитанции</a></p>
                 </div>
                     </div>
         </div>

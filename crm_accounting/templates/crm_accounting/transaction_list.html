@@ -195,7 +195,11 @@
                                                 </select>
                                             </th>
                                             <th class="sort">
-                                                <input type="text" name="personal_account" id="personal_account" class="form-control">
+                                                {% if account_id %}
+                                                <input type="text" name="personal_account" value="{{ account_id }}" id="id_personal_account" class="form-control">
+                                                {% else %}
+                                                <input type="text" name="personal_account" id="id_personal_account" class="form-control">
+                                                {% endif %}
                                             </th>
                                             <th class="sort">
                                                 <select name="type_of_payment" id="type_of_payment" class="form-select">

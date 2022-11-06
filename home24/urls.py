@@ -10,7 +10,6 @@ urlpatterns = [
     path('admin/', include('houses.urls')),
     path('crm-accounting/', include('crm_accounting.urls')),
     path('system-settings/', include('crm_home.urls')),
-
     path('users/', include('users.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
 

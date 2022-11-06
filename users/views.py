@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -23,6 +24,23 @@ from houses.models import House, Flat, Section, Floor
 from users.forms import LoginUserForm, CustomUserForm, \
     OwnerUserForm, RequestForm, MessageForm, RequestUserForm
 from users.models import CustomUser, Role, Request, Message, MessageUsers
+
+
+class CabinetPermissionMixin(LoginRequiredMixin, UserPassesTestMixin):
+    login_url = reverse_lazy('users:login')
+    redirect_field_name = 'redirect_to'
+
+    def test_func(self):
+        if self.request.user.is_anonymous:
+            return False
+        elif not self.request.user.role:
+            return True
+
+    def handle_no_permission(self):
+        if not self.request.user.is_authenticated:
+            return super().handle_no_permission()
+        elif self.request.user.role:
+            return HttpResponseRedirect(reverse_lazy('houses:statistics'))
 
 
 def check_remember_me_answer(self, form):
@@ -58,6 +76,7 @@ class LoginUser(LoginView):
 class LoginAdminUser(LoginView):
     form_class = LoginUserForm
     template_name = 'users/login_admin_user.html'
+
     # redirect_authenticated_user = reverse_lazy('users:layout')
 
     @method_decorator(sensitive_post_parameters())
@@ -66,7 +85,7 @@ class LoginAdminUser(LoginView):
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated and self.request.user.is_staff:
             return HttpResponseRedirect(reverse_lazy('users:message_list'))
-        elif self.request.user.is_authenticated and not self.request.user.\
+        elif self.request.user.is_authenticated and not self.request.user. \
                 is_staff:
             return HttpResponseRedirect(reverse_lazy('users:user_profile'))
         return super().dispatch(request, *args, **kwargs)
@@ -94,7 +113,7 @@ class LogoutUser(LogoutView):
 
 class UsersListView(account_views.AdminPermissionMixin, ListView):
     model = CustomUser
-    queryset = CustomUser.objects.filter(~Q(role=None)).order_by('id').\
+    queryset = CustomUser.objects.filter(~Q(role=None)).order_by('id'). \
         select_related('role')
     context_object_name = 'users'
     check_permission_name = 'users'
@@ -119,7 +138,7 @@ class AjaxUsersListView(View):
                                           Q(role__name__icontains=role_name),
                                           Q(phone__contains=phone),
                                           Q(email__icontains=email),
-                                          Q(status__contains=status_value)).\
+                                          Q(status__contains=status_value)). \
             order_by('id')
         user_list = []
         for user in users:
@@ -142,7 +161,6 @@ class UserCreateView(account_views.AdminPermissionMixin, CreateView):
     success_url = reverse_lazy('users:users')
     check_permission_name = 'users'
 
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['label_suffix'] = ''
@@ -154,7 +172,6 @@ class UserDetailView(account_views.AdminPermissionMixin, DetailView):
     check_permission_name = 'users'
 
 
-
 class UserUpdateView(account_views.AdminPermissionMixin, UpdateView):
     model = CustomUser
     form_class = CustomUserForm
@@ -162,8 +179,6 @@ class UserUpdateView(account_views.AdminPermissionMixin, UpdateView):
     success_url = reverse_lazy('users:users')
     template_name = 'users/customuser_update_form.html'
     check_permission_name = 'users'
-
-
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -191,9 +206,10 @@ def delete_user(request, pk):
 class OwnerListView(account_views.AdminPermissionMixin, ListView):
     model = CustomUser
     context_object_name = 'users'
-    queryset = CustomUser.objects.filter(role=None).prefetch_related('house_set',
-                                                                      'flat_set__house__personalaccount_set',
-                                                                     'flat_set__personal_account').order_by('date_joined')
+    queryset = CustomUser.objects.filter(role=None).prefetch_related(
+        'house_set',
+        'flat_set__house__personalaccount_set',
+        'flat_set__personal_account').order_by('date_joined')
     template_name = 'users/owners_list.html'
     check_permission_name = 'owner'
 
@@ -210,7 +226,6 @@ class OwnerCreateView(account_views.AdminPermissionMixin, CreateView):
     success_url = reverse_lazy('users:owner_list')
     template_name = 'users/owner_create_form.html'
     check_permission_name = 'owner'
-
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -232,29 +247,29 @@ class OwnerUpdateView(account_views.AdminPermissionMixin, UpdateView):
     template_name = 'users/owner_update_form.html'
     check_permission_name = 'owner'
 
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['label_suffix'] = ''
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        form_class = self.form_class(request.POST, request.FILES, instance=self.get_object())
+        print(request.POST)
+        form_class = self.form_class(request.POST, request.FILES,
+                                     instance=self.get_object())
         if form_class.is_valid():
             form_class.save(commit=False)
-            if len(request.POST.get('password')) == 0:
-                del form_class.instance.password
             form_class.save()
             messages.success(request, 'Владелец успешно обновлен')
             return HttpResponseRedirect(reverse_lazy('users:owner_list'))
-        return render(request, self.template_name, self.get_context_data())
+        return render(request, self.template_name,
+                      context={'form': form_class})
 
 
 class OwnerDetailView(account_views.AdminPermissionMixin, DetailView):
     model = CustomUser
     template_name = 'users/owner_detail.html'
     check_permission_name = 'owner'
-    queryset = CustomUser.objects.all().\
+    queryset = CustomUser.objects.all(). \
         prefetch_related('flat_set__house__personalaccount_set')
 
 
@@ -263,7 +278,6 @@ class RequestsCreateView(account_views.AdminPermissionMixin, CreateView):
     success_url = reverse_lazy('users:requests_list')
     form_class = RequestForm
     check_permission_name = 'application'
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -293,11 +307,10 @@ class RequestListView(account_views.AdminPermissionMixin, ListView):
     queryset = model.objects.all().select_related('flat__house', 'owner')
     check_permission_name = 'application'
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
         context['owners'] = CustomUser.objects.filter(role=None)
-        context['masters'] = CustomUser.objects.filter(~Q(role=None)).\
+        context['masters'] = CustomUser.objects.filter(~Q(role=None)). \
             select_related('role')
         return context
 
@@ -328,7 +341,7 @@ class RequestGetViewAjax(BaseDatatableView):
             date_start = datetime.datetime.strptime(date_range.split(' - ')[0],
                                                     '%m/%d/%Y')
             date_end = datetime.datetime.strptime(date_range.split(' - ')[1],
-                                                    '%m/%d/%Y')
+                                                  '%m/%d/%Y')
             qs = qs.filter(Q(date__gt=date_start), Q(date__lt=date_end))
         if id:
             qs = qs.filter(id=id)
@@ -337,7 +350,8 @@ class RequestGetViewAjax(BaseDatatableView):
         if description:
             qs = qs.filter(description__contains=description)
         if flat:
-            qs = qs.filter(Q(flat__contains=flat)|Q(flat__house__contains=flat))
+            qs = qs.filter(
+                Q(flat__contains=flat) | Q(flat__house__contains=flat))
         if owner:
             qs = qs.filter(owner=owner)
         if phone:
@@ -387,7 +401,6 @@ class MessageListView(account_views.AdminPermissionMixin, ListView):
     model = Message
     check_permission_name = 'message'
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         return {}
 
@@ -415,7 +428,6 @@ class MessageCreateView(account_views.AdminPermissionMixin, CreateView):
     form_class = MessageForm
     template_name = 'users/message_form.html'
     check_permission_name = 'message'
-
 
     def post(self, request, *args, **kwargs):
         form_class = self.form_class(request.POST or None)
@@ -528,11 +540,8 @@ class MessageAjaxDelete(DeleteView):
             )
 
 
-class LayoutTemplateView(TemplateView):
-    template_name = 'users/cabinet/layout.html'
 
-
-class CabinetStatisticView(TemplateView):
+class CabinetStatisticView(CabinetPermissionMixin, TemplateView):
     template_name = 'users/cabinet/statistics_for_flat.html'
 
     def get_context_data(self, **kwargs):
@@ -559,7 +568,7 @@ class CabinetStatisticView(TemplateView):
         return context
 
 
-class CabinetInvoicesListView(ListView):
+class CabinetInvoicesListView(CabinetPermissionMixin, ListView):
     model = Invoice
     template_name = 'users/cabinet/invoice_users.html'
 
@@ -600,16 +609,16 @@ class CabinetInvoicesAjaxList(BaseDatatableView):
         return qs
 
 
-class CabinetInvoicesDetail(DetailView):
+class CabinetInvoicesDetail(CabinetPermissionMixin, DetailView):
     model = Invoice
     template_name = 'users/cabinet/invoice_users_detail.html'
 
     def get_queryset(self):
-        return Invoice.objects.filter(flat__owner=self.request.user).\
-        prefetch_related('invoiceservice_set__service__unit')
+        return Invoice.objects.filter(flat__owner=self.request.user). \
+            prefetch_related('invoiceservice_set__service__unit')
 
 
-class CabinetTariffForFlatView(TemplateView):
+class CabinetTariffForFlatView(CabinetPermissionMixin, TemplateView):
     model = TariffService
     template_name = 'users/cabinet/tariff_for_flat.html'
 
@@ -628,13 +637,13 @@ class CabinetTariffForFlatView(TemplateView):
                               .select_related('house'),
                               id=self.request.GET.get('flat_id'))
         context['tariff_services'] = \
-            self.model.objects.\
-                filter(tariff__flat=self.request.GET.get('flat_id')).\
+            self.model.objects. \
+                filter(tariff__flat=self.request.GET.get('flat_id')). \
                 select_related('service__unit')
         return context
 
 
-class MessageUserList(TemplateView):
+class MessageUserList(CabinetPermissionMixin, TemplateView):
     template_name = 'users/cabinet/message_users_list.html'
 
 
@@ -644,7 +653,7 @@ class MessageUserAjaxList(BaseDatatableView):
                'message.sender', 'read']
 
     def get_initial_queryset(self):
-        return self.model.objects.filter(user=self.request.user).\
+        return self.model.objects.filter(user=self.request.user). \
             select_related('message').order_by('-message_id')
 
     def filter_queryset(self, qs):
@@ -655,7 +664,7 @@ class MessageUserAjaxList(BaseDatatableView):
         return qs
 
 
-class MessageUserAjaxDelete(DeleteView):
+class MessageUserAjaxDelete(CabinetPermissionMixin, DeleteView):
     model = MessageUsers
 
     def post(self, request, *args, **kwargs):
@@ -676,11 +685,11 @@ class MessageUserAjaxDelete(DeleteView):
         return JsonResponse({'success': 'success'})
 
 
-class MessageUserDetailView(DetailView):
+class MessageUserDetailView(CabinetPermissionMixin, DetailView):
     template_name = 'users/cabinet/message_user_detail.html'
 
     def get_queryset(self):
-        qs = MessageUsers.objects.filter(user=self.request.user).\
+        qs = MessageUsers.objects.filter(user=self.request.user). \
             select_related('message')
         return qs
 
@@ -692,7 +701,7 @@ class MessageUserDetailView(DetailView):
         return super().get_context_data()
 
 
-class RequestUserListView(TemplateView):
+class RequestUserListView(CabinetPermissionMixin, TemplateView):
     template_name = 'users/cabinet/request_user_list.html'
 
 
@@ -702,11 +711,11 @@ class RequestUserAjaxListView(BaseDatatableView):
                'status']
 
     def get_initial_queryset(self):
-        return self.model.objects.filter(owner_id=self.request.user.id)\
+        return self.model.objects.filter(owner_id=self.request.user.id) \
             .order_by('-id')
 
 
-class RequestUserAjaxDelete(DeleteView):
+class RequestUserAjaxDelete(CabinetPermissionMixin, DeleteView):
     model = Request
 
     def post(self, request, *args, **kwargs):
@@ -720,7 +729,7 @@ class RequestUserAjaxDelete(DeleteView):
             return JsonResponse({'success': 'Это не ваш запрос!'})
 
 
-class RequestUserCreateView(CreateView):
+class RequestUserCreateView(CabinetPermissionMixin, CreateView):
     model = Request
     template_name = 'users/cabinet/request_user_form.html'
     form_class = RequestUserForm
@@ -731,22 +740,28 @@ class RequestUserCreateView(CreateView):
             form_class.save(commit=False)
             form_class.instance.owner = request.user
             form_class.save()
-            return HttpResponseRedirect(reverse_lazy('users:request_user_view'))
+            return HttpResponseRedirect(
+                reverse_lazy('users:request_user_view'))
         else:
             return render(request, self.template_name,
                           context={'form': form_class})
 
 
-class ProfileUserView(TemplateView):
+class ProfileUserView(CabinetPermissionMixin, TemplateView):
     template_name = 'users/cabinet/profile_user_view.html'
 
     def get_context_data(self, **kwargs):
         context = dict()
-        context['flats'] = Flat.objects.filter(owner=self.request.user).\
+        context['flats'] = Flat.objects.filter(owner=self.request.user). \
             select_related('floor', 'house', 'section')
         return context
 
 
+class ProfileUserUpdate(CabinetPermissionMixin, UpdateView):
+    template_name = 'users/cabinet/profile_user_update_form.html'
+    form_class = OwnerUserForm
+    success_url = reverse_lazy('users:user_profile')
 
-
-
+    def get_object(self, queryset=None):
+        print(self.request.user)
+        return self.request.user

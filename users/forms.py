@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import UserChangeForm
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Invisible, ReCaptchaV2Checkbox
+
 from houses.models import House
 from . import models
 from .models import Role, CustomUser, Request
@@ -61,13 +63,12 @@ class CustomUserForm(forms.ModelForm):
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        if not self.instance:
-            if len(password) == 0:
+        if len(password) == 0:
+            if not self.instance:
                 raise ValidationError(
                     'Поле не может быть пустым!'
                 )
-        if len(password) > 0 and len(password) < 8:
-            print('go')
+        if len(password) < 8:
             raise ValidationError(
                 'Пароль не может быть меньше 8 символов.'
             )
@@ -76,7 +77,9 @@ class CustomUserForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password"])
+        print(self.cleaned_data)
+        if len(self.cleaned_data.get('password')) != 0:
+            user.set_password(self.cleaned_data["password"])
         if commit:
             user.save()
         return user
@@ -143,10 +146,10 @@ class SearchUserForm(forms.ModelForm):
         fields = ['first_name', ]
 
 
-class OwnerUserForm(forms.ModelForm):
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label_suffix='',
+class OwnerUserForm(UserChangeForm):
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}), label_suffix='',
                                 label='Повторить пароль', required=False)
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label_suffix='',
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}), label_suffix='',
                                label='Пароль', required=False)
 
     class Meta:
@@ -199,7 +202,10 @@ class OwnerUserForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password"])
+        print(user.update_fields)
+        password = self.cleaned_data.get('password')
+        if password != '':
+            user.set_password(password)
         if commit:
             user.save()
         return user

@@ -110,7 +110,7 @@ def print_invoice(invoice, template_id, email=None):
             )
             email.attach(f'Квитанция № {invoice.number}.xlsx', stream,
                          'application/vnd.ms-excel')
-            # email.send()
+            email.send()
             return True
         else:
             return False

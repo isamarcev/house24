@@ -265,6 +265,8 @@ class TransactionCreateView(AdminPermissionMixin, CreateView):
         type_of_transaction = self.request.GET.get('type')
         context['manager'] = self.request.user
         instance_id = self.request.GET.get('transaction_id')
+        flat_id = self.request.GET.get('flat_id')
+
         if kwargs.get('form'):
             context['form'] = kwargs['form']
         else:
@@ -285,12 +287,22 @@ class TransactionCreateView(AdminPermissionMixin, CreateView):
             context['form'] = self.form_class(initial=initial)
             type_of_transaction = transaction.payment_state.type
             context['manager'] = transaction.manager
+        if flat_id:
+            flat = get_object_or_404(Flat, id=flat_id)
+            initial = {
+                'owner': flat.owner,
+                'personal_account': flat.personal_account,
+
+            }
+            context['form'] = self.form_class(initial=initial)
         if type_of_transaction == 'in':
             context['type'] = 'приходная ведомость'
         elif type_of_transaction == 'out':
             context['type'] = 'расходная ведомость'
         context['payment_states'] = PaymentState.objects.filter(
             type=type_of_transaction)
+        print(context)
+        print(self.form_class)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -326,6 +338,13 @@ class TransactionListView(AdminPermissionMixin, ListView):
         context = dict()
         context['owners'] = CustomUser.objects.filter(role=None)
         context['payment_states'] = PaymentState.objects.all()
+        account_id = self.request.GET.get('account_id')
+        if account_id:
+            account_id = get_object_or_404(models.PersonalAccount,
+                                           id=account_id)
+            context['account_id'] = account_id.account_number
+            print(account_id.account_number)
+
         context = get_statistics(context)
         return context
 
@@ -347,7 +366,12 @@ class TransactionListViewAjax(BaseDatatableView):
     order_columns = ['date']
 
     def get_initial_queryset(self):
-        return self.model.objects.all().select_related('payment_state'). \
+        if self.request.GET.get('account'):
+            queryset = self.model.objects.filter(
+                personal_account_id=self.request.GET.get('account'))
+        else:
+            queryset = self.model.objects.all()
+        return queryset.select_related('payment_state'). \
             order_by('-number')
 
     def filter_queryset(self, qs):
@@ -365,7 +389,8 @@ class TransactionListViewAjax(BaseDatatableView):
         if owner:
             qs = qs.filter(owner=owner)
         if personal_account:
-            qs = qs.filter(personal_account__contains=personal_account)
+            qs = qs.filter(
+                personal_account__account_number__contains=personal_account)
         if completed:
             if completed == 'completed':
                 qs = qs.filter(completed=True)
@@ -522,6 +547,11 @@ class InvoiceListView(AdminPermissionMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(InvoiceListView, self).get_context_data()
+        context['owner'] = CustomUser.objects.filter(role=None)
+        flat_id = self.request.GET.get('flat_id')
+        if flat_id:
+            flat = get_object_or_404(Flat, id=flat_id)
+            context['flat_number'] = flat.number
         context = get_statistics(context)
         return context
 
@@ -559,11 +589,13 @@ class InvoiceListViewAjax(BaseDatatableView):
             qs = qs.filter(account_number__icontains=number)
         if status:
             qs = qs.filter(status=status)
-        if flat:
+        if owner:
             qs = qs.filter(flat__owner_id=owner)
+        if flat:
+            qs = qs.filter(flat__number__icontains=flat)
         if payment_state:
             qs = qs.filter(payment_state=payment_state)
-        x = self.model.objects.filter()
+        # x = self.model.objects.filter()
         return qs
 
 
@@ -575,6 +607,19 @@ class InvoiceCreateView(AdminPermissionMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(InvoiceCreateView, self).get_context_data()
+        personal_account_id = self.request.GET.get('personal_account')
+        if personal_account_id:
+            personal_account = get_object_or_404(
+                models.PersonalAccount.objects.
+                select_related('flat__section__house', 'flat__owner'),
+                id=personal_account_id)
+            initial = {
+                'personal_account': personal_account.account_number,
+                'flat': personal_account.flat,
+                'house': personal_account.flat.house,
+                'section': personal_account.flat.section,
+            }
+            context['form'] = self.form_class(initial=initial)
         date_service = {'form-TOTAL_FORMS': '0',
                         'form-INITIAL_FORMS': '0',
                         }

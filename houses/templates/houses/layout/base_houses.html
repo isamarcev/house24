@@ -61,28 +61,24 @@
       <li class="nav-item dropdown" style="height: 50px; ">
         <a class="nav-link" id="messege" style="height: 50px" data-toggle="dropdown" href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" aria-expanded="false">
           <i class="fa fa-child fa-lg" style=""></i>
-            <span class="">43</span>
-{#          <span class="badge badge-warning navbar-badge">15</span>#}
+            {% if new_users %}
+            <span class="">
+                {{ new_users.count }}
+            </span>
+            {% endif %}
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
-          <span class="dropdown-item dropdown-header">15 Notifications</span>
+          <span class="dropdown-item dropdown-header">
+              Новых пользователей: {{ new_users.count }}
+          </span>
+            {% for user in new_users %}
+{#              <div class="dropdown-divider"></div>#}
+              <a href="{% url 'users:owner_detail' user.id %}" class="dropdown-item">
+                {{ user }}
+              </a>
           <div class="dropdown-divider"></div>
-          <a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="file:///home/igoristotel/AdminLTE-3.2.0/index.html#" class="dropdown-item dropdown-footer">See All Notifications</a>
+            {% endfor %}
+          <a href="{% url 'users:owner_list' %}" class="dropdown-item dropdown-footer">Перейти в раздел пользователей</a>
         </div>
       </li>
 {#        <li class="dropdown user user-menu">#}

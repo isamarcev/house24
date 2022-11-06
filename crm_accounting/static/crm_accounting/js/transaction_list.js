@@ -72,7 +72,7 @@ $(document).ready( function CreateTable() {
                     { "name": 'completed', "value": $('#completed').val() },
                     { "name": 'paymentstate', "value": $('#paymentstate').val() },
                     { "name": 'owner', "value": $('#owner').val() },
-                    { "name": 'personal_account', "value": $('#personal_account').val() },
+                    { "name": 'personal_account', "value": $('#id_personal_account').val() },
                     { "name": 'type_of_payment', "value": $('#type_of_payment').val() },
                       );},
             processing: true,
@@ -122,8 +122,6 @@ $(document).ready( function CreateTable() {
                         }}
                 ],
                 "createdRow": function( row, data, dataIndex ) {
-                    console.log(data)
-                    console.log(row)
                     var url = 'detail/'+data[8]
                     $(row).attr( 'data-href', url );
                     $(row).on("click", function() {
@@ -146,9 +144,10 @@ $(document).ready( function CreateTable() {
         $('#owner').on('change clear', function () {
             table.columns([4]).search($(this).val()).draw();
         });
-        $('#personal_account').on('change clear', function () {
+        $('#id_personal_account').on('change clear', function () {
             table.columns([5]).search($(this).val()).draw();
         });
+    console.log($('#id_personal_account').val())
         $('#type_of_payment').on('change clear', function () {
             table.columns([6]).search($(this).val()).draw();
         });

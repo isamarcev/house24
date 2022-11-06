@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from houses.models import Flat
-from users.models import MessageUsers
+from users.models import MessageUsers, CustomUser
 
 
 def user_info(request):
@@ -18,4 +18,5 @@ def user_info(request):
             'unread_message_count': unread_message.count()
             }
     else:
-        return {}
+        new_users = CustomUser.objects.filter(status="Новый")
+        return {'new_users': new_users}

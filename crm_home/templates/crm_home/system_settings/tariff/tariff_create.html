@@ -57,7 +57,16 @@
 {#                                        <input type="hidden" name="{{ form.prefix }}-id" id="id_{{ form.prefix }}-id" value="{{ form.instance.id }}">#}
                                         <div class="col-xs-6 col-md-4">
                                             <label for="id_{{ form.prefix }}-service">Услуга</label>
-                                            {{ form.service }}
+                                            <select name="{{ form.prefix }}-service" id="id_{{ form.prefix }}-service" class="form-select">
+                                                <option value="" >Выберите...</option>
+                                                {% for service in services %}
+                                                    {% if service.id == form.instance.service.id %}
+                                                    <option value="{{ service.id }}" selected>{{ service.name }}</option>
+                                                    {% else %}
+                                                    <option value="{{ service.id }}" >{{ service.name }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <div class="col-xs-6 col-md-3">
                                             <label for="id_{{ form.prefix }}-service">Цена</label>

@@ -55,8 +55,6 @@ urlpatterns = [
     # invoices
     path('account/invoice/detail/<int:pk>/', views.main_page,
          name='invoices_for_flat'),
-    path('account/invoice/create/', views.main_page,
-         name="create_invoice_for_flat"),
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
     path('invoices/get-ajax-list/', views.InvoiceListViewAjax.as_view(),
          name='get_invoices_ajax_list'),

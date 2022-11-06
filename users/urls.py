@@ -42,7 +42,6 @@ urlpatterns = [
     path('cabinet/invoices/ajax-request/',
          views.CabinetInvoicesAjaxList.as_view(),
          name='invoice_for_users_ajax'),
-    path('cabinet/', views.LayoutTemplateView.as_view(), name='layout'),
 
     #TARIFF
     path('cabinet/tariff/', views.CabinetTariffForFlatView.as_view(),
@@ -75,8 +74,8 @@ urlpatterns = [
     path('cabinet/profile/',
          views.ProfileUserView.as_view(),
          name='user_profile'),
-    path('cabinet/profile/update',
-         views.ProfileUserView.as_view(),
+    path('cabinet/profile/update/',
+         views.ProfileUserUpdate.as_view(),
          name='user_profile_update'),
 
 

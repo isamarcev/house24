@@ -94,12 +94,27 @@ class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
 
 
     def get_context_data(self, **kwargs):
+        context = dict()
         data = {'service-TOTAL_FORMS': '0',
                 'service-INITIAL_FORMS': '0',
                 }
-        context = {'form_tariff': forms.TariffForm(),
-                   'services_formset': self.services_formset(prefix='service', data=data),
-                   'services': Service.objects.all().select_related('unit')}
+        context['form_tariff'] = forms.TariffForm()
+        context['services_formset'] = self.services_formset(prefix='service',
+                                                            data=data)
+        context['services'] = Service.objects.all().select_related('unit')
+        tariff_id = self.request.GET.get('tarif_id')
+        if tariff_id:
+            tariff = get_object_or_404(Tariff.objects.
+                                       prefetch_related('tariffservice_set'),
+                                       id=tariff_id)
+            x = TariffService.objects.filter(tariff=tariff)
+            context['form_tariff'] = forms.TariffForm(initial={
+                'name': tariff.name,
+                'describe': tariff.describe
+            })
+            context['services_formset'] = self.services_formset(
+                prefix='service',
+                queryset=TariffService.objects.filter(tariff=tariff))
         return context
 
     def post(self, request, *args, **kwargs):
@@ -320,8 +335,13 @@ class CounterDataListViewAjax(BaseDatatableView):
     order_columns = ['house', 'section', 'flat', 'service']
 
     def get_initial_queryset(self):
-        return self.model.objects.all().select_related('flat',
-                                                       'service__unit')
+        flat_id = self.request.get('flat_id')
+        print(flat_id)
+        if flat_id:
+            queryset = self.model.objects.filter(flat_id=flat_id)
+        else:
+            queryset = self.model.objects.all()
+        return queryset.select_related('flat', 'service__unit')
 
     def filter_queryset(self, qs):
         house = self.request.GET.get('house')

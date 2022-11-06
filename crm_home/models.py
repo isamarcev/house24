@@ -42,6 +42,8 @@ class TariffService(models.Model):
         verbose_name_plural = "Тарифы Услуги"
         verbose_name = "Тариф Услуга"
 
+    def __str__(self):
+        return f'{self.tariff.name} - {self.service.name}'
     # def clean_price(self):
     #     new_price = self.cleaned
 
