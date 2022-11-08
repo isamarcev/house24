@@ -1,0 +1,86 @@
+{% extends 'content/layout/base.html' %}
+{% load  static %}
+
+{% block title %}CRM система для управляющей компании HOME 24{% endblock %}
+
+{% block content %}
+
+<div class="container" style="margin-top: 50px; margin-bottom: 50px">
+    <div class="row">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="/">Главная</a></li>
+                <li class="active">О нас</li>
+            </ol>
+        </div>
+        <div class="col-12">
+            <div class="box clearfix">
+                <div class="page-header">
+                    <h1 class="header">{{ about.header }}</h1>
+                </div>
+                <img src="{{ about.image.url }}" style="max-width: 250px" class="img-responsive imgFloatRight" alt="">
+                <p id="text">
+                    <script>
+                        let textMessage = '{{ about.text }}'
+                        let textElement = document.createElement('span')
+                        textElement.innerHTML = textMessage
+                        document.getElementById('text').innerHTML = textElement.innerText
+                    </script>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        {% for gallery in about.gallery_set.all %}
+            <div class="col-xs-12 col-sm col-md-3">
+                <a href="{{ gallery.image.url }}" class="big">
+                    <img src="{{ gallery.image.url }}" alt="" class="img-responsive img-thumbnail">
+                </a>
+            </div>
+        {% endfor %}
+        <div class="col-12">
+            <div class="box clearfix">
+                <div class="page-header">
+                    <h1 class="header">{{ about.additional_header }}</h1>
+                </div>
+                <p id="additional_text">
+                    <script>
+                        let textMessageAdditional = '{{ about.additional_text }}'
+                        let textElementNew = document.createElement('span')
+                        textElementNew.innerHTML = textMessageAdditional
+                        document.getElementById('additional_text').innerHTML = textElementNew.innerText
+                    </script>
+                </p>
+            </div>
+        </div>
+        {% for gallery in about.additionalgallery_set.all %}
+            <div class="col-xs-12 col-sm col-md-3">
+                <a href="{{ gallery.image.url }}" class="big">
+                    <img src="{{ gallery.image.url }}" alt="" class="img-responsive img-thumbnail">
+                </a>
+            </div>
+        {% endfor %}
+        <div class="col-12">
+            <div class="box clearfix">
+                <div class="page-header">
+                    <h1 class="header">Документы</h1>
+                </div>
+                {% for doc in document %}
+                    <div class="media">
+                        <div class="media-left">
+                            <div class="media-object">
+                                <img src="{% static 'content/img/empty.jpeg' %}" alt="" style="width: 32px; height: 42px">
+                            </div>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">{{ doc.title }}</h4>
+                            <a href="{{ doc.file.url }}" download=""><i class="fa fa-download" aria-hidden="true"></i> Скачать</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

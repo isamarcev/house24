@@ -1,4 +1,5 @@
 import datetime
+from django.utils.translation import gettext_lazy as _
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -30,6 +31,7 @@ class Role(models.Model):
 
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(_("email address"), unique=True)
     photo = models.ImageField(upload_to='users/', blank=True, null=True)
     birthday = models.DateField(null=True, blank=True)
     father_name = models.CharField(max_length=30, help_text='Отчество',

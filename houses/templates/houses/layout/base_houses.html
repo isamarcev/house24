@@ -72,7 +72,6 @@
               Новых пользователей: {{ new_users.count }}
           </span>
             {% for user in new_users %}
-{#              <div class="dropdown-divider"></div>#}
               <a href="{% url 'users:owner_detail' user.id %}" class="dropdown-item">
                 {{ user }}
               </a>
@@ -81,29 +80,6 @@
           <a href="{% url 'users:owner_list' %}" class="dropdown-item dropdown-footer">Перейти в раздел пользователей</a>
         </div>
       </li>
-{#        <li class="dropdown user user-menu">#}
-{#                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">#}
-{#                            <!--<img src="/admin/dist/img/user2-160x160.jpg" class="user-image" alt="ава тар">-->#}
-{#                                                                                    <i class="fa fa-user-circle text-purple"></i>#}
-{#                            <span class="hidden-xs">ава тар</span>#}
-{#                        </a>#}
-{#                        <ul class="dropdown-menu">#}
-{#                            <!-- User image -->#}
-{#                            <li class="user-header">#}
-{#                                <!--<img src="/admin/dist/img/user2-160x160.jpg" class="img-circle" alt="ава тар">-->#}
-{#                                <span><i class="fa fa-user-circle text-purple bg-gray-light img-circle"></i></span>#}
-{#                                <p>ава тар (Директор)</p>#}
-{#                            </li>#}
-{#                            <!-- Menu Footer-->#}
-{#                            <li class="user-footer">#}
-{#                                <div class="pull-left">#}
-{#                                    <a class="btn btn-default btn-flat" href="/admin/user-admin/update-my">Профиль</a>                                </div>#}
-{#                                <div class="pull-right">#}
-{#                                    <a class="btn btn-default btn-flat" href="/admin/site/logout" data-method="post">Выход</a>                                </div>#}
-{#                            </li>#}
-{#                        </ul>#}
-{#                    </li>#}
-
       <li class="nav-item" style="height: 50px; text-align: center;">
         <a class="nav-link" data-toggle="dropdown" style="height: 50px;border-bottom: 1px solid #d2d6de;" href="#" role="button">
           <i class="fa fa-user-circle text-purple"></i>
@@ -224,8 +200,6 @@
                      <p>Показания счетчиков</p>
                  </a>
              </li>
-
-
             <li class="nav-item" >
                  <a href="#" style="width: 100%; border-radius: 0; " id="content-link" class="nav-link">
                     <i class="fa fa-desktop"></i>

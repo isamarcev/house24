@@ -6,12 +6,50 @@ from django.urls import reverse_lazy
 from crm_home.models import Tariff
 from . import forms
 from .models import *
-from django.views.generic import DetailView, UpdateView, DeleteView
+from django.views.generic import DetailView, UpdateView, \
+    DeleteView, TemplateView
 from crm_accounting import views as account_views
 
 
 def main_page(request):
     return render(request, 'content/layout/base.html')
+
+
+class MainPage(TemplateView):
+    template_name = 'content/main_page/main_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        context['main_page'] = Main.objects.prefetch_related('block_set').first()
+        context['contacts'] = Contacts.objects.first()
+        return context
+
+
+class AboutPage(TemplateView):
+    template_name = 'content/main_page/about_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        context['document'] = Document.objects.all()
+        context['about'] = About.objects.\
+            prefetch_related('additionalgallery_set', 'gallery_set').first()
+        return context
+
+
+class ServicesPage(TemplateView):
+    template_name = 'content/main_page/services_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = {'services': AboutService.objects.all()}
+        return context
+
+
+class ContactsPage(TemplateView):
+    template_name = 'content/main_page/contacts_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = {'contacts': Contacts.objects.first()}
+        return context
 
 
 class MainUpdateView(account_views.AdminPermissionMixin, UpdateView):
@@ -66,16 +104,22 @@ class AboutUpdateView(account_views.AdminPermissionMixin, UpdateView):
         context['gallery'] = Gallery.objects.filter(page_id=self.object.id)
         context['add_gallery'] = AdditionalGallery.objects.filter(page_id=self.object.id)
         context['form3'] = forms.SeoForm(instance=self.object.seo)
-        context['formset'] = self.formset(queryset=Document.objects.filter(page_id=self.object.id))
+        context['formset'] = self.formset(queryset=Document.objects.filter(
+            page_id=self.object.id))
         return context
 
     def post(self, request, *args, **kwargs):
         object = self.get_object()
-        form_class = self.form_class(request.POST, request.FILES, instance=object)
+        form_class = self.form_class(request.POST, request.FILES,
+                                     instance=object)
         form3 = forms.SeoForm(request.POST, instance=object.seo)
-        formset = self.formset(request.POST, request.FILES, queryset=Document.objects.filter(page_id=object.id))
-        form_gallery = forms.GalleryForm(request.POST, request.FILES, prefix='gallery_form')
-        add_gallery = forms.AdditionalGalleryForm(request.POST, request.FILES, prefix='add_gallery_form')
+        formset = self.formset(request.POST, request.FILES,
+                               queryset=Document.objects.filter(
+                                   page_id=object.id))
+        form_gallery = forms.GalleryForm(request.POST, request.FILES,
+                                         prefix='gallery_form')
+        add_gallery = forms.AdditionalGalleryForm(request.POST, request.FILES,
+                                                  prefix='add_gallery_form')
         if form_class.is_valid():
             form_class.save()
         if form3.is_valid():
@@ -88,11 +132,16 @@ class AboutUpdateView(account_views.AdminPermissionMixin, UpdateView):
                     foo.save()
             for foo in formset.deleted_objects:
                 foo.delete()
-            formset.save()
         if form_gallery.is_valid():
-            form_gallery.save()
+            form_gallery.save(commit=False)
+            if form_gallery.instance.image:
+                form_gallery.instance.page = object
+                form_gallery.save()
         if add_gallery.is_valid():
-            add_gallery.save()
+            add_gallery.save(commit=False)
+            if add_gallery.instance.image:
+                add_gallery.instance.page = object
+                add_gallery.save()
         return super().post(request, *args, **kwargs)
 
 
@@ -180,13 +229,7 @@ def delete_additional_gallery(request, pk):
 
 def delete_service(request, pk):
     pass
-    # service = AboutService.objects.get(pk=pk)
-    # service.delete()
-    # return HttpResponseRedirect(reverse_lazy('content:services-change'))
 
-
-def about(request):
-    return HttpResponse('about')
 
 
 def contacts(request):

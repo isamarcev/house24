@@ -1,9 +1,17 @@
-from django.urls import path, include
+from django.urls import path, include, register_converter
 from . import views
+
+
 
 app_name = 'users'
 urlpatterns = [
     path('accounts/login/', views.LoginUser.as_view(), name='login'),
+    path('accounts/register/', views.RegisterUserView.as_view(),
+         name='register'),
+    path('accounts/register-done/', views.RegisterDoneView.as_view(),
+         name='register_done'),
+    path('confirm/<str:sign>/', views.confirm_register,
+         name='confirm_register'),
     path('accounts/admin-login/', views.LoginAdminUser.as_view(),
          name='admin-login'),
     path('accounts/logout/', views.LogoutUser.as_view(),

@@ -2,13 +2,12 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserChangeForm
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Invisible, ReCaptchaV2Checkbox
+from django.forms import PasswordInput
 
 from houses.models import House
 from . import models
 from .models import Role, CustomUser, Request
-from home24.settings import RECAPTCHA_PUBLIC_KEY, RECAPTCHA_PRIVATE_KEY
+from .utilites import send_activation_notification
 
 
 class RegisterUserForm(UserCreationForm):
@@ -36,17 +35,20 @@ class LoginUserForm(AuthenticationForm):
 
 
 class CustomUserForm(forms.ModelForm):
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label_suffix='',
-                               label='Повторить пароль', required=False)
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label_suffix='',
-                               label='Пароль', required=False)
-    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='', label='Имя')
-    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='',
-                                label='Фамилия')
+    password2 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'form-control'}), label_suffix='',
+        label='Повторить пароль', required=False)
+    password1 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'form-control'}), label_suffix='',
+        label='Пароль', required=False)
+    first_name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control'}), label_suffix='', label='Имя')
+    last_name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control'}), label_suffix='',label='Фамилия')
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'password', 'password2', 'role', 'email', 'phone', 'status']
+        fields = ['first_name', 'last_name', 'password1', 'password2', 'role', 'email', 'phone', 'status']
         widgets = {
             'status': forms.Select(attrs={'class': 'form-select'}),
             'role': forms.Select(attrs={'class': 'form-select'}),
@@ -62,7 +64,7 @@ class CustomUserForm(forms.ModelForm):
         }
 
     def clean_password(self):
-        password = self.cleaned_data.get('password')
+        password = self.cleaned_data.get('password1')
         if len(password) == 0:
             if not self.instance:
                 raise ValidationError(
@@ -77,18 +79,18 @@ class CustomUserForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        print(self.cleaned_data)
-        if len(self.cleaned_data.get('password')) != 0:
-            user.set_password(self.cleaned_data["password"])
+        password = self.cleaned_data.get('password1')
+        if password != '':
+            user.set_password(password)
         if commit:
             user.save()
         return user
+
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
-            print('Ne sovpada')
             raise ValidationError(
                 'Пароли не совпадают. Попробуйте снова'
             )
@@ -149,13 +151,13 @@ class SearchUserForm(forms.ModelForm):
 class OwnerUserForm(UserChangeForm):
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}), label_suffix='',
                                 label='Повторить пароль', required=False)
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}), label_suffix='',
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}), label_suffix='',
                                label='Пароль', required=False)
 
     class Meta:
         model = CustomUser
         fields = ['photo', 'first_name', 'last_name', 'father_name', 'birthday', 'phone', 'viber', 'telegram', 'email', 'status',
-                  'username', 'about', 'password', 'password2', ]
+                  'username', 'about', 'password1', 'password2', ]
         widgets = {
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -187,14 +189,13 @@ class OwnerUserForm(UserChangeForm):
         }
 
     def clean_password(self):
-        password = self.cleaned_data.get('password')
+        password = self.cleaned_data.get('password1')
         if not self.instance:
             if len(password) == 0:
                 raise ValidationError(
                     'Поле не может быть пустым!'
                 )
         if len(password) > 0 and len(password) < 8:
-            print('go')
             raise ValidationError(
                 'Пароль не может быть меньше 8 символов.'
             )
@@ -202,8 +203,7 @@ class OwnerUserForm(UserChangeForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        print(user.update_fields)
-        password = self.cleaned_data.get('password')
+        password = self.cleaned_data.get('password1')
         if password != '':
             user.set_password(password)
         if commit:
@@ -211,7 +211,7 @@ class OwnerUserForm(UserChangeForm):
         return user
 
     def clean_password2(self):
-        password1 = self.cleaned_data.get("password")
+        password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise ValidationError(
@@ -347,4 +347,51 @@ class MessageForm(forms.ModelForm):
         }
 
 
+class RegisterUserForm(UserCreationForm):
+    password1 = forms.CharField(label='Пароль', widget=PasswordInput(
+        attrs={'class': 'form-control'}),
+                                required=True,
+                                error_messages={
+                                    'required': 'Пароль обязателен к заполненю.'
+                                })
+    password2 = forms.CharField(label='Повторить пароль', widget=PasswordInput(
+        attrs={'class': 'form-control'}),
+                                help_text='Повторите пароль',
+                                error_messages={
+                                    'required': 'Пароль обязателен к заполненю.'
+                                }
+                                )
+
+    class Meta:
+        model = CustomUser
+        fields = (
+            'email', 'last_name', 'first_name', 'father_name', 'password1',
+            'password2')
+        widgets = {'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+                   'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+                   'father_name': forms.TextInput(attrs={'class': 'form-control'}),
+                   'email': forms.EmailInput(attrs={'class': 'form-control'})}
+        error_messages = {
+            'email':
+                {'unique': 'Пользователь с таким Email уже зарегистрирован',
+                 'blank': 'Поле обязательно к заполнению.'},
+            'password1': {'required': 'Пароль обязателен к заполненю.'},
+            'password2': {'required': 'Пароль обязателен к заполненю.'},
+        }
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise ValidationError('Пароли не совпадают.')
+        return password2
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password1'])
+        user.status = 'Неактивен'
+        user.is_active = False
+        if commit:
+            user.save()
+            send_activation_notification(user)
+        return user
 

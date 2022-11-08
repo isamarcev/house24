@@ -65,7 +65,7 @@ class Document(models.Model):
 
 class About(models.Model):
     header = models.CharField(max_length=100)
-    text = models.TextField(max_length=1000, null=True, blank=True)
+    text = models.TextField(max_length=2000, null=True, blank=True)
     image = models.ImageField(upload_to='content/about/', null=True, blank=True)
     additional_text = models.TextField(max_length=1000, null=True, blank=True)
     additional_header = models.CharField(max_length=100, null=True, blank=True)
@@ -80,8 +80,10 @@ class About(models.Model):
 
 
 class AdditionalGallery(models.Model):
-    image = models.ImageField(upload_to='content/additional-gallery/', null=True, blank=True)
-    page = models.ForeignKey('About', on_delete=models.CASCADE, null=True, blank=True)
+    image = models.ImageField(upload_to='content/additional-gallery/',
+                              null=True, blank=True)
+    page = models.ForeignKey('About', on_delete=models.CASCADE, null=True,
+                             blank=True)
 
     class Meta:
         verbose_name_plural = "Доплонительные Галереи"

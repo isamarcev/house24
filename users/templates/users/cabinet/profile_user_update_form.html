@@ -125,9 +125,9 @@
                                         Изменить пароль
                                     </h2>
                                     <div class="form-group">
-                                        {{ form.password.label_tag }}
+                                        {{ form.password1.label_tag }}
                                         <div class="input-group">
-                                            {{ form.password }}
+                                            {{ form.password1 }}
                                             <span class="input-group-btn">
                                                 <button class="btn btn-default" type="button" onclick="generatePassword()">
                                                     Сгенерировать
@@ -139,9 +139,9 @@
                                             <div class="help-block">Значение «Пароль» должно содержать минимум 6 символов.</div>
                                         </div>
                                     </div>
-                                {% if form.errors.password %}
+                                {% if form.errors.password1 %}
                                             <div class="errorlist-password" style="color: #dd4b39">
-                                            {% for field in form.errors.password %}
+                                            {% for field in form.errors.password1 %}
                                                 {{ field }}
                                             {% endfor %}
                                             </div>

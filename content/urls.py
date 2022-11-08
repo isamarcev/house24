@@ -3,10 +3,10 @@ from . import views
 
 app_name = 'content'
 urlpatterns = [
-    path('', views.main_page, name='main'),
-    path('about-us/', views.about, name='about'),
-    path('services/', views.services, name='services'),
-    path('contacts/', views.contacts, name='contacts'),
+    path('', views.MainPage.as_view(), name='main'),
+    path('about/', views.AboutPage.as_view(), name='about'),
+    path('services/', views.ServicesPage.as_view(), name='services'),
+    path('contacts/', views.ContactsPage.as_view(), name='contacts'),
 
     # page_changes
     path('main/change/', views.MainUpdateView.as_view(), name='main-change'),

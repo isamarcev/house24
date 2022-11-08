@@ -63,13 +63,15 @@
                             <div class="col-xs-12">
                                 <div class="checkbox icheck">
                                     {{ form.remember_me }}
-                                    <label for="{{ form.remember_me.id_for_label }}">Запомнить меня</label>                                </div>
+                                    <label for="{{ form.remember_me.id_for_label }}">Запомнить меня</label>
+                                </div>
                             </div>
                             <div class="col-xs-12">
-                                {{ form.captcha }}
+                                <button type="submit" id="users_button" class="btn btn-primary btn-block" name="login-button">Вход</button>
                             </div>
-                            <div class="col-xs-12">
-                                <button type="submit" id="users_button" class="btn btn-primary btn-block" name="login-button">Вход</button>                            </div>
+                            <div class="col-xs-12" style="padding-top: 20px; text-align: center">
+                                <p>У Вас еще нет аккаунта? <a class="link-list" href="{% url 'users:register' %}">Регистрация</a></p>
+                            </div>
                         </div>
                     </form>
                 </div>

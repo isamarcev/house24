@@ -13,24 +13,37 @@ import os
 from pathlib import Path
 
 from django.conf.global_settings import AUTHENTICATION_BACKENDS
+import environ
+
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h^!*l90$qdhn+#1w8rz8&9cw#l6+ie-4ztj-tgz&#5rb%89dms'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 LOGIN_URL = '/users/accounts/login/'
 
 LOGIN_REDIRECT_URL = '/'
+
+CELERY_BROKER_URL = env("CELERY_BROKER")
+CELERY_RESULT_BACKEND = env("CELERY_BROKER")
 
 # Application definition
 
@@ -48,12 +61,9 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'psycopg2',
     'debug_toolbar',
-    'captcha'
+    'celery',
 
 ]
-
-RECAPTCHA_PUBLIC_KEY = '6Lfvo68iAAAAAEx4E9ak4CNYZxYJtOZIy0HLFrSA'
-RECAPTCHA_PRIVATE_KEY = '6Lfvo68iAAAAAAuZIavLFo5iqXTSE8fzNO6mncuh'
 
 AUTHENTICATION_BACKENDS = [
     'users.authentication.EmailAuthentication',
@@ -114,11 +124,11 @@ WSGI_APPLICATION = 'home24.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'house24',
-        'USER': 'home',
-        'PASSWORD': 'qwerty40req',
-        'HOST': 'localhost',
+        'ENGINE': env('ENGINE'),
+        'NAME': env('DBNAME'),
+        'USER': env('DBUSER'),
+        'PASSWORD': env('DBPASSWORD'),
+        'HOST': env('DBHOST'),
         'PORT': '',
     }
 }
@@ -162,11 +172,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'isamarcev1994@gmail.com'
-EMAIL_HOST_PASSWORD = 'dleautjnmhbrylci'
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+EMAIL_PORT = int(env('EMAIL_PORT'))
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 
 # Default primary key field type

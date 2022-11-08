@@ -1,5 +1,6 @@
 import datetime
 
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
@@ -22,8 +23,21 @@ from crm_accounting import views as account_views
 from crm_home.models import TariffService
 from houses.models import House, Flat, Section, Floor
 from users.forms import LoginUserForm, CustomUserForm, \
-    OwnerUserForm, RequestForm, MessageForm, RequestUserForm
+    OwnerUserForm, RequestForm, MessageForm, RequestUserForm, RegisterUserForm
 from users.models import CustomUser, Role, Request, Message, MessageUsers
+from users.utilites import send_activation_notification, signer
+
+
+def handler403(request, exception):
+    response = render(request, 'error403.html', context={}, status=403)
+    return response
+
+
+def handlers404(request, exception):
+    response = render(request, 'error404.html', context={}, status=404)
+    print(response)
+
+    return response
 
 
 class CabinetPermissionMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -71,6 +85,35 @@ class LoginUser(LoginView):
         ''' Check remember me checkbox from form'''
         check_remember_me_answer(self, form)
         return super(LoginUser, self).form_valid(form)
+
+
+class RegisterUserView(CreateView):
+    model = CustomUser
+    form_class = RegisterUserForm
+    template_name = 'users/registration_user.html'
+    success_url = reverse_lazy('users:register_done')
+
+    def get_context_data(self, **kwargs):
+        context = super(RegisterUserView, self).get_context_data()
+        confirmation = self.request.GET.get('notconfirm')
+        if confirmation:
+            context['confirm'] = 'Почта не подтверждена, поскольку ' \
+                                 'использован нерпавильный ключ. ' \
+                                 'Попробуйте еще раз'
+        return context
+
+    def post(self, request):
+        form_class = self.form_class(request.POST)
+        if form_class.is_valid():
+            form_class.save()
+            return HttpResponseRedirect(self.success_url)
+        else:
+            return render(request, self.template_name,
+                          context={'form': form_class})
+
+
+class RegisterDoneView(TemplateView):
+    template_name = 'users/register_done.html'
 
 
 class LoginAdminUser(LoginView):
@@ -253,7 +296,6 @@ class OwnerUpdateView(account_views.AdminPermissionMixin, UpdateView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
         form_class = self.form_class(request.POST, request.FILES,
                                      instance=self.get_object())
         if form_class.is_valid():
@@ -763,5 +805,18 @@ class ProfileUserUpdate(CabinetPermissionMixin, UpdateView):
     success_url = reverse_lazy('users:user_profile')
 
     def get_object(self, queryset=None):
-        print(self.request.user)
         return self.request.user
+
+
+def confirm_register(request, sign):
+    email = signer.unsign((sign))
+    user = CustomUser.objects.filter(email=email)
+    if user.exists():
+        user = user.first()
+        user.is_active = True
+        user.status = 'Новый'
+        user.save()
+        return HttpResponseRedirect(reverse_lazy('users:login'))
+    else:
+        return HttpResponseRedirect(
+            f"{reverse_lazy('users:register')}?notconfirm=True")
