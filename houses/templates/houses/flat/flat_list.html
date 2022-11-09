@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
 {% endblock %}
 {% block css_after %}
-    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link type="text/css" rel="stylesheet" href="{% static 'users/dist/datatables/datatables.min.css' %}">
     <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
     <link rel="stylesheet" href="{% static 'users/css/jquery.toast.css' %}" type="text/css">
 
@@ -150,7 +150,7 @@
   </script>
 {% endblock %}
 {% block script %}
-    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'users/dist/datatables/datatables.min.js' %}"></script>
 
     <script>
         function delete_flat(event, elem) {

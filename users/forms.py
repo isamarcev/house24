@@ -156,7 +156,8 @@ class OwnerUserForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-        fields = ['photo', 'first_name', 'last_name', 'father_name', 'birthday', 'phone', 'viber', 'telegram', 'email', 'status',
+        fields = ['photo', 'first_name', 'last_name', 'father_name',
+                  'birthday', 'phone', 'viber', 'telegram', 'email', 'status',
                   'username', 'about', 'password1', 'password2', ]
         widgets = {
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -166,7 +167,8 @@ class OwnerUserForm(UserChangeForm):
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'viber': forms.TextInput(attrs={'class': 'form-control'}),
             'telegram': forms.TextInput(attrs={'class': 'form-control'}),
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control',
+                                               'disabled': 'disabled'}),
             'about': forms.Textarea(attrs={'class': 'form-control', 'rows': '13', 'style': 'resize: none;'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'})

@@ -56,7 +56,7 @@
                                     </div>
                                      <div class="form-group">
                                         {{ form.username.label_tag }}
-                                        {{ form.username }}
+                                         <input type="text" value="{{ form.username.value }}" class="form-control" disabled="disabled">
                                          {% if form.errors.username %}
                                         <div class="errorlist-password" style="color: #dd4b39">
                                             {% for field in form.errors.username %}

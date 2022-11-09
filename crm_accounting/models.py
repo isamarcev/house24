@@ -127,7 +127,7 @@ class Invoice(models.Model):
 class Transaction(models.Model):
     number = models.CharField(default=get_next_transaction, max_length=15)
     date = models.DateField(default=datetime.datetime.now)
-    owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT,
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
                               related_name='owner', null=True, blank=True)
     personal_account = models.ForeignKey(PersonalAccount,
                                          on_delete=models.PROTECT,

@@ -389,9 +389,9 @@ class FlatUpdateView(account_views.AdminPermissionMixin, UpdateView):
                     if not account.first().flat:
                         account.first().flat = form_class.instance
                         form_class.instance.personal_account = account.first()
+                        account.first().save()
                         messages.success(request, 'Квартира успешно изменена')
-                    else:
-                        form_class.save()
+                    form_class.save()
                     return create_or_add_next(self, request, form_class)
                 else:
                     account_form.save(commit=False)
@@ -404,6 +404,7 @@ class FlatUpdateView(account_views.AdminPermissionMixin, UpdateView):
                         account_form.save()
                         form_class.instance.personal_account = account_form.instance
                     else:
+                        print(account_form.instance.account_number)
                         form_class.instance.personal_account = None
                         account_form.instance.flat = None
                         account_form.instance.house = None

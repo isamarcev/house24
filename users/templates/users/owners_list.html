@@ -172,7 +172,7 @@
 
                                             <td>
                                                 {% for flat in object.flat_set.all %}
-                                                    <a href="#">{{ flat }}</a>
+                                                    <a href="{% url 'houses:flat_detail' flat.id %}">{{ flat }}</a>
                                                 {% endfor %}
                                             </td>
 
@@ -190,16 +190,21 @@
                                             {% endif %}
                                             </td>
 
-                                            <td>
-                                                {% for flat in object.flat_set.all %}
+                                            <td id="debts-{{ object.id }}">
+                                                <script>
+                                                    let varDebts{{ object.id }} = 0
+                                                    {% for flat in object.flat_set.all %}
                                                     {% if flat.personal_account.balance < 0 %}
-                                                        Да
-                                                   {% else %}
-                                                        Нет
+                                                        varDebts{{ object.id }} += 1
                                                     {% endif %}
-                                                {% endfor %}
+                                                    {% endfor %}
+                                                if (varDebts{{ object.id }}>0) {
+                                                    document.getElementById('debts-{{ object.id }}').innerText = 'Да'
+                                                        } else {
+                                                    document.getElementById('debts-{{ object.id }}').innerText = 'Нет'
+                                                }
+                                                </script>
                                             </td>
-
                                             <td style="width: 10%">
                                                 <div class="btn-group pull-right" >
                                                     <a class="btn btn-default btn-sm" href="{% url 'users:owner_update' object.id %}" title="Редактировать" data-toggle="tooltip">

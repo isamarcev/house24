@@ -189,7 +189,7 @@ class ContactsUpdateView(account_views.AdminPermissionMixin, UpdateView):
     template_name = 'content/edit_pages/contacts.html'
     form_class = forms.ContactsForm
     success_url = reverse_lazy('content:contacts-change')
-    queryset = Contacts.objects.first()
+    queryset = Contacts.objects.all()
     check_permission_name = 'site_management'
 
     def get_object(self, queryset=None):
