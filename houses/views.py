@@ -404,7 +404,6 @@ class FlatUpdateView(account_views.AdminPermissionMixin, UpdateView):
                         account_form.save()
                         form_class.instance.personal_account = account_form.instance
                     else:
-                        print(account_form.instance.account_number)
                         form_class.instance.personal_account = None
                         account_form.instance.flat = None
                         account_form.instance.house = None

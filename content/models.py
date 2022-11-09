@@ -8,7 +8,6 @@ class Main(models.Model):
     slide2 = models.ImageField(upload_to='content/main', null=True, blank=True)
     slide3 = models.ImageField(upload_to='content/main', null=True, blank=True)
     apps_links = models.BooleanField(null=True)
-    # block = models.ForeignKey('Block', on_delete=models.PROTECT, null=True)
     seo = models.OneToOneField('Seo', on_delete=models.PROTECT, null=True)
 
     class Meta:
@@ -58,10 +57,6 @@ class Document(models.Model):
     def __str__(self):
         return f"{self.title}"
 
-
-# def get_page():
-#     x = About.objects.get(pk=1).id
-#     return x
 
 class About(models.Model):
     header = models.CharField(max_length=100)

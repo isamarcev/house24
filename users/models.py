@@ -32,8 +32,11 @@ class Role(models.Model):
 
 def get_next_user_id():
     users = CustomUser.objects.filter(is_superuser=False).\
-        order_by('-username').first()
-    user_id = int(users.username) + 1
+        order_by('-username')
+    if users.exists():
+        user_id = int(users.first().username) + 1
+    else:
+        user_id = 1
     return user_id
 
 
@@ -63,7 +66,10 @@ class CustomUser(AbstractUser):
                              blank=True)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} {self.father_name}'
+        if self.father_name:
+            return f'{self.first_name} {self.last_name} {self.father_name}'
+        else:
+            return f'{self.first_name} {self.last_name}'
 
 
 class Message(models.Model):

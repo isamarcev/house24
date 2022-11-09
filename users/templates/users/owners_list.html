@@ -59,8 +59,8 @@
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" href="{% url 'users:owner_create' %}">Добавить владельца квартиры</a>
-                <a class="dropdown-item" href="#">Отправить сообщение должникам</a>
-                <a class="dropdown-item" href="#">Отправить приглашение</a>
+                <a class="dropdown-item" href="{% url 'users:message_create' %}">Отправить сообщение должникам</a>
+{#                <a class="dropdown-item" href="#">Отправить приглашение</a>#}
               </div>
             </div>
         </div>
