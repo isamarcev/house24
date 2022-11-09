@@ -121,18 +121,4 @@ urlpatterns = [
          name='message_create'),
     path('messages/detail/<int:pk>/', views.MessageDetailView.as_view(),
          name='message_detail'),
-
-
-
-
-    # path('accounts/login/', views.LoginUser.as_view(), name='login'),
-
-    # path('admin/login/', views.LoginUser.as_view(), name='login'),
-
-    # path('accounts/logout/', views.LoginUser.as_view, name='logout'),
-
-    # path('about-us/', views.about, name='about'),
-    # path('services/', views.services, name='services'),
-    # path('contacts/', views.contacts, name='contacts'),
-
 ]
