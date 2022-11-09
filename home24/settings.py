@@ -36,7 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(' ')
 
 LOGIN_URL = '/users/accounts/login/'
 
@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     'crm_accounting.apps.CrmAccountingConfig',
     'users.apps.UsersConfig',
     'psycopg2',
-    'debug_toolbar',
     'celery',
 
 ]
@@ -73,7 +72,6 @@ AUTHENTICATION_BACKENDS = [
 AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -124,14 +122,25 @@ WSGI_APPLICATION = 'home24.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('ENGINE'),
-        'NAME': env('DBNAME'),
-        'USER': env('DBUSER'),
-        'PASSWORD': env('DBPASSWORD'),
-        'HOST': env('DBHOST'),
-        'PORT': '',
+        'ENGINE': env('SQL_ENGINE'),
+        'NAME': env('SQL_DATABASE'),
+        'USER': env('SQL_USER'),
+        'PASSWORD': env('SQL_PASSWORD'),
+        'HOST': env('SQL_HOST'),
+        'PORT': env('SQL_PORT'),
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': env('SQL_ENGINE'),
+#         'NAME': env('DBNAME'),
+#         'USER': env('DBUSERLOCAL'),
+#         'PASSWORD': env('DBPASSWORDLOCAL'),
+#         'HOST': env('DBHOSTLOCAL'),
+#         'PORT': env('DBPORTLOCAL'),
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -166,7 +175,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

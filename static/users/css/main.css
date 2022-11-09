@@ -1,0 +1,104 @@
+.login-pages {
+    -ms-flex-align: center;
+    align-items: center;
+    background-color: #d2d6de!important;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    height: 100vh;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+
+.nav a button {
+    color: #444;
+}
+
+
+ul .breadcrumbs> li .active:before   {
+    content: '>\00a0';
+        padding: 0 5px;
+    color: #ccc;
+
+}
+
+
+.content-header>.breadcrumbs{
+    float: right!important;
+    background: transparent!important;
+    margin-top: 0!important;
+    margin-bottom: 0!important;
+    font-size: 12px!important;
+    padding: 7px 5px!important;
+    position: absolute!important;
+    top: 15px!important;
+    right: 10px!important;
+    border-radius: 2px!important;
+}
+
+.login-form input {
+    border-radius: 0!important;
+}
+
+.nav>button:hover {
+    cursor: default;
+}
+.nav a:hover button {
+    color: #999;
+    border: 1px solid transparent;
+}
+
+#logo-login {
+  max-width: 100% !important;
+  z-index: 2000;
+  position: relative;
+}
+
+/*.login-box {*/
+/*    padding-top: 7%;*/
+/*}*/
+
+.nav-tabs-custom {
+  margin-bottom: 20px;
+  background: #fff;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+
+.nav > li > a {
+  position: relative;
+  display: block;
+  padding: 10px 15px!important;
+    text-decoration: none;
+    color: #444;
+    /*border-right:1px solid #f4f4f4;*/
+    border-bottom: none;
+    border-top-color: transparent;
+}
+
+#users_button {
+    background-color: #3c8dbc;
+    color: #fff;
+    border-color: #204d74;
+    border-radius: 3px;
+    height: 34px;
+    font-size: 14px;
+}
+
+#users_button:hover {
+    border-color: #204d74;
+    background-color: #367fa9;
+
+}
+
+.admin-tab {
+    color: #495057;
+}
+
+.admin-tab:hover {
+    color: #495057;
+    border-radius: 0;
+    background-color: #fff;
+}
