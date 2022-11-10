@@ -2,6 +2,6 @@
 
 .idea/
 media/*
-.env
-.env.prod
-.env.prod.db
+#.env
+#.env.prod
+#.env.prod.db
