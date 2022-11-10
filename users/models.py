@@ -31,13 +31,15 @@ class Role(models.Model):
 
 
 def get_next_user_id():
-    users = CustomUser.objects.filter(is_superuser=False).\
-        order_by('-username')
-    if users.exists():
-        user_id = int(users.first().username) + 1
-    else:
-        user_id = 1
-    # user_id = 2
+    try:
+        users = CustomUser.objects.filter(is_superuser=False).\
+            order_by('-username')
+        if users.exists():
+            user_id = int(users.first().username) + 1
+        else:
+            user_id = 1
+    except:
+        user_id = 2
     return user_id
 
 

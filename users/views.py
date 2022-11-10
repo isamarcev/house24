@@ -209,6 +209,20 @@ class UserCreateView(account_views.AdminPermissionMixin, CreateView):
         kwargs['label_suffix'] = ''
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context = super(UserCreateView, self).get_context_data()
+        user_id = self.request.GET.get('user_id')
+        if user_id:
+            user = get_object_or_404(CustomUser, id=user_id)
+            initial = {
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'role': user.role,
+                'phone': user.phone
+            }
+            context['form'] = self.form_class(initial=initial)
+        return context
+
 
 class UserDetailView(account_views.AdminPermissionMixin, DetailView):
     model = CustomUser
@@ -582,7 +596,6 @@ class MessageAjaxDelete(DeleteView):
             return JsonResponse(
                 {'success': "У Вас недостаточно прав для удаления."}
             )
-
 
 
 class CabinetStatisticView(CabinetPermissionMixin, TemplateView):

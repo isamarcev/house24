@@ -1,12 +1,12 @@
 from django.core.management import BaseCommand
 
 from content.models import About, Block, Main, Seo, ServicePage, AboutService, Contacts
-from crm_home.models import Requisites
+from crm_home.models import Requisites, Tariff, Unit, Service
 from users.models import Role
 
 
-slideurl = 'https://myhouse24.avada-media.ua/site/glide?path=%2Fupload%2FWebsiteHomeSlide%2F1%2Fimage.jpg&w=1920&h=800&fit=crop'
-imageurl = 'https://myhouse24.avada-media.ua/site/glide?path=%2Fupload%2FWebsiteHomeFeature%2F1%2Fimage.jpeg&w=1000&h=600&fit=crop'
+slideurl = 'https://myhourop'
+imageurl = 'https://myhoucrop'
 class Command(BaseCommand):
     help = "Create instance of Main -ansd-> SEO, Block and About models"
 
@@ -82,3 +82,16 @@ class Command(BaseCommand):
 
         requisites = Requisites.objects.create(title='ABC oj',
                                                info='Hello world')
+        tariffs = Tariff.objects.bulk_create([
+            Tariff(name='Successful', describe='Goodlucker'),
+            Tariff(name='SecondFull', describe='Yes yes yes')
+        ])
+        units = Unit.objects.bulk_create([
+            Unit(title='m2'),
+            Unit(title='String')
+        ])
+        services_units = Service.objects.bulk_create([
+            Service(name='Coding'),
+            Service(name='Cooking')
+        ])
+

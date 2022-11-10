@@ -37,10 +37,14 @@ def get_next_account(count=None):
         except IndexError:
             return str(1).zfill(11)
     else:
-        numbers = PersonalAccount.objects.order_by('-account_number')[0]
-        account_list = []
-        for number in range(1, count):
-            account_list.append(str(int(numbers.account_number) + number).zfill(11))
+        try:
+            numbers = PersonalAccount.objects.order_by('-account_number')[0]
+            account_list = []
+            for number in range(1, count):
+                account_list.append(
+                    str(int(numbers.account_number) + number).zfill(11))
+        except IndexError:
+            account_list = [str(1).zfill(11), str(2).zfill(11)]
         return account_list
 
 

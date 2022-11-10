@@ -49,17 +49,20 @@ def main_page(request, pk):
 
 def get_statistics(context):
     """Balance personal accounts, depts and cahsbox`s state """
-    income = models.Transaction.objects. \
-        filter(payment_state__type='in').aggregate(Sum('amount'))
-    outcome = models.Transaction.objects. \
-        filter(payment_state__type='out').aggregate(Sum('amount'))
-    cashbox_state = income['amount__sum'] - outcome['amount__sum']
-    if cashbox_state:
+    try:
+        income = models.Transaction.objects. \
+            filter(payment_state__type='in').aggregate(Sum('amount'))
+        outcome = models.Transaction.objects. \
+            filter(payment_state__type='out').aggregate(Sum('amount'))
+        cashbox_state = income['amount__sum'] - outcome['amount__sum']
         context['cashbox_state'] = cashbox_state
+    except TypeError:
+        context['cashbox_state'] = 0
     sum_personal_accounts = models.PersonalAccount.objects.all().aggregate(
         Sum('balance'))
     if sum_personal_accounts:
-        context['sum_accounts_balance'] = sum_personal_accounts.get('balance__sum')
+        context['sum_accounts_balance'] = sum_personal_accounts.\
+            get('balance__sum')
     invoices_dopts = models.Invoice.objects.filter(
         payment_state=True,status__in=['Неоплачена', 'Частично оплачена']). \
         aggregate(Sum('amount'))
