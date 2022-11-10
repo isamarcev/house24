@@ -335,8 +335,7 @@ class CounterDataListViewAjax(BaseDatatableView):
     order_columns = ['house', 'section', 'flat', 'service']
 
     def get_initial_queryset(self):
-        flat_id = self.request.get('flat_id')
-        print(flat_id)
+        flat_id = self.request.GET.get('flat_id')
         if flat_id:
             queryset = self.model.objects.filter(flat_id=flat_id)
         else:

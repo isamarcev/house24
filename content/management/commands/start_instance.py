@@ -5,8 +5,8 @@ from crm_home.models import Requisites, Tariff, Unit, Service
 from users.models import Role
 
 
-slideurl = 'https://myhourop'
-imageurl = 'https://myhoucrop'
+slideurl = 'shortenerua.herokuapp.com/ZXQAA/'
+imageurl = 'shortenerua.herokuapp.com/ky1q8/'
 class Command(BaseCommand):
     help = "Create instance of Main -ansd-> SEO, Block and About models"
 
@@ -21,25 +21,77 @@ class Command(BaseCommand):
                                             key_words='Base, Management')
         seo_about_page.save()
         main_page = Main.objects.create(
-            header='Header', text='Text Page', seo=seo_main_page,
+            header='О управляющей компании',
+            text='Жилой комплекс «NORD» расположен  на берегу Черного моря в '
+                 'живописном районе Одессы. Оригинальная архитектура комплекса'
+                 ' делает его уникальным объектом не только для Одессы, '
+                 'но и для всей Украины – дом прекрасно вписывается в '
+                 'архитектуру берега и открывает свои жильцам и гостям '
+                 'прекрасный вид на бескрайнее море. Ярким преимуществом '
+                 'жилого комплекса является его месторасположения – удобная'
+                 ' транспортная развязка, социальная инфраструктура, парк и '
+                 'прекрасный морской воздух создают все условия для '
+                 'комфортного проживания.', seo=seo_main_page,
             slide1=slideurl,
             slide2=slideurl, slide3=slideurl
         )
         blocks = Block.objects.bulk_create([
-            Block(header='Block 1', description='Block 1 Block 1',
+            Block(header='Рестораны и Кафе',
+                  description='В непосредственной близости от жилого '
+                              'комплекса  расположены рыбный ресторан  и '
+                              'итальянская пиццерия. Кроме того, всего в '
+                              'десяти минутах ходьбы от комплекса находятся '
+                              'рестораны испанской, итальянской, американской,'
+                              ' украинской и русской кухни, пиццерии, кафе '
+                              'и лаунж-бары на любой вкус.',
                   main=main_page, image=imageurl),
-            Block(header='Block 2', description='Block 1 Block 1',
-                  main=main_page, image=imageurl ),
-            Block(header='Block 3', description='Block 1 Block 1',
+            Block(header='Рестораны и Кафе',
+                  description='В непосредственной близости от жилого '
+                              'комплекса  расположены рыбный ресторан  и '
+                              'итальянская пиццерия. Кроме того, всего в '
+                              'десяти минутах ходьбы от комплекса находятся '
+                              'рестораны испанской, итальянской, американской,'
+                              ' украинской и русской кухни, пиццерии, кафе '
+                              'и лаунж-бары на любой вкус.',
                   main=main_page, image=imageurl),
-            Block(header='Block 4', description='Block 1 Block 1',
+            Block(header='Рестораны и Кафе',
+                  description='В непосредственной близости от жилого '
+                              'комплекса  расположены рыбный ресторан  и '
+                              'итальянская пиццерия. Кроме того, всего в '
+                              'десяти минутах ходьбы от комплекса находятся '
+                              'рестораны испанской, итальянской, американской,'
+                              ' украинской и русской кухни, пиццерии, кафе '
+                              'и лаунж-бары на любой вкус.',
                   main=main_page, image=imageurl),
-            Block(header='Block 5', description='Block 1 Block 1',
+            Block(header='Рестораны и Кафе',
+                  description='В непосредственной близости от жилого '
+                              'комплекса  расположены рыбный ресторан  и '
+                              'итальянская пиццерия. Кроме того, всего в '
+                              'десяти минутах ходьбы от комплекса находятся '
+                              'рестораны испанской, итальянской, американской,'
+                              ' украинской и русской кухни, пиццерии, кафе '
+                              'и лаунж-бары на любой вкус.',
                   main=main_page, image=imageurl),
-            Block(header='Block 6', description='Block 1 Block 1',
+            Block(header='Рестораны и Кафе',
+                  description='В непосредственной близости от жилого '
+                              'комплекса  расположены рыбный ресторан  и '
+                              'итальянская пиццерия. Кроме того, всего в '
+                              'десяти минутах ходьбы от комплекса находятся '
+                              'рестораны испанской, итальянской, американской,'
+                              ' украинской и русской кухни, пиццерии, кафе '
+                              'и лаунж-бары на любой вкус.',
+                  main=main_page, image=imageurl),
+            Block(header='Рестораны и Кафе',
+                  description='В непосредственной близости от жилого '
+                              'комплекса  расположены рыбный ресторан  и '
+                              'итальянская пиццерия. Кроме того, всего в '
+                              'десяти минутах ходьбы от комплекса находятся '
+                              'рестораны испанской, итальянской, американской,'
+                              ' украинской и русской кухни, пиццерии, кафе '
+                              'и лаунж-бары на любой вкус.',
                   main=main_page, image=imageurl),
         ])
-        about_page = About.objects.create(header='About ABOUT',
+        about_page = About.objects.create(header='О управляющей компании',
                                           text='ABOTU ABOUT Abotu aboout',
                                           additional_text='Some additional text',
                                           additional_header='some add header',
