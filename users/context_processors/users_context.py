@@ -18,5 +18,5 @@ def user_info(request):
             'unread_message_count': unread_message.count()
             }
     else:
-        new_users = CustomUser.objects.filter(status="Новый")
+        new_users = CustomUser.objects.filter(role=None, status="Новый")
         return {'new_users': new_users}
