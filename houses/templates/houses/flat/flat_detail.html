@@ -1,0 +1,141 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Квартира №{{ object.number }}, {{ object.house }}
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
+    <style>
+        .disabled {
+            pointer-events: all;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+            <input type="hidden" id="link-id" value="flat-link">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Квартира №{{ object.number }}, {{ object.house }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'houses:flat_list' %}" style="color: #444; text-decoration: none"> <span style="color: #ccc; margin-right: 5px" >></span> Квартиры </a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Квартира №{{ object.number }}, {{ object.house }} </li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                <div class="box-header" style="position: relative; height: 42px">
+                    <h3 class="box-title">Просмотр квартиры</h3>
+                    <div class="box-tools">
+                        {% if object.personal_account %}
+                            <a style="height: 31px" href="{% url 'crm_accounting:transaction_account_create' %}?flat_id={{ object.id }}" class="btn btn-default btn-sm">
+                                {% else %}
+                            <a style="height: 31px" class="btn btn-default btn-sm disabled" onclick="alert('У квартиры нет лицевого счета')">
+                                {% endif %}
+                    <span class="hidden-xs"><i class="fa fa-dollar"></i> Принять платеж</span>
+                </a>
+                    {% if object.personal_account %}
+                <a style="height: 31px" href="{% url 'crm_accounting:invoice_list' %}?flat_id={{ object.id }}" class="btn btn-default btn-sm">
+                   {% else %}
+                            <a style="height: 31px" class="btn btn-default btn-sm disabled" onclick="alert('У квартиры нет лицевого счета')">
+                   {% endif %}
+                    <span class="hidden-xs"><i class="fa fa-files-o"></i> Оформить квитанцию</span>
+                </a>
+                        <a href="{% url 'houses:flat_update' object.id %}" class="btn btn-tariff btn-sm">
+                <span class="hidden-xs">Редактировать квартиру</span>
+            </a>
+        </div>
+                </div>
+                    <div class="box-body row">
+                    <div class="col-sm-12 col-lg-12">
+                        <table class="table table-bordered table-striped table-view" >
+                    <tbody>
+                        <tr>
+                            <td class="user-label">Лицевой счет</td>
+                            {% if object.personal_account %}
+                                <td>
+                                    <a class="link-list" href="{% url 'crm_accounting:detail_account' object.personal_account.id %}">
+                                        {{ object.personal_account }}
+                                    </a>
+                                </td>
+                            {% else %}
+                                <td>Не указано</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="user-label">Номер квартиры</td>
+                            <td>{{ object.number }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Площадь</td>
+                            {% if object.area %}
+                                <td>{{ object.area }}м<sup>2</sup></td>
+                                {% else %}
+                                <td>Не указано</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td class="user-label">Дом</td>
+                            <td><a class="link-list" href="{% url 'houses:house_detail' object.house.id %}">{{ object.house }}</a></td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Секция</td>
+                            <td>{{ object.section }}</td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Этаж</td>
+                            <td>
+                                {{ object.floor }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Владелец</td>
+                            <td>
+                                {% if object.owner %}
+                                <a class="link-list" href="{% url 'users:owner_detail' object.owner.id %}">{{ object.owner }}</a>
+                                {% else %}
+                                    Владелец не указан
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="user-label">Тариф</td>
+                            <td>
+                                {% if object.tariff %}
+                                    {{ object.tariff }}
+                                    {% else %}
+                                    Не указано
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                    <div>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:counter_data' object.id %}">Посмотреть показания счетчиков</a></p>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:transaction_account_detail' %}/?account={{ object.personal_account.id }}">Посмотреть приходы</a></p>
+                    <p style="margin-bottom: 10px" ><a class="link-list" href="{% url 'crm_accounting:invoices_for_flat' object.id %}">Посмотреть квитанции</a></p>
+                </div>
+                    </div>
+        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+
+
+{% endblock %}

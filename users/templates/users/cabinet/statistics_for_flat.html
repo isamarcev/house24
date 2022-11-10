@@ -1,0 +1,101 @@
+{% extends 'users/cabinet/layout.html' %}
+{% load static %}
+{% block title %}
+    Сводка {{ flat.house }}, кв. {{ flat.number }}
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'users/css/owner_create.css' %}">
+{% endblock %}
+{% block content %}
+    <input type="hidden" id="current" value="message">
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Сводка {{ flat.house }}, кв. {{ flat.number }}
+        </h1>
+    </section>
+
+    <div class="row" style="padding: 15px">
+        <div class="col-xs-12 col-md-6 col-lg-4">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>{{ personal_account.balance }} грн</h3>
+                    <p>Баланс по квартире</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-money"></i>
+                </div>
+                <span class="small-box-footer">
+                </span>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6 col-lg-4">
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h3>{{ personal_account }}</h3>
+                    <p>Лицевой счет</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-user"></i>
+                </div>
+                <span class="small-box-footer">
+                </span>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6 col-lg-4">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3>
+                        {% if average_per_month %}
+                            {{ average_per_month }}
+                        {% else %}
+                        0
+                        {% endif %}
+                        грн</h3>
+                    <p>Средний расход за месяц</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-pie-chart"></i>
+                </div>
+                <span class="small-box-footer">
+                </span>
+            </div>
+        </div>
+    </div>
+    <!-- content -->
+    <section class="content" style="padding: 15px" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-header" >
+                            <h3 style="font-size: 18px">Диаграмма расходов</h3>
+                    </div>
+                    <div class="box-body">
+                            <p>Недостаточно данных для отображения статистики</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-header" >
+                            <h3 style="font-size: 18px">Диаграмма расходов по месяцам за год</h3>
+                    </div>
+                    <div class="box-body">
+                            <p>Недостаточно данных для отображения статистики</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+        const UrlDelete = '{% url 'users:messages_user_delete' %}'
+        const SuccessUrl = '{% url 'users:messages_view' %}'
+    </script>
+        <script src="{% static 'users/js/user_create.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'users/cabinet/layout.html' %}
+{% load static %}
+{% block title %}
+    Просмотр квитанции #{{ object.number }}
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.css">
+{#    <link rel="stylesheet" href="{% static 'crm_home/css/counter_create.css' %}">#}
+
+{% endblock %}
+{% block content %}
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Просмотр квитанции #{{ object.number }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'users:invoice_for_users' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Квитанции
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span>Просмотр квитанции #{{ object.number }}</li>
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="padding-bottom: 20px" class="box">
+                    <div class="box-body">
+                        <div class="box-header" style="position: relative; height: 42px; padding: 0!important; margin-bottom: 10px!important;">
+                            <div class="box-tools" style="position: absolute; top: 5px; right: 10px;">
+                                <a href="{% url 'crm_accounting:invoice_update' object.id %}" style="font-size: 12px!important; padding: 4px 8px!important; color: #FFFFFF" class="btn btn-info btn-sm">
+                                    <span class="hidden-xs"><i class="fa fa-print"></i>Распечатать</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                            <table id="users" style="padding-bottom: 40px; font-size: 14px" class="table table-bordered table-striped table-view">
+                             <thead>
+                                  <tr>
+                                      <th tabindex="0" aria-controls="users" rowspan="1" colspan="1" >
+                                          #
+                                      </th>
+                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Услуга
+                                      </th>
+                                      <th tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Кол-во потребления(расход)
+                                      </th>
+                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1" >
+                                          Ед.изм.
+                                      </th>
+                                      <th tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Цена за ед., грн
+                                      </th>
+                                      <th tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                          Стоимость, грн
+                                      </th>
+                                  </tr>
+                             </thead>
+                            <tbody>
+                            {% if object.invoiceservice_set.all %}
+                                {% for service in object.invoiceservice_set.all %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        {{ service.service }}
+                                    </td>
+                                    <td>
+                                        {{ service.amount }}
+                                    </td>
+                                    <td>
+                                        {{ service.service.unit }}
+                                    </td>
+                                    <td>
+                                        {{ service.price }}
+                                    </td>
+                                    <td>
+                                        {{ service.total }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="6">
+                                    Нет ни одной услуги!
+                                </td>
+                            </tr>
+                            {% endif %}
+                            </tbody>
+                            <tfoor>
+                                {% if object.invoiceservice_set.all %}
+                                <tr style="height: 40px!important;">
+                                    <td  style="height: 40px!important;" colspan="5"></td>
+                                    <td style="height: 40px!important;">
+                                        <b>Итого: {{ object.amount }}</b>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tfoor>
+                        </table>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="pull-right" style="text-align: right; padding: 0 10px">
+                            <a href="/cabinet/invoice/download/600" style="color: #FFFFFF; font-size: 12px" class="btn btn-sm btn-warning" download=""><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Скачать в PDF</a>
+                            <a href="/cabinet/invoice/pay/600" style="color: #FFFFFF; font-size: 12px!important;" class="btn btn-sm btn-success"><i class="fa fa-credit-card" aria-hidden="true"></i> Оплатить</a>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'crm_accounting/js/account_create.js' %}"></script>
+    <style>
+    .table-striped tbody tr:nth-of-type(odd) {
+    /* background-color: rgba(0,0,0,.05); */
+        background-color: transparent;
+}
+    </style>
+{% endblock %}

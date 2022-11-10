@@ -1,0 +1,379 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+     Заявки вызова мастера
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="{% static 'users/dist/datatables/datatables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
+
+{% endblock %}
+{% block content %}
+            <input type="hidden" id="link-id" value="request-link">
+
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Заявки вызова мастера
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;">
+                <span style="color: #ccc; margin-right: 5px" >></span>
+                 Заявки вызова мастера
+            </li>
+        </ul>
+    </section>
+
+    <section class="content" style="padding-top: 15px">
+    <div class="row">
+        <div class="col-sm-12" style="text-align: right; padding: 0 15px">
+            <a class="btn btn-success" href="{% url 'users:requests_create' %}">Добавить заявку</a>
+        </div>
+    </div>
+    </section>
+
+    <!-- content -->
+    <section class="content content-custom" >
+    {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                <div class="box-header" style="text-align: right; height: 45px">
+                    <div class="box-tools" >
+                    <button  type="button" id="reset" class="btn btn-default">
+                        <span class="hidden-xs">Очистить</span>
+                    </button>
+                </div>
+                    <input type="hidden" id="id_flat" value="{{ flat.id }}">
+                    <input type="hidden" id="id_service" value="{{ service.id }}">
+                </div>
+                    <div class="box-body" style="padding: 0">
+                    {% csrf_token %}
+                        <table id="counters" align="center" style="margin: 0; width: 100%;" class="table table-bordered table-hover table-responsive table-striped linkedRow">
+                             <thead>
+                                  <tr>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc; width: 50px; min-width: 50px" >
+                                          № заявки
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc ; width: 130px; min-width: 130px">
+                                          Удобное время
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc; width: 120px; min-width: 120px ">
+                                          Тип мастера
+                                      </th>
+                                      <th  tabindex="0"  rowspan="1" colspan="1" style="min-width: 200px">
+                                          Описание
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 150px; min-width: 150px">
+                                          Квартира
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 200px; min-width: 200px">
+                                          Владелец
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 100px; min-width: 100px; ">
+                                          Телефон
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 200px; ">
+                                          Мастер
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 70px;min-width: 70px; ">
+                                          Статус
+                                      </th>
+                                      <th style="width: 50px"></th>
+                                  </tr>
+                                    <tr>
+                                            <th class="sort">
+                                                <input type="text" name="id" id="id" class="form-control">
+                                            </th>
+                                            <th class="sort">
+                                                <input type="text" name="date_range" id="date_range" class="form-control">
+                                            </th>
+                                            <th class="sort">
+                                                <select name="type_master" id="type_master" class="form-select">
+                                                    <option value="">Не выбрано...</option>
+                                                    <option value="Сантехник">Сантехник</option>
+                                                    <option value="Электрик">Электрик</option>
+                                                    <option value="Слесарь">Слесарь</option>
+                                                    <option value="Любой спецциалист">Любой спецциалист</option>
+                                                </select>
+                                            </th>
+                                            <th class="sort">
+                                                <input type="text" name="description" id="description" class="form-control">
+                                            </th>
+                                            <th>
+                                                <input type="text" name="flat" id="flat" class="form-control">
+                                            </th>
+                                            <th class="sort">
+                                                <select name="owner" id="owner" class="form-select">
+                                                    <option value=""></option>
+                                                    {% for owner in owners %}
+                                                        <option value="{{ owner.id }}">{{ owner }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </th>
+                                            <th class="sort">
+                                                <input type="text" name="phone" id="phone" class="form-control">
+                                            </th>
+                                            <th class="sort">
+                                                <select name="master" id="master" class="form-select">
+                                                    <option value=""></option>
+                                                    {% for master in masters %}
+                                                        <option value="{{ master.id }}">{{ master.role }} - {{ master }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </th>
+                                        <th>
+                                            <select name="status" id="status" class="form-select">
+                                                <option value=""></option>
+                                                <option value="Новое">Новое</option>
+                                                <option value="В работе">В работе</option>
+                                                <option value="Выполнено">Выполнено</option>
+                                            </select>
+                                        </th>
+                                            <th></th>
+                                        </tr>
+                                  </thead>
+                                  <tbody>
+                                  </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div>
+
+    </div>
+
+{% endblock %}
+{% block script %}
+
+    <!-- JS -->
+    <script src="{% static 'users/js/request_list.js' %}"></script>
+
+
+    <!-- DATEPICKER -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <!-- DATATABLE -->
+    <script src="{% static 'users/dist/datatables/datatables.min.js' %}"></script>
+
+    <script>
+        function delete_request(event, elem) {
+            const result = confirm('Вы уверены, что хотите удалить эту заявку?')
+            if (result) {
+                var csrf = $("input[name=csrfmiddlewaretoken]").val();
+                $.ajax({
+                    url: '{% url 'users:requests_delete_ajax' %}',
+                    type: 'post',
+                    data: {
+                        'id': elem.id,
+                        csrfmiddlewaretoken: csrf,
+                    },
+                    success: (data) => {
+                        if (data.success === 'success') {
+                            $('#reset').click()
+                        } else {
+                            alert(data.success)
+                        }
+                    },
+                    errors: (errors) => {
+                    console.log(errors)
+                }
+            })}
+            event.stopPropagation()
+
+        }
+    </script>
+
+    <script>
+        $(document).ready( function CreateTable() {
+        var table = $('#counters').DataTable(
+            {
+                "order": [],
+                "bSortCellsTop": true,
+                "bFilter": false,
+                 "iDisplayLength": 10,
+                "lengthChange": false,
+                {#dom: 't',#}
+                "language": {
+                    "zeroRecords": "Ничего не найдено",
+                    "info": "Количество квартир:  _MAX_",
+                    'infoFiltered': '',
+                    "infoEmpty": "",
+                    "paginate": {
+                        "next":       "След.",
+                        "previous":   "Пред."
+                    },
+                  },
+                "aoColumnDefs": [
+                    { 'bSortable': false, 'targets': [3, 4, 5, 6, 7, 8, 9] },
+                    ],
+                "fnServerParams": function ( aoData ) {
+                      aoData.push(
+                          { "name": 'id', "value": $('#id').val() },
+                          { "name": 'date_range', "value": $('#date_range').val() },
+                          { "name": 'type_master', "value": $('#type_master').val() },
+                          { "name": 'description', "value": $('#description').val() },
+                          { "name": 'flat', "value": $('#flat').val() },
+                          { "name": 'owner', "value": $('#owner').val() },
+                          { "name": 'phone', "value": $('#phone').val() },
+                          { "name": 'master', "value": $('#master').val() },
+                          { "name": 'status', "value": $('#status').val() },
+                      );
+                },
+                processing: true,
+                serverSide: true,
+                sAjaxSource: "{% url 'users:requests_get_ajax_list' %}",
+                columns: [
+                    {name: "id", data: 0},
+                    {name: "date_range", data: null, render: function(data, type, row) {
+                            var fullDate = row[1] + ' - ' + row[2]
+                            return fullDate
+                        }},
+
+                    {name: "type_master", data: 3},
+
+                    {name: "description", data: 4},
+                    {name: "flat_number", data: null, render: function (data, type, row) {
+                            let flat_link = '<a class="link-list" href="../../admin/flats/detail/' + row[7] + '">'+ row[5] + ' ' + row[6] + '</a>'
+                            return flat_link
+                        }},
+                    {name: "owner", data: null, render: function (data, type, row) {
+                        let owner_link = ''
+                        if (row[8]) {
+                            owner_link += '<a class="link-list" href="../owner/detail/' + row[9] + '">'+ row[8] + '</a>'
+                        } else {
+                            owner_link += '(Не задано)'
+                        }
+                            return owner_link
+                        }},
+                    {name: "phone", data: null, render: function (data, type, row) {
+                        let phone = ''
+                        if (row[10]) {
+                            phone += row[10]
+                        } else {
+                            phone += '(Не задано)'
+                        }
+                            return phone
+                        }},
+                    {name: "master", data: null, render: function (data, type, row) {
+                        let master_link = ''
+                        if (row[12]) {
+                            master_link += '<a class="link-list" href="../detail/' + row[12] + '">'+ row[11] + '</a>'
+                        } else {
+                            master_link += '(Не задано)'
+                        }
+                            return master_link
+                        }},
+                    {name: "status", data: null, render: function (data, type, row) {
+                            if (row[13] === 'Выполнено') {
+                                this.data = `<small class="label label-success">${row[13]}</small>`
+                            } else if (row[13] === 'Новое') {
+                                this.data = `<small class="label label-warning">${row[13]}</small>`
+                            } else if (row[13] === 'В работе') {
+                                this.data = `<small class="label label-danger">${row[13]}</small>`
+                            } else {
+                                this.data = 'Не выбрано'
+                            }
+                            return this.data
+                        }},
+                    {name: "id", data: null, render: function (data, type, row) {
+                            return '<div class="btn-group pull-right">' +
+                                '<a class="btn btn-default btn-sm" href="update/'+ row[0] + '" title="Редактировать" data-toggle="tooltip">' +
+                                '<i class="fa fa-pencil"></i>' +
+                                '</a> ' +
+                                '<a class="btn btn-default btn-sm btn-delete" onclick="delete_request(event, this)" id="'+row[0]+'" title="Удалить">' +
+                                '<i class="fa fa-trash"></i>' +
+                                '</a>' +
+                                '</div>'
+                        }}],
+                "createdRow": function( row, data, dataIndex ) {
+                    var url = 'detail/' + data[0]
+                    $(row).attr( 'data-href', url );
+                    $(row).on("click", function() {
+                        document.location = $(this).data('href');
+                        });
+
+            }
+            });
+        $('#id').on('change clear', function () {
+            table.columns(0).search($(this).val()).draw();
+        } );
+        $('#date_range').on('click blur change clear', function () {
+            table.columns([1]).search($(this).val()).draw();
+        });
+        $('#type_master').on('change clear', function () {
+            table.columns([2]).search($(this).val()).draw();
+        });
+        $('#description').on('change clear', function () {
+            table.columns([3]).search($(this).val()).draw();
+        });
+        $('#flat').on('change clear', function () {
+            table.columns([4]).search($(this).val()).draw();
+        });
+        $('#owner').on('change clear', function () {
+            table.columns([5]).search($(this).val()).draw();
+        });
+        $('#phone').on('change clear', function () {
+            table.columns([6]).search($(this).val()).draw();
+        });
+        $('#master').on('change clear', function () {
+            table.columns([7]).search($(this).val()).draw();
+        });
+        $('#status').on('change clear', function () {
+            table.columns([8]).search($(this).val()).draw();
+        });
+    } );
+    </script>
+    <!-- AJAX -->
+
+    <script>
+    $(document).ready( function () {
+        $('.odd').css('background-color', '#f9f9f9')
+    })
+    </script>
+
+    <style>
+        .sorting {
+            padding: 8px!important;
+        }
+        .dataTables_wrapper .dataTables_info {
+            clear: both;
+            float: left;
+            padding: 10px 0 0 25px;
+        }
+
+    </style>
+    <!-- DATE PICKER -->
+    <script type="text/javascript">
+            $(function() {
+              $('#date_range').daterangepicker({
+                  autoUpdateInput: false,
+                  locale: {
+                      cancelLabel: 'Clear'
+                  }
+              });
+
+              $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                  $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+                  $(this).click()
+              });
+
+              $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                  $(this).val('');
+                  $(this).click()
+              });
+
+            });
+    </script>
+
+{% endblock %}

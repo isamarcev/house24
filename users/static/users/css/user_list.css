@@ -1,0 +1,108 @@
+.form-select-sm {
+    padding: 6px 12px;
+    background-color: #FFFFFF;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    color: #555
+}
+
+/*.form-select-sm:focus-visible {*/
+/*    padding: 6px 12px;*/
+/*    background-color: #FFFFFF;*/
+/*    border-radius: 3px;*/
+/*    border: 1px solid #ccc;*/
+/*    color: #555*/
+/*}*/
+
+#role > option:hover {
+    background-color: red!important;
+}
+
+tr[data-href]:hover {
+    cursor: pointer;
+}
+
+#users {
+    font-size: 14px;
+}
+
+#users tbody td {
+    /*height: 80px;*/
+    vertical-align: middle;
+    padding: 8px;
+}
+
+
+
+.label-success {
+    background-color: #00a65a!important;
+    color: white;
+    padding: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+.label-warning {
+    background-color: #f39c12 !important;
+    color: white;
+    padding: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+.label-danger {
+    background-color: #dd4b39 !important;
+    color: white;
+    padding: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+
+.form-control {
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+}
+
+
+
+.btn-success {
+    background-color: #00a65a;
+    border-color: #008d4c;
+    font-size: 14px;
+    border-radius: 3px;
+    line-height: 1.42857143;
+}
+
+#users {
+    border-top: 1px solid #f4f4f4;
+}
+
+#users thead > th {
+    border: none;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    padding: 10px;
+    border: none;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    border-bottom: 1px solid #f4f4f4;
+    border-right: 1px solid #f4f4f4;
+
+}
+
+.btn-default:hover {
+    background-color: #e7e7e7!important;
+}

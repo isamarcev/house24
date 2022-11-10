@@ -1,0 +1,405 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+     Показания счетчиков, кв.{{ flat }}
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}">
+{#    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.css">#}
+{#<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>#}
+
+{% endblock %}
+{% block content %}
+                            <input type="hidden" id="link-id" value="counter-link">
+
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Показания счетчиков, кв.{{ flat }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span>
+                <a href="{% url 'crm_home:counter_data_list' %}" style="color: #444; text-decoration: none"> Счетчики</a> </li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Показания счетчиков, {{ flat }} </li>
+        </ul>
+    </section>
+
+    <section class="content" style="padding-top: 15px">
+    <div class="row">
+        <div class="col-sm-12" style="text-align: right; padding: 0 15px">
+            <a class="btn btn-success" href="{% url 'crm_home:counter_data_create' %}">Добавить показания</a>
+        </div>
+    </div>
+    </section>
+
+
+    <!-- content -->
+    <section class="content content-custom" >
+    {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                <div class="box-header" style="text-align: right; height: 45px">
+                    <div class="box-tools" >
+                    <button  type="button" id="reset" class="btn btn-default">
+                        <span class="hidden-xs">Очистить</span>
+                    </button>
+                </div>
+                    <input type="hidden" id="id_flat" value="{{ flat.id }}">
+                    <input type="hidden" id="id_service" value="{{ service.id }}">
+                </div>
+                    <div class="box-body" style="padding: 0">
+                    {% csrf_token %}
+                        <table id="counters" align="center" style="margin: 0; width: 100%;" class="table table-bordered table-hover table-responsive table-striped linkedRow">
+                             <thead>
+                                  <tr>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 140px; min-width: 140px" >
+                                          №
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 130px; min-width: 130px">
+                                          Статус
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc; width: 120px; min-width: 120px ">
+                                          Дата
+                                      </th>
+                                      <th  tabindex="0"  rowspan="1" colspan="1" style="color: #3c8dbc; width: 110px; min-width: 110px">
+                                          Месяц
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="">
+                                          Дом
+                                      </th>
+                                      <th tabindex="0"  rowspan="1" colspan="1" style="width: 120px; min-width: 120px">
+                                          Секция
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 100px; min-width: 100px; color: #3c8dbc  ">
+                                          № квартиры
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 110px; ">
+                                          Счетчик
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="width: 70px;min-width: 70px; ">
+                                          Показания
+                                      </th>
+                                      <th  tabindex="0" rowspan="1" colspan="1"  style="min-width: 110px;">
+                                          Ед. изм.
+                                      </th>
+                                      <th style="width: 50px"></th>
+                                  </tr>
+                                    <tr>
+                                            <th class="sort">
+                                                <input type="text" name="number" id="number" class="form-control">
+                                            </th>
+                                            <th class="sort">
+                                                <select name="status" id="status" class="form-select">
+                                                    <option value="">Не выбрано...</option>
+                                                    <option value="Новое">Новое</option>
+                                                    <option value="Учтено">Учтено</option>
+                                                    <option value="Учтено и оплачено">Учтено и оплачено</option>
+                                                    <option value="Нулевое">Нулевое</option>
+                                                </select>
+                                            </th>
+                                            <th class="sort">
+                                                <input type="text" name="date_range" id="date_range" class="form-control">
+                                            </th>
+                                            <th></th>
+                                            <th class="sort">
+                                                <select name="house" id="house" class="form-select">
+                                                    <option value=""></option>
+                                                    {% for house in houses %}
+                                                        <option value="{{ house.id }}">{{ house.title }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </th>
+                                            <th class="sort">
+                                                <select name="section" id="section" class="form-select">
+                                                    <option value="">Выберите дом...</option>
+                                                </select>
+                                            </th>
+                                            <th class="sort">
+                                                <input type="text" name="flat_number" id="flat_number" class="form-control">
+                                            </th>
+                                            <th class="sort">
+                                                <select name="service" id="service" class="form-select">
+                                                    <option value=""></option>
+                                                    {% for ser in services %}
+                                                        {% if ser == service %}
+                                                        <option value="{{ ser.id }}" selected>{{ ser.name }}</option>
+                                                            {% else %}
+                                                        <option value="{{ ser.id }}">{{ ser.name }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+                                            </th>
+                                        <th></th>
+                                        <th></th>
+                                            <th></th>
+
+                                        </tr>
+                                  </thead>
+                                  <tbody>
+                                  </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div>
+
+    </div>
+
+{% endblock %}
+{% block script %}
+ <!-- DATEPICKER -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        function delete_counter(event, elem) {
+            const result = confirm('Вы уверены, что хотите удалить этот счетчик?')
+            if (result) {
+                var csrf = $("input[name=csrfmiddlewaretoken]").val();
+                {#let qwer = elem.closest('tr[data-href]')#}
+                {#qwer.removeAttribute('data-href')#}
+                $.ajax({
+                    url: '{% url 'crm_home:counter_delete_ajax' %}',
+                    type: 'post',
+                    data: {
+                        'id': elem.id,
+                        csrfmiddlewaretoken: csrf,
+                    },
+                    success: (data) => {
+                        if (data.success === 'success') {
+                            $('#reset').click()
+                        } else {
+                            alert(data.success)
+                        }
+                    },
+                    errors: (errors) => {
+                    console.log(errors)
+                }
+            })}
+            event.stopPropagation()
+
+        }
+    </script>
+
+    <script>
+        $(document).ready( function CreateTable() {
+        var table = $('#counters').DataTable(
+            {
+                "order": [],
+                "bSortCellsTop": true,
+                "bFilter": false,
+                 "iDisplayLength": 10,
+                "lengthChange": false,
+                {#dom: 't',#}
+                "language": {
+                    "zeroRecords": "Ничего не найдено",
+                    "info": "Количество показаний:  <b>_MAX_</b>",
+                    'infoFiltered': '',
+                    "infoEmpty": "",
+                    "paginate": {
+                        "next":       "След.",
+                        "previous":   "Пред."
+                    },
+                  },
+                "aoColumnDefs": [
+                    { 'bSortable': false, 'targets': [0, 1, 4, 5, 6, 7, 8, 9, 10] },
+                    ],
+                "fnServerParams": function ( aoData ) {
+                      aoData.push(
+                          { "name": 'number', "value": $('#number').val() },
+                          { "name": 'status', "value": $('#status').val() },
+                          { "name": 'date_range', "value": $('#date_range').val() },
+                          { "name": 'house', "value": $('#house').val() },
+                          { "name": 'section', "value": $('#section').val() },
+                          { "name": 'flat_number', "value": $('#flat_number').val() },
+                          { "name": 'service', "value": $('#service').val() },
+                          { "name": 'id_flat', "value": $('#id_flat').val() },
+                          { "name": 'id_service', "value": $('#id_service').val() },
+                      );
+                },
+                processing: true,
+                serverSide: true,
+                sAjaxSource: "{% url 'crm_home:counter_data-flat_get_ajax' %}",
+                columns: [
+                    {name: "number", data: 9},
+                    {name: "status", data: null, render: function (data, type, row) {
+                            if (row[10] === 'Новое') {
+                                this.data = `<small class="label label-success">${row[10]}</small>`
+                            } else if (row[10] === 'Учтено') {
+                                this.data = `<small class="label label-warning">${row[10]}</small>`
+                            } else if (row[10] === 'Учтено и оплачено') {
+                                this.data = `<small class="label label-danger">${row[10]}</small>`
+                            } else if (row[10] === 'Нулевое') {
+                                this.data = `<small class="label label-null">${row[10]}</small>`
+                            } else {
+                                this.data = 'Не выбрано'
+                            }
+                            return this.data
+                        }},
+                    {name: "date_range", data: 11},
+                    {name: "month", data: null, render: function(data, type, row) {
+                            var months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+                            var myDate = new Date(row[11]);
+                            var fullDate = months[myDate.getMonth()] + ' ' + myDate.getFullYear()
+                            return fullDate
+                        }},
+                    {name: "house", data: 0},
+                    {name: "section", data: 1},
+                    {name: "flat_number", data: 2},
+                    {name: "service", data: 3},
+                    {name: "data", data: 4},
+                    {name: "unit", data: 5},
+                    {name: "id", data: null, render: function (data, type, row) {
+                            return '<div class="btn-group pull-right">' +
+                                '<a class="btn btn-default btn-sm" href="../update/'+ row[6] + '" title="Редактировать" data-toggle="tooltip">' +
+                                '<i class="fa fa-pencil"></i>' +
+                                '</a> ' +
+                                '<a class="btn btn-default btn-sm btn-delete" onclick="delete_counter(event, this)" id="'+row[6]+'" title="Удалить">' +
+                                '<i class="fa fa-trash"></i>' +
+                                '</a>' +
+                                '</div>'
+                        }}],
+                "createdRow": function( row, data, dataIndex ) {
+                    var url = '../detail/' + data[6]
+                    $(row).attr( 'data-href', url );
+                    $(row).on("click", function() {
+                        document.location = $(this).data('href');
+                        });
+
+            }
+            });
+        $('#number').on('change clear', function () {
+            table.columns(0).search($(this).val()).draw();
+        } );
+        $('#status').on('change clear', function () {
+            table.columns([1]).search($(this).val()).draw();
+        });
+        $('#date_range').on('blur change clear', function () {
+            table.columns([2]).search($(this).val()).draw();
+        });
+        $('#house').on('change clear', function () {
+            table.columns([4]).search($(this).val()).draw();
+        });
+        $('#section').on('change clear', function () {
+            table.columns([5]).search($(this).val()).draw();
+        });
+        $('#flat_number').on('change clear', function () {
+            table.columns([6]).search($(this).val()).draw();
+        });
+        $('#service').on('change clear', function () {
+            table.columns([7]).search($(this).val()).draw();
+        });
+    } );
+    </script>
+    <!-- AJAX -->
+
+    <script>
+        function ajax_section (){
+            const house = ($("#house").val())
+            var empty_value = '<option value="">Выберите дом...</option>'
+            const section = $('#section')
+            section.empty()
+
+            if (house) {
+                $.ajax({
+                url: '{% url 'houses:get_section_and_floor' %}',
+                type: 'get',
+                data: {
+                    'house': house,
+                },
+                success: (data) => {
+                    var sections = '';
+                    $(data.sectionist).each(function (index, value) {
+                        sections += "<option value='"+value.id+"'>"+value.title+"</option>"
+                    })
+                    section.append(empty_value)
+                    section.append(sections)
+                }
+            })
+            } else {
+                section.append(empty_value)
+            }
+        }
+    </script>
+
+     <script>
+        $('#house').on('change', ajax_section)
+    </script>
+
+    <script>
+    $(document).ready( function () {
+        $('.odd').css('background-color', '#f9f9f9')
+    })
+    </script>
+
+
+{#        $(function() {#}
+{#  $('#date_range').datepicker({#}
+{#    range: 'period', // режим - выбор периода#}
+{#    numberOfMonths: 2,#}
+{#    onSelect: function(dateText, inst, extensionRange) {#}
+{#    	// extensionRange - объект расширения#}
+{#      $('[name=startDate]').val(extensionRange.startDateText);#}
+{#      $('[name=endDate]').val(extensionRange.endDateText);#}
+{#    }#}
+{#  });#}
+{##}
+{#  $('#date_range').datepicker('setDate', ['+4d', '+8d']);#}
+{##}
+{#  // объект расширения (хранит состояние календаря)#}
+{#  var extensionRange = $('#date_range').datepicker('widget').data('datepickerExtensionRange');#}
+{#  if(extensionRange.startDateText) $('[name=startDate]').val(extensionRange.startDateText);#}
+{#  if(extensionRange.endDateText) $('[name=endDate]').val(extensionRange.endDateText);#}
+
+    </script>
+            <script src="{% static 'crm_home/js/counter_data-flat_list.js' %}"></script>
+    <style>
+        .sorting {
+            padding: 8px!important;
+        }
+        .dataTables_wrapper .dataTables_info {
+            clear: both;
+            float: left;
+            padding: 10px 0 0 25px;
+        }
+
+    </style>
+
+     <!-- DATE PICKER -->
+    <script type="text/javascript">
+            $(function() {
+              $('#date_range').daterangepicker({
+                  autoUpdateInput: false,
+                  locale: {
+                      cancelLabel: 'Clear'
+                  }
+              });
+
+              $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                  $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+                  $(this).blur()
+              });
+
+              $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                  $(this).val('');
+                  $(this).click()
+              });
+
+            });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Редактирование страницы
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{% static 'crm_home/css/crm_tariff.css' %}">
+{% endblock %}
+{% block content %}
+                        <input type="hidden" id="link-id" value="settings-link">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">Тариф: {{ tariff.name }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_home:tariffs' %}" style="color: #444; text-decoration: none">> <span style="color: #ccc; margin-right: 5px" >></span> Тарифы</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" >></span> Тариф {{ tariff.name }}</li>
+
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                <div class="box-header" style="position: relative; height: 42px">
+                        <a class="btn btn-tariff" href="{% url 'crm_home:tariff_update' tariff.id %}" style="height: 30px; position: absolute; top: 5px; right: 8px;">Редактировать тариф</a>
+                    </a>
+                </div>
+                    <div class="box-body">
+                        <table class="table table-bordered table-striped table-view" id="tariff_table">
+                            <tbody>
+                            <tr>
+                                <td>Название тарифа</td>
+                                <td>{{ tariff.name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Описание</td>
+                                <td>{{ tariff.describe }}</td>
+                            </tr>
+                            <tr>
+                                <td>Дата редактирования</td>
+                                <td>{{ tariff.updated_at|date:"d-m-Y - G:i " }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="table-responsive no-padding margin-top-15">
+            <table class="table table-bordered table-striped" id="services_table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Услуга</th>
+                        <th>Ед. изм.</th>
+                        <th>Цена за ед., грн</th>
+                        <th>Валюта</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                            <tr role="row">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ service.service.name }}</td>
+                                <td>{{ service.service.unit.title }}</td>
+                                <td>{{ service.price }}</td>
+                                <td>грн</td>
+                            </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+        <script src="{% static 'crm_home/js/crm_tariff.js' %}"></script>
+{% endblock %}

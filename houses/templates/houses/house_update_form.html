@@ -1,0 +1,351 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    {{ object.title }}
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'houses/css/houses.css' %}" type="text/css">
+
+{% endblock %}
+{% block content %}
+                        <input type="hidden" id="link-id" value="house-link">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px">{{ object.title }}</h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'houses:house_list' %}" style="color: #444; text-decoration: none"><span style="color: #ccc; margin-right: 5px" >></span> Дома</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" > </span><a
+                    href="{% url 'houses:house_detail' object.id %}" style="color: #444; text-decoration: none"> {{ object.title }}</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"> <span style="color: #ccc; margin-right: 5px" > </span> Редактирование </li>
+
+        </ul>
+    </section>
+    <!-- content -->
+    <section class="content content-custom" >
+            <div class="box-body" style="padding: 10px">
+                <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                    <div class="row">
+                        <!-- FORM TITLE, ADDRESS, IMAGES -->
+                        <div class="col-xs-12 col-lg-4" id="house_form">
+                            <div class="form-group">
+                                {{ form.title.label_tag }}
+                                {{ form.title }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.address.label_tag }}
+                                {{ form.address }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.image_1.label_tag }}
+                                <input type="file" name="image_1" accept="image/*" id="id_image_1">
+{#                                {{ form.image_1 }}#}
+                            </div>
+                            <div class="form-group">
+                                {{ form.image_2.label_tag }}
+                                <input type="file" name="image_2" accept="image/*" id="id_image_2">
+                            </div>
+                            <div class="form-group">
+                                {{ form.image_3.label_tag }}
+                                <input type="file" name="image_3" accept="image/*" id="id_image_3">
+                            </div>
+                            <div class="form-group">
+                                {{ form.image_4.label_tag }}
+                                <input type="file" name="image_4" accept="image/*" id="id_image_4">
+                            </div>
+                            <div class="form-group">
+                                {{ form.image_5.label_tag }}
+                                <input type="file" name="image_5" accept="image/*" id="id_image_5">
+                            </div>
+                        </div>
+                        <!-- END FORM TITLE, ADDRESS, IMAGES -->
+
+                        <!-- IMAGES PREVIEW -->
+                        <div class="col-xs-12 col-lg-8">
+                            <div class="row">
+                                <div class="col-xs-12 col-md-6">
+                                    {% if object.image_1 %}
+                                        <img src="{{ object.image_1.url }}" class="largeImg" alt="">
+                                    {% else %}
+                                        <img src="{% static 'content/img/empty.jpeg' %}" class="largeImg" alt="">
+                                    {% endif %}
+                                </div>
+                                <div class="col-xs-12 col-md-6">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if object.image_2 %}
+                                                <img src="{{ object.image_2.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if object.image_3 %}
+                                                <img src="{{ object.image_3.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if object.image_4 %}
+                                                <img src="{{ object.image_4.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-xs-12 col-md-6 ">
+                                            {% if object.image_5 %}
+                                                <img src="{{ object.image_5.url }}" class="smallImg" alt="">
+                                            {% else %}
+                                                <img src="{% static 'content/img/empty.jpeg' %}" class="smallImg" alt="">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- END IMAGES PREVIEW -->
+                    </div>
+                        <!-- TAB CONTENT -->
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-7" style="margin-bottom: 30px">
+                            <nav>
+                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <button class="nav-link active" id="nav-section-tab" data-bs-toggle="tab" data-bs-target="#nav-section" type="button" role="tab" aria-controls="nav-section" aria-selected="true">Секции</button>
+                                    <button class="nav-link" id="nav-floor-tab" data-bs-toggle="tab" data-bs-target="#nav-floor" type="button" role="tab" aria-controls="nav-floor" aria-selected="false">Этажи</button>
+                                    <button class="nav-link" id="nav-users-tab" data-bs-toggle="tab" data-bs-target="#nav-users" type="button" role="tab" aria-controls="nav-users" aria-selected="false">Пользователи</button>
+                                </div>
+                            </nav>
+                            <div class="tab-content" id="nav-tabContent" style="padding: 10px">
+                                <!-- SECTION TAB -->
+                                <div class="tab-pane fade show active" id="nav-section" role="tabpanel" aria-labelledby="nav-section-tab">
+                                        <div id="form_set_section" class="row">
+                                        {{ section_formset.management_form }}
+                                            {% for section in section_formset %}
+                                                {% if section %}
+                                                    {% for field in section.hidden_fields %}
+                                                        {{ field }}
+                                                    {% endfor %}
+
+                                                    <div class="col-xs-12" id="{{ section.prefix }}-form" style="padding: 0 0 0 20px">
+{#                                            <input type="hidden" name="{{ section.prefix }}-id" id="id_{{ section.prefix }}-id">#}
+                                                <div class="form-group">
+                                                    <label for="id_{{ section.prefix }}-title">Название</label>
+                                                    <div class="input-group">
+                                                        {{ section.title }}
+{#                                                        <input type="text" name="{{ section.prefix }}-title" class="form-control" id="id_{{ section.prefix }}-title">#}
+                                                        <span class="input-group-btn">
+                                                            <button type="button" id="{{ section.prefix }}" onclick="delete_section(this.id)" class="btn btn-danger form-row-remove-btn">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                <!-- EMPTY FORM SECTION -->
+                                    <div id="empty_form_section" style="display: none;">
+                                            <div class="col-xs-12" id="section-__prefix__-form" style="padding: 0 0 0 20px">
+                                            <input type="hidden" name="service-__prefix__-id" id="id_service-__prefix__-id">
+                                                <div class="form-group">
+                                                    <label for="id_section-__prefix__-title">Название</label>
+                                                    <div class="input-group">
+                                                        <input type="text" name="section-__prefix__-title" class="form-control" id="id_section-__prefix__-title">
+                                                        <span class="input-group-btn">
+                                                            <button type="button" id="section-__prefix__" onclick="delete_section(this.id)" class="btn btn-danger form-row-remove-btn">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <div class="delete-list-section"></div>
+                                    <div class="row" style="justify-content: right">
+                                        <button type="button" id="add_section" class="btn btn-success" style="width: auto">Добавить</button>
+                                    </div>
+                                </div>
+                                <!-- END SECTION TAB -->
+                                <!-- FLOOR TAB -->
+                                <div class="tab-pane fade" id="nav-floor" role="tabpanel" aria-labelledby="nav-floor-tab">
+                                    <div id="form_set_floor" class="row">
+                                        {{ floor_formset.management_form }}
+                                        {% for floor in floor_formset %}
+                                            {% for field in floor.hidden_fields %}
+                                                {{ field }}
+                                                {% endfor %}
+                                            <div class="col-xs-12" id="{{ floor.prefix }}-form">
+{#                                            <input type="hidden" name="{{ floor.prefix }}-id" id="id_{{ floor.prefix }}-id">#}
+                                                <div class="form-group">
+                                                    <label for="id_{{ floor.prefix }}-title">Название</label>
+                                                    <div class="input-group">
+                                                        {{ floor.title }}
+{#                                                        <input type="text" name="{{ floor.prefix }}-title" class="form-control" id="id_{{ floor.prefix }}-title">#}
+                                                        <span class="input-group-btn">
+                                                            <button type="button" id="{{ floor.prefix }}" onclick="delete_floor(this.id)" class="btn btn-danger form-row-remove-btn">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor  %}
+
+                                    </div>
+                                <!-- EMPTY FORM SECTION -->
+                                    <div id="empty_form_floor" style="display: none;">
+                                            <div class="col-xs-12" id="floor-__prefix__-form">
+                                            <input type="hidden" name="floor-__prefix__-id" id="id_floor-__prefix__-id">
+                                                <div class="form-group">
+                                                    <label for="id_floor-__prefix__-title">Название</label>
+                                                    <div class="input-group">
+                                                        <input type="text" name="floor-__prefix__-title" class="form-control" id="id_floor-__prefix__-title">
+                                                        <span class="input-group-btn">
+                                                            <button type="button" id="floor-__prefix__" onclick="delete_floor(this.id)" class="btn btn-danger form-row-remove-btn">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                    <div class="delete-list-floor"></div>
+                                    <div class="row" style="justify-content: right">
+                                        <button type="button" id="add_floor" class="btn btn-success btn-hover-change" style="width: auto">Добавить</button>
+                                    </div>
+                                </div>
+                                <!-- END FLOOR TAB -->
+
+                                <!-- USERS TAB -->
+                                <div class="tab-pane fade" id="nav-users" role="tabpanel" aria-labelledby="nav-users-tab">
+                                    <div class="row" id="form_set_users">
+                                        {{ users_formset.management_form }}
+                                        {% for user_form in users_formset %}
+                                            {% for field in user_form.hidden_fields %}
+                                                {{ field }}
+                                                {% endfor %}
+                                            <div class="col-xs-12" id="{{ user_form.prefix }}-form">
+{#                                            <input type="hidden" name="{{ user_form.prefix }}-id" id="id_{{ user_form.prefix }}_id">#}
+                                            <div class="row">
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <div class="form-group">
+                                                        <label for="id_{{ user_form.prefix }}-name">ФИО</label>
+                                                        <div class="input-group">
+{#                                                            {{ user_form.name }}#}
+{#                                                            {{ user_form.name.choices }}#}
+
+                                                            <select name="{{ user_form.prefix }}-name" id="id_{{ user_form.prefix }}-name" class="form-select">
+                                                                <option value="">Выберите...</option>
+                                                                {% for user in users %}
+                                                                    {% if user != user_form.instance %}
+                                                                    <option value="{{ user.id }}" name="{{ user.role }}">{{ user }}</option>
+                                                                    {% else %}
+                                                                    <option value="{{ user.id }}" name="{{ user.role }}" selected>{{ user }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-5">
+                                                <label>Роль</label>
+                                                <div class="input-group">
+                                                        <input type="text" name="{{ user_form.prefix }}-name-role" value="{{ user_form.instance.role.name }}" class="form-control" id="id_{{ user_form.prefix }}-name-role" disabled>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" id="{{ user_form.prefix }}" onclick="delete_user(this.id)" class="btn btn-danger form-row-remove-btn">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="row" style="justify-content: right">
+                                        <button type="button" id="add_users" class="btn btn-success btn-hover-change" style="width: auto">Добавить</button>
+                                    </div>
+                                    <div class="row" id="empty_form_users" style="display: none" >
+                                        <div class="col-xs-12" id="users-__prefix__-form">
+                                            <input type="hidden" name="users-__prefix__-id" id="id_users-__prefix-__id">
+                                            <div class="row">
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <div class="form-group">
+                                                        <label for="id_users-__prefix__-name">ФИО</label>
+                                                        <div class="input-group">
+                                                            <select name="users-__prefix__-name" id="id_users-__prefix__-name" class="form-select">
+                                                                <option value=""></option>
+                                                                {% for user in users %}
+                                                                    <option value="{{ user.id }}" name="{{ user.role }}">{{ user }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-5">
+                                                <label>Роль</label>
+                                                <div class="input-group">
+                                                        <input type="text" name="users-__prefix__-name-role" class="form-control" id="id_users-__prefix__-name-role" disabled>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" id="users-__prefix__" onclick="delete_user(this.id)" class="btn btn-danger form-row-remove-btn">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="delete-list-users"></div>
+                                </div>
+                                <!-- END USERS TAB -->
+                                </div>
+
+                            </div>
+                        </div>
+                    <!-- END TAB CONTENT -->
+                    <div class="form-group" style="text-align: right">
+                            <a href="{% url 'crm_home:set_services' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+    border-color: #ddd!important;">Отменить</a>
+                            <button type="submit" class="btn btn-success" id="btn-save" style="height: 34px; font-size: 14px;background-color: #00a65a!important;
+    border-color: #008d4c!important;">Сохранить</button>
+                    </div>
+
+                </form>
+            </div>
+    </section>
+    <div>
+    </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+    <!--AJAX-->
+    function get_role(id, name) {
+            $.ajax({
+                url:`{% url 'houses:get_role' %}`,
+                type: 'get',
+                data: {'id': id},
+                success: (data) => {
+                    if (data.role) {
+                        $('#id_'+ name +'-role').val(data.role)
+                    } else {
+                        alert('Something wrong.')
+                    }
+                }
+            })
+        }
+    </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="{% static 'houses/js/create_house.js' %}"></script>
+{% endblock %}

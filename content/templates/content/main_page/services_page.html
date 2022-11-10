@@ -1,0 +1,47 @@
+{% extends 'content/layout/base.html' %}
+{% load  static %}
+
+{% block title %}CRM система для управляющей компании HOME 24{% endblock %}
+
+{% block content %}
+
+<div class="container" style="margin-top: 50px; margin-bottom: 50px">
+    <div class="row">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="/">Главная</a></li>
+                <li class="active">Услуги</li>
+            </ol>
+        </div>
+        <div class="col-12">
+            <div class="box clearfix">
+                <div class="page-header">
+                    <h1 class="header">Наши услуги</h1>
+                </div>
+                {% for service in services %}
+                    <div class="row services">
+                        <div class="col-xs-12 col-md-7">
+                            <img src="{{ service.image.url }}" alt="">
+                        </div>
+                        <div class="col-xs-12 col-md-5">
+                            <div class="page-header">
+                                <h3>{{ service.title }}</h3>
+                            </div>
+                            <div id="service-{{ forloop.counter }}">
+                                <script>
+                                    let textMessage{{ forloop.counter }} = '{{ service.text }}'
+                                    let textElementNew{{ forloop.counter }} = document.createElement('span')
+                                    textElementNew{{ forloop.counter }}.innerHTML = textMessage{{ forloop.counter }}
+                                    document.getElementById('service-{{ forloop.counter }}').innerHTML = textElementNew{{ forloop.counter }}.innerText
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

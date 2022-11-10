@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="http://myhouse24.avada-media.ua/favicon.png">
+<link type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <title>{% block title %}Регистрация{% endblock %}</title>
+
+<!-- Google Font: Source Sans Pro -->
+  <link  type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link type="text/css" rel="stylesheet" href="{% static 'houses/plugins/fontawesome-free/css/all.min.css' %}">
+  <link type="text/css" rel="stylesheet" href="{% static 'houses/plugins/fontawesome-free/css/v4-shims.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'houses/dist/css/adminlte.min.css' %}">
+  <link rel="stylesheet" href="{% static 'houses/css/bootstrap.css' %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static 'houses/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+        <link href="{% static 'houses/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'users/css/main.css' %}" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" rel="stylesheet">
+</head>
+
+<body class="login-page" style="height: auto; padding-top: 7%; min-height: 496.781px; background-color: #d2d6de; font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight: 400; font-size: 14px">
+
+
+<div class="login-box">
+    <div class="login-logo">
+        <a href="#">
+            <img src="http://myhouse24.avada-media.ua/logo.svg" width="100%" id="logo-login" alt="logo">
+        </a>
+    </div>
+    <div class="nav-tabs-custom">
+        <div class="tab-content" id="myTabContent">
+            <!-- CITIZEN -->
+          <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="login-box-body" style="padding: 20px">
+                    <h3 class="login-box-msg" style="color: #666">Регистрация</h3>
+                {% if confirm %}
+                    <div class="errorlist-password">
+                        {{ confirm }}
+                    </div>
+                {% endif %}
+                    <form id="login-form" action="" method="post">
+                        {% csrf_token %}
+                        <div class="form-group" style="position: relative">
+                            <label for="{{ form.email.id_for_label }}" style="display: none"></label>
+                            <input type="text"  id="{{ form.email.id_for_label }}" class="form-control" name="{{ form.email.name }}" placeholder="E-mail" aria-required="true" style="background-color: white; border-radius: 0" >
+                            {% if form.errors.email %}
+                                <div class="errorlist-password" style="color: #dd4b39">
+                                    {% for field in form.errors.email %}
+                                        {{ field }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group" style="position: relative">
+                            <label for="{{ form.last_name.id_for_label }}" style="display: none"></label>
+                            <input type="text"  id="{{ form.last_name.id_for_label }}" class="form-control" name="{{ form.last_name.name }}" placeholder="Фамилия" aria-required="true" style="background-color: white; border-radius: 0" >
+                        </div>
+                        <div class="form-group" style="position: relative">
+                            <label for="{{ form.first_name.id_for_label }}" style="display: none"></label>
+                            <input type="text"  id="{{ form.first_name.id_for_label }}" class="form-control" name="{{ form.first_name.name }}" placeholder="Имя" aria-required="true" style="background-color: white; border-radius: 0" >
+                        </div>
+                        <div class="form-group" style="position: relative">
+                            <label for="{{ form.father_name.id_for_label }}" style="display: none"></label>
+                            <input type="text"  id="{{ form.father_name.id_for_label }}" class="form-control" name="{{ form.father_name.name }}" placeholder="Отчество" aria-required="true" style="background-color: white; border-radius: 0" >
+                        </div>
+                        <div class="form-group" style="position: relative">
+                            <label for="{{ form.password1.id_for_label }}" style="display: none"></label>
+                            <input type="password"  id="{{ form.password1.id_for_label }}" class="form-control" name="{{ form.password1.name }}" placeholder="Пароль" aria-required="true" style="background-color: white; border-radius: 0" >
+                            {% if form.errors.password1 %}
+                                <div class="errorlist-password" style="color: #dd4b39">
+                                    {% for field in form.errors.password1 %}
+                                        {{ field }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                        </div>
+                        <div class="form-group" style="position: relative">
+                            <label for="{{ form.password2.id_for_label }}" style="display: none"></label>
+                            <input type="password"  id="{{ form.password2.id_for_label }}" class="form-control" name="{{ form.password2.name }}" placeholder="Повторите пароль" aria-required="true" style="background-color: white; border-radius: 0" >
+                            {% if form.errors.password2 %}
+                                <div class="errorlist-password" style="color: #dd4b39">
+                                    {% for field in form.errors.password2 %}
+                                        {{ field }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <button type="submit" id="users_button" class="btn btn-primary btn-block" name="login-button">Регистрация</button>
+                            </div>
+                            <div class="col-xs-12" style="padding-top: 20px; text-align: center">
+                                <p>Уже есть аккаунт? <a class="link-list" href="{% url 'users:login' %}">Вход</a></p>
+                            </div>
+                        </div>
+                    </form>
+          </div>
+                </div>
+          </div>
+            <!--END  CITIZEN -->
+        </div>
+    </div>
+</div>
+
+
+
+   <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>
+<script src="{% static 'houses/plugins/bootstrap/js/bootstrap.js' %}"></script>
+<script src="{% static 'houses/dist/js/adminlte.min.js' %}"></script>
+                <script src="{% static 'houses/plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'houses/plugins/jquery-ui/jquery-ui.js' %}"></script>
+<script>
+    $('#admin-login-tab').on('click', function () {
+        var adminUrl = '{% url 'users:admin-login' %}';
+        document.location = adminUrl
+    })
+</script>
+</body>
+
+</html>

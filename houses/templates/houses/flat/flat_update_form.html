@@ -1,0 +1,248 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Квартира №{{ object.number }}, {{ object.house }}
+{% endblock %}
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'houses/css/flat_create.css' %}">
+
+{% endblock %}
+{% block content %}
+                    <input type="hidden" id="link-id" value="flat-link">
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Квартира №{{ object.number }}, {{ object.house }}
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'houses:flat_list' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Квартиры
+                </a>
+            </li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'houses:flat_detail' object.id %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Квартира №{{ object.number }}, {{ object.house }}
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span> Редактирование </li>
+        </ul>
+    </section>
+
+    <!-- content -->
+    <section class="content content-custom" >
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="form-group">
+                                        {{ form.number.label_tag }}
+                                        {{ form.number }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.area.label_tag }}
+                                        {{ form.area }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.house.label_tag }}
+                                        {{ form.house }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.section.label_tag }}
+{#                                        {{ form.section }}#}
+                                        <select name="section" id="id_section" class="form-select">
+                                            <option value="">Выберите...</option>
+                                            {% for section in sections %}
+                                                {% if section == object.section%}
+                                                    <option value="{{ section.id }}" selected>{{ section }}</option>
+                                                    {% else %}
+                                                    <option value="{{ section.id }}">{{ section }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        {% if form.errors.section %}
+                                             <div class="errorlist" >
+                                            {% for field in form.errors.section %}
+                                                {{ field }}
+                                            {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.floor.label_tag }}
+                                        <select name="floor" id="id_floor" class="form-select">
+                                            <option value="">Выберите...</option>
+                                            {% for floor in floors %}
+                                                {% if floor == object.floor %}
+                                                    <option value="{{ floor.id }}" selected>{{ floor }}</option>
+                                                    {% else %}
+                                                    <option value="{{ floor.id }}">{{ floor }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                         {% if form.errors.floor %}
+                                             <div class="errorlist" >
+                                            {% for field in form.errors.floor %}
+                                                {{ field }}
+                                            {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.owner.label_tag }}
+                                        {{ form.owner }}
+                                        {% if form.errors.owner %}
+                                             <div class="errorlist" >
+                                            {% for field in form.errors.owner %}
+                                                {{ field }}
+                                            {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.tariff.label_tag }}
+                                        {{ form.tariff }}
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="form-group">
+                                        {{ account.account_number.label_tag }}
+{#                                        <input type="text" name="account_number" class="form-control" id="id_account_number" value="{{ account.n }}">#}
+                                        {{ account.account_number }}
+                                        {% if account.errors.account_number %}
+                                         <div class="errorlist" >
+                                            {% for field in form.errors.personal_account %}
+                                                {{ field }}
+                                            {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <select name="account_list" id="account_list" class="form-select">
+
+                                        </select>
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-group" style="text-align: right">
+                            <a href="{% url 'houses:flat_list' %}" class="btn btn-default" style="height: 34px; font-size: 14px; background-color: #f4f4f4; color: #444!important;
+                                ">Отменить</a>
+                            <button type="submit" class="btn btn-success" name="save">Сохранить</button>
+                            <button type="submit" class="btn btn-success" name="save_and_add" >Сохранить и добавить новую</button>
+
+                                </div>
+                            </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div>
+
+    </div>
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'houses/js/flat_create.js' %}">
+    </script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+    $(document).ready(function() {
+    $("#id_owner").select2({
+          tags: true,
+        selectionCssClass: 'form-select',
+        });
+        })
+    </script>
+    <script>
+    $(document).ready(
+            $.ajax({
+                url: '{% url 'houses:get_account_list' %}',
+                type: 'get',
+                success: (data) => {
+                    console.log(data)
+                    let options = "<option class'options-select' value=''>Выберите из списка...</option>";
+                    $(data.data).each(function (index, value) {
+                        options += "<option class'options-select' value='"+value+"'>"+value+"</option>"
+                    })
+                    $('#account_list').append(options).select2({
+                        tags: true,
+                        placeholder: 'или выберите из списка...',
+                        selectionCssClass: 'form-select'
+                    })
+                    $('#account_list').on('change', function () {
+                        let value = ($(this))
+                        console.log(value)
+                        console.log(value.val())
+                        $('#id_account_number').val(value.val())
+                    })
+
+                }
+
+            })
+    )
+    </script>
+    <script>
+        function ajax_section (){
+            const house = ($(this).val())
+            console.log(house)
+            if (house) {
+                $.ajax({
+                url: '{% url 'houses:get_section_and_floor' %}',
+                type: 'get',
+                data: {
+                    'house': house,
+                },
+                success: (data) => {
+
+                    var id_sections = $('#id_section');
+                    var empty_value = '<option value="">Выберите...</option>'
+                    id_sections.empty()
+                    id_sections.append(empty_value)
+                    var id_floor = $('#id_floor');
+                    id_floor.empty()
+                    id_floor.append(empty_value)
+                    var sections = '';
+                    var floors = '';
+
+                    $(data.sectionist).each(function (index, value) {
+                        sections += "<option value='"+value.id+"'>"+value.title+"</option>"
+                    })
+                    id_sections.append(sections)
+                    $(data.floors).each(function (index, value) {
+                        floors += "<option value='"+value.id+"'>"+value.title+"</option>"
+                    })
+                    id_floor.append(floors)
+                }
+            })
+            } else {
+
+            }
+        }
+    </script>
+
+    <script>
+        $('#id_house').on('change', ajax_section)
+    </script>
+    <script>
+        $(document).ready(function (){
+            $('#id_house').change()
+            $('[aria-controls="select2-id_owner-container"]').removeClass("select2-selection select2-selection--single")
+            $('body > div.wrapper > div > section.content.content-custom > div > div > div > div > form > div > div:nth-child(2) > div > span > span.selection > span').removeClass("select2-selection select2-selection--single")
+        })
+    </script>
+    <style>
+
+    </style>
+
+
+{% endblock %}
