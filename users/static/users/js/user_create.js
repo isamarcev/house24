@@ -12,12 +12,15 @@ function generatePassword(){
     $('#id_password1').parent().parent().addClass('has-success')
     $('#id_password2').parent().parent().addClass('has-success');
     $('.errorlist-password').css('display', 'none')
+    console.log('success_generate')
+
     return password;
 }
 
 $('#showPass').click(function () {
     var password1 = $('#id_password1');
     var password2 = $('#id_password2');
+    console.log('success')
     if (password1.attr('type') === 'password') {
         password1.attr('type', 'text');
         password2.attr('type', 'text');
