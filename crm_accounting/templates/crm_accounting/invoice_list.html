@@ -32,6 +32,19 @@
                     position: 'top-left'
                 })
             </script>
+            {% elif message.tags == 'errors' %}
+            <script src="{% static 'houses/plugins/jquery/jquery.js' %}"></script>
+            <script src="{% static 'users/js/jquery.toast.js' %}"></script>
+            <script>
+                var MyToast =  $.toast({
+                    heading: 'Error',
+                    text: '{{ message }}',
+                    showHideTransition: 'slide',
+                    icon: 'error',
+                    position: 'top-left'
+                })
+            </script>
+
         {% endif %}
     {% endfor %}
         <!-- MESSAGE FROM BACKEND-->
@@ -193,7 +206,11 @@
                                             <input type="text" name="month" id="month" class="form-control">
                                         </th>
                                         <th class="sort">
+                                            {% if flat_number %}
+                                            <input type="text" name="flat" id="flat" value="{{ flat_number }}" class="form-control">
+                                            {% else %}
                                             <input type="text" name="flat" id="flat" class="form-control">
+                                            {% endif %}
                                         </th>
                                         <th class="sort">
                                             <select name="owner" id="owner" class="form-select">

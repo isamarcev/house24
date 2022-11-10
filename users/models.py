@@ -1,4 +1,5 @@
 import datetime
+from django.utils.translation import gettext_lazy as _
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -29,7 +30,19 @@ class Role(models.Model):
         return self.name
 
 
+def get_next_user_id():
+    # users = CustomUser.objects.filter(is_superuser=False).\
+    #     order_by('-username')
+    # if users.exists():
+    #     user_id = int(users.first().username) + 1
+    # else:
+    #     user_id = 1
+    user_id = 2
+    return user_id
+
+
 class CustomUser(AbstractUser):
+    email = models.EmailField(_("email address"), unique=True)
     photo = models.ImageField(upload_to='users/', blank=True, null=True)
     birthday = models.DateField(null=True, blank=True)
     father_name = models.CharField(max_length=30, help_text='Отчество',
@@ -42,18 +55,22 @@ class CustomUser(AbstractUser):
                     ('Отключен', 'Отключен')]
     status = models.CharField(choices=status_state, default=status_state[1][0],
                               max_length=20, null=True, blank=True)
-    username = models.CharField(max_length=100, verbose_name="User ID",
+    username = models.IntegerField(verbose_name="User ID",
                                 unique=True, help_text='Required',
                                 error_messages=
                                 {"unique":
                                      "Пользователь с таким ID уже существует."},
-                                blank=True, null=True)
+                                blank=True, null=True,
+                                default=get_next_user_id)
     about = models.TextField(max_length=1000, null=True, blank=True)
     role = models.ForeignKey('Role', on_delete=models.PROTECT, null=True,
                              blank=True)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} {self.father_name}'
+        if self.father_name:
+            return f'{self.first_name} {self.last_name} {self.father_name}'
+        else:
+            return f'{self.first_name} {self.last_name}'
 
 
 class Message(models.Model):
@@ -87,7 +104,7 @@ class Request(models.Model):
     date = models.DateField(default=datetime.datetime.now)
     time = models.TimeField(default=datetime.datetime.now)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              on_delete=models.PROTECT,
+                              on_delete=models.CASCADE,
                               related_name='owner_request',
                               null=True)
     description = models.TextField(max_length=1999, blank=True, null=True)

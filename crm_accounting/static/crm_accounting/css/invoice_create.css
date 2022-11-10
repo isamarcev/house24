@@ -351,3 +351,25 @@ button .add-more {
     text-decoration: none;
     color: #72afd2;
 }
+
+.template a {
+    display: inline-block;
+    margin-right: 15px;
+    text-decoration: none;
+
+}
+
+.template a:hover {
+    outline: none;
+    text-decoration: none;
+    color: #72afd2;
+}
+
+
+.text-success {
+    color: #3c763d;
+}
+
+.text-danger {
+    color: #a94442;
+}

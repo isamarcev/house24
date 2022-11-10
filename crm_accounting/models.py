@@ -127,7 +127,7 @@ class Invoice(models.Model):
 class Transaction(models.Model):
     number = models.CharField(default=get_next_transaction, max_length=15)
     date = models.DateField(default=datetime.datetime.now)
-    owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT,
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
                               related_name='owner', null=True, blank=True)
     personal_account = models.ForeignKey(PersonalAccount,
                                          on_delete=models.PROTECT,
@@ -164,4 +164,17 @@ class InvoiceService(models.Model):
     class Meta:
         verbose_name_plural = 'Квитанции с услугами'
         verbose_name = 'Квитанция с услугами'
+
+
+class Template(models.Model):
+    file = models.FileField(upload_to='templates_invoice/', null=True,
+                            blank=True)
+    name = models.CharField(max_length=20, default='New template')
+    default = models.BooleanField(null=True, blank=True, default=False)
+
+    def __str__(self):
+        if self.default:
+            return f'{self.name} (по-умолчанию)'
+        else:
+            return f'{self.name}'
 

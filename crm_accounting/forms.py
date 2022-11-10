@@ -264,8 +264,40 @@ class InvoiceServiceForm(forms.ModelForm):
         }
 
 
-
 InvoiceServiceFormset = modelformset_factory(models.InvoiceService,
                                              InvoiceServiceForm,
                                              fields='__all__', can_delete=True,
                                              extra=0)
+
+
+class TemplateForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Template
+        fields = ['file', 'name']
+
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'file': forms.FileInput(attrs={'style': 'width: 100%;'})
+        }
+
+    def clean_file(self):
+        x = self.cleaned_data.get('file')
+        good_format = ['xlsx', 'xls']
+        format_file = x.name.split('.')[-1]
+        if format_file not in good_format:
+            raise ValidationError(
+                'Файл вложенного формата недопустим. Выберите файл .xlsx .xls'
+            )
+        return x
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if not name:
+            file_name = self.cleaned_data.get('file').name.split('.'[0])
+            return file_name
+        return name
+
+class TemplatePrint(forms.Form):
+    template = forms.ModelChoiceField(queryset=models.Template.objects.all(),
+                                      widget=forms.RadioSelect)

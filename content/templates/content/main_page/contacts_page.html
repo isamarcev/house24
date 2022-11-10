@@ -1,0 +1,107 @@
+{% extends 'content/layout/base.html' %}
+{% load  static %}
+
+{% block title %}Сайт Управляющей компании ЖКХ - "МОЙ ДОМ 24" - Контакты{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 50px;">
+    <div class="row">
+            <div class="col-xs-12">
+                <ol class="breadcrumb">
+                    <li><a href="/">Главная</a></li>
+                    <li class="active">Контакты</li>
+                </ol>
+            </div>
+    </div>
+</div>
+    <div class="row" style="width: 100%; text-align: center">
+        <div class="map col-12" id="map-element">
+            {{ contacts.map|safe }}
+        </div>
+    </div>
+
+<div class="info">
+<div class="container">
+    <div class="row">
+    <div class="col-xs-12 col-sm-7 col-md-8">
+                <div class="page-header">
+                    <h1 class="header">{{ contacts.title }}</h1>
+                </div>
+                <div class="box">
+{#                    <b></b><h3></h3><p id="text">#}
+{#                            <script>#}
+{#                                let textMessage = '{{ main_page.text }}'#}
+{#                                let textElement = document.createElement('span')#}
+{#                                textElement.innerHTML = textMessage#}
+{#                                document.getElementById('text').innerHTML = textElement.innerText#}
+{#                            </script>#}
+{#                    <br></p><br><p><b></b></p>#}
+                    {{ contacts.text|safe }}
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <a href="{% url 'content:about' %}" class="btn btn-primary">Подробнее</a>
+                        </div>
+                        <div class="col-xs-8">
+                            <a href="#">
+                                <img src="/img/appstore.png" class="img-responsive imgStore" alt="">
+                            </a>
+                            <a href="#">
+                                <img src="/img/googleplay.png" class="img-responsive imgStore" alt="">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-5 col-md-4">
+                <div class="page-header">
+                    <h3 class="header">Контакты</h3>
+                </div>
+                <div class="box">
+                    <p><i class="fas fa-user-circle"></i> {{ contacts.fio }}</p>
+                    <p><i class="fas fa-compass"></i> {{ contacts.address }}</p>
+                    <p><i class="fas fa-map-marker"></i>  {{ contacts.location }}</p>
+                    <p><i class="fas fa-phone"></i> <a href="tel:{{ contacts.phone }}">{{ contacts.phone }}</a></p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:{{ contacts.email }}">{{ contacts.email }}</a></p>
+            </div>
+            </div>
+        </div>
+                <div class="row">
+                <div class="col-12">
+                    <div class="page-header">
+                        <h3 class="header">Рядом с нами</h3>
+                    </div>
+                </div>
+                </div>
+            <div class="row row-eq-height">
+
+                {% for block in main_page.block_set.all %}
+                <div class="col-xs-12 col-sm-6 col-md-4 advantage-item">
+                    <div class="thumbnail">
+                        {% if block.image %}
+                        <img src="{{ block.image.url }}" class="img-responsive" alt="">
+                        {% else %}
+                        <img src="{% static 'content/img/empty.jpeg' %}" class="img-responsive" alt="">
+                        {% endif %}
+
+                        <div class="caption">
+                            <h3>{{ block.header }}</h3>
+                            <p id="block-{{ forloop.counter }}">
+                                <script>
+                                let textMessage_{{ forloop.counter }} = '{{ block.description }}'
+                                let textElement_{{ forloop.counter }} = document.createElement('span')
+                                textElement_{{ forloop.counter }}.innerHTML = textMessage_{{ forloop.counter }}
+                                let element_{{ forloop.counter }} = "block-{{ forloop.counter }}"
+                                console.log(element_{{ forloop.counter }})
+                                document.getElementById(element_{{ forloop.counter }}).innerHTML = textElement_{{ forloop.counter }}.innerText
+                            </script>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+    </div>
+</div>
+
+{% endblock %}
+

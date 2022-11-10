@@ -8,7 +8,7 @@
 <script src="{% static 'content/plugins/ckeditor/ckeditor.js' %}"></script>
 {% endblock %}
 {% block content %}
-                            <input type="hidden" id="link-id" value="settings-link">
+                            <input type="hidden" id="link-id" value="content-link">
 
     <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
         <h1 style="color: #444; font-size: 24px">Редактирование страницы</h1>
@@ -142,6 +142,9 @@
                                         <label style="font-size: 14px!important;" for="{{ foo.title.id_for_label }}">Название документа</label>
                                         {{ foo.title }}
                                     </div>
+                                            {% for foos in foo.errors.document %}
+                                                <div class="errorlist">{{ foos }}</div>
+                                                {% endfor %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -202,8 +205,6 @@
   </script>
 {% endblock %}
 {% block script %}
-{#        <script rel="stylesheet" href="{% static 'content/plugins/summernote/summernote.min.css' %}" type="text/css">#}
-{#    <script src="{% static 'content/plugins/summernote/summernote.min.js' %}"></script>#}
             <script>
                         CKEDITOR.replace( 'id_text' );
                 </script>

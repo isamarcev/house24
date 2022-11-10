@@ -100,6 +100,9 @@
                                         {{ form.section.label_tag }}
                                         <select name="section" id="id_section" class="form-select">
                                             <option value="">Выберите...</option>
+                                            {% if form.initial.section %}
+                                            <option value="{{ form.initial.section.id }}" selected>{{ form.initial.section }}</option>
+                                            {% endif %}
                                         </select>
                                         <div class="errorlist">
                                             {% if form.errors.section %}
@@ -113,6 +116,9 @@
                                         {{ form.flat.label_tag }}
                                         <select name="flat" id="id_flat" class="form-select">
                                             <option value="">Выберите...</option>
+                                            {% if form.initial.flat %}
+                                            <option value="{{ form.initial.flat.id }}" selected>{{ form.initial.flat }}</option>
+                                            {% endif %}
                                         </select>
                                         <div class="errorlist">
                                             {% if form.errors.flat %}
@@ -172,10 +178,23 @@
                                 </div>
                             </div>
                             <p >
-                                <b>Владелец:</b> <span id="owner">не выбран</span>
+                                <b>Владелец:</b>
+                                <span id="owner">
+                                    {% if form.initial.flat %}
+                                    <a class='link-list' href="{% url 'users:owner_detail' form.initial.flat.owner.id %}">{{ form.initial.flat.owner }}</a>
+                                    {% else %}
+                                    не выбран
+                                    {% endif %}
+                                </span>
                             </p>
                             <p >
-                                <b>Телефон:</b> <span id="phone">не выбран</span>
+                                <b>Телефон:</b> <span id="phone">
+                                {% if form.initial.flat.owner.phone %}
+                                    {{ form.initial.flat.owner.phone }}
+                                    {% else %}
+                                    не выбран
+                                    {% endif %}
+                            </span>
                             </p>
                         </div>
                         <!-- TABLE SERVICES -->

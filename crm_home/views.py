@@ -5,20 +5,20 @@ from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic.base import View
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from houses.models import House, Flat
-from houses.views import create_or_add_next
 from users.forms import RoleForm
 from users.models import Role
 from . import forms
 from .models import *
 from django.views.generic import DetailView, UpdateView, DeleteView, FormView,\
     ListView, CreateView, TemplateView
+from crm_accounting import views as account_views
 
 
-class ServiceSettings(FormView, SuccessMessageMixin):
+class ServiceSettings(account_views.AdminPermissionMixin,
+                      FormView, SuccessMessageMixin):
     formset_service = modelformset_factory(Service, forms.ServiceForm,
                                            extra=0, can_delete=True,
                                            fields=('name', 'show', 'unit'))
@@ -27,6 +27,7 @@ class ServiceSettings(FormView, SuccessMessageMixin):
         select_related('unit')
     formset_units = modelformset_factory(Unit, forms.UnitForm, extra=0,
                                          can_delete=True, fields=('title',))
+    check_permission_name = 'service'
 
     def get_context_data(self, **kwargs):
         context = {'formset_service': self.formset_service(
@@ -63,14 +64,16 @@ class ServiceSettings(FormView, SuccessMessageMixin):
                                'formset_units': formset_units})
 
 
-class TariffListView(ListView):
+class TariffListView(account_views.AdminPermissionMixin, ListView):
     queryset = Tariff.objects.all().order_by('-updated_at')
     template_name = 'crm_home/system_settings/tariff/tariff_list.html'
+    check_permission_name = 'tariff'
 
 
-class TariffDetailView(DetailView):
+class TariffDetailView(account_views.AdminPermissionMixin, DetailView):
     model = Tariff
     template_name = 'crm_home/system_settings/tariff/tariff_detail_view.html'
+    check_permission_name = 'tariff'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -81,19 +84,37 @@ class TariffDetailView(DetailView):
         return context
 
 
-class TariffCreateVIew(CreateView):
+class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
     template_name = 'crm_home/system_settings/tariff/tariff_create.html'
     services_formset = modelformset_factory(TariffService,
                                             forms.TariffServiceForm,
                                             fields=('service', 'price',),
                                             can_delete=True, extra=0)
+    check_permission_name = 'tariff'
+
+
     def get_context_data(self, **kwargs):
+        context = dict()
         data = {'service-TOTAL_FORMS': '0',
                 'service-INITIAL_FORMS': '0',
                 }
-        context = {'form_tariff': forms.TariffForm(),
-                   'services_formset': self.services_formset(prefix='service', data=data),
-                   'services': Service.objects.all().select_related('unit')}
+        context['form_tariff'] = forms.TariffForm()
+        context['services_formset'] = self.services_formset(prefix='service',
+                                                            data=data)
+        context['services'] = Service.objects.all().select_related('unit')
+        tariff_id = self.request.GET.get('tarif_id')
+        if tariff_id:
+            tariff = get_object_or_404(Tariff.objects.
+                                       prefetch_related('tariffservice_set'),
+                                       id=tariff_id)
+            x = TariffService.objects.filter(tariff=tariff)
+            context['form_tariff'] = forms.TariffForm(initial={
+                'name': tariff.name,
+                'describe': tariff.describe
+            })
+            context['services_formset'] = self.services_formset(
+                prefix='service',
+                queryset=TariffService.objects.filter(tariff=tariff))
         return context
 
     def post(self, request, *args, **kwargs):
@@ -112,11 +133,13 @@ class TariffCreateVIew(CreateView):
                                                             'services': Service.objects.all().select_related('unit')})
 
 
-class TariffUpdateView(UpdateView):
+class TariffUpdateView(account_views.AdminPermissionMixin, UpdateView):
     template_name = 'crm_home/system_settings/tariff/tariff_update.html'
     services_formset = modelformset_factory(TariffService, forms.TariffServiceForm, fields=('service', 'price',),
                                             can_delete=True, extra=0)
     model = Tariff
+    check_permission_name = 'tariff'
+
 
     def get_context_data(self, **kwargs):
         context = {'form_tariff': forms.TariffForm(instance=self.object),
@@ -150,7 +173,6 @@ class TariffUpdateView(UpdateView):
 def get_unit_for_service(request):
     if request.GET:
         x = request.GET.get('id')
-        print(x)
         unit = Service.objects.get(pk=x).unit.title
         return JsonResponse({'unit': unit}, status=200)
 
@@ -169,10 +191,12 @@ def delete_tariff(request):
             return JsonResponse({'error': 'error'}, status=500)
 
 
-class RolesUpdateView(FormView):
+class RolesUpdateView(account_views.AdminPermissionMixin, FormView):
     queryset = Role.objects.all()
     template_name = 'crm_home/system_settings/roles/roles.html'
     roles_formset = modelformset_factory(Role, RoleForm, extra=0)
+    check_permission_name = 'role'
+
 
     def get_context_data(self, **kwargs):
         context = {
@@ -189,9 +213,11 @@ class RolesUpdateView(FormView):
                       context={'roles_formset': roles_formset})
 
 
-class RequisitesUpdateView(UpdateView):
+class RequisitesUpdateView(account_views.AdminPermissionMixin, UpdateView):
     model = Requisites
     form_class = forms.RequisitesForm
+    check_permission_name = 'requisites'
+
 
     def get_object(self, queryset=None):
         return Requisites.objects.first()
@@ -210,27 +236,29 @@ class RequisitesUpdateView(UpdateView):
             return HttpResponseRedirect(reverse_lazy('crm_home:requisites'))
 
 
-class PaymentStateCreateView(CreateView):
+class PaymentStateCreateView(account_views.AdminPermissionMixin, CreateView):
     success_url = reverse_lazy('crm_home:payment_states')
     model = PaymentState
     form_class = forms.PaymentStateForm
+    check_permission_name = 'tariff'
 
     def post(self, request, *args, **kwargs):
         form_class = self.form_class(request.POST)
-        print(form_class.is_valid(), form_class.errors)
         response = super().post(self, request, *args, **kwargs)
         messages.success(request, 'Успешно выполнено')
         return response
 
 
-class PaymentStateListView(ListView):
+class PaymentStateListView(account_views.AdminPermissionMixin, ListView):
     queryset = PaymentState.objects.all().order_by('id')
+    check_permission_name = 'tariff'
 
 
-class PaymentStateUpdateView(UpdateView):
+class PaymentStateUpdateView(account_views.AccountCreateView, UpdateView):
     success_url = reverse_lazy('crm_home:payment_states')
     model = PaymentState
     form_class = forms.PaymentStateForm
+    check_permission_name = 'tariff'
 
     def post(self, request, *args, **kwargs):
         response = super().post(self, request, *args, **kwargs)
@@ -249,11 +277,12 @@ def delete_payment_state(request):
             return JsonResponse({'error': 'error'}, status=500)
 
 
-class CounterDataCreateView(CreateView):
+class CounterDataCreateView(account_views.AdminPermissionMixin, CreateView):
     model = CounterData
     template_name = 'crm_home/counterdata_form.html'
     form_class = forms.CounterDataForm
     success_url = reverse_lazy('crm_home:counter_data_list')
+    check_permission_name = 'meter'
 
     def get_success_url(self, form_class):
         if 'save_and_add' in self.request.POST.keys():
@@ -287,8 +316,9 @@ class CounterDataCreateView(CreateView):
             })
 
 
-class CounterDataListView(ListView):
+class CounterDataListView(account_views.AdminPermissionMixin, ListView):
     model = CounterData
+    check_permission_name = 'meter'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = {
@@ -305,15 +335,19 @@ class CounterDataListViewAjax(BaseDatatableView):
     order_columns = ['house', 'section', 'flat', 'service']
 
     def get_initial_queryset(self):
-        return self.model.objects.all().select_related('flat',
-                                                       'service__unit')
+        flat_id = self.request.get('flat_id')
+        print(flat_id)
+        if flat_id:
+            queryset = self.model.objects.filter(flat_id=flat_id)
+        else:
+            queryset = self.model.objects.all()
+        return queryset.select_related('flat', 'service__unit')
 
     def filter_queryset(self, qs):
         house = self.request.GET.get('house')
         section = self.request.GET.get('section')
         service = self.request.GET.get('service')
         flat = self.request.GET.get('flat')
-        # dolg = self.request.GET.get('dolg')
         if house:
             qs = qs.filter(house=house)
         if section:
@@ -325,9 +359,10 @@ class CounterDataListViewAjax(BaseDatatableView):
         return qs
 
 
-class FlatCounterDataListView(TemplateView):
+class FlatCounterDataListView(account_views.AdminPermissionMixin, TemplateView):
     model = CounterData
     template_name = 'crm_home/counterdata_flat_list.html'
+    check_permission_name = 'meter'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = dict()
@@ -404,19 +439,21 @@ class CounterDeleteAjax(DeleteView):
             )
 
 
-class CounterDetailView(DetailView):
+class CounterDetailView(account_views.AdminPermissionMixin, DetailView):
     model = CounterData
+    check_permission_name = 'meter'
 
     def get_queryset(self):
         return self.model.objects.all().\
             select_related('flat__owner', 'service__unit')
 
 
-class CounterDataUpdateView(UpdateView):
+class CounterDataUpdateView(account_views.AdminPermissionMixin, UpdateView):
     model = CounterData
     template_name = 'crm_home/counterdata_update_form.html'
     form_class = forms.CounterDataForm
     success_url = reverse_lazy('crm_home:counter_data_list')
+    check_permission_name = 'meter'
 
     def get_success_url(self, form_class):
         if 'save_and_add' in self.request.POST.keys():

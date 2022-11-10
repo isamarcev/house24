@@ -43,6 +43,8 @@ urlpatterns = [
          name='transaction_detail'),
     path('transactions/delete/', views.DeleteTransaction.as_view(),
          name='delete_transaction'),
+    path('transactions/export/', views.download_file,
+         name='export_transaction'),
     path('transactions/get-personal-accounts-ajax/',
          views.get_personal_accounts_ajax,
          name='get_personal_accounts_ajax'),
@@ -53,8 +55,6 @@ urlpatterns = [
     # invoices
     path('account/invoice/detail/<int:pk>/', views.main_page,
          name='invoices_for_flat'),
-    path('account/invoice/create/', views.main_page,
-         name="create_invoice_for_flat"),
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
     path('invoices/get-ajax-list/', views.InvoiceListViewAjax.as_view(),
          name='get_invoices_ajax_list'),
@@ -74,8 +74,10 @@ urlpatterns = [
          name='get_info_by_flat'),
     path('invoices/get-tariff-info/', views.tariff_ajax_info,
          name="get_tariff_info"),
-
-
+    path('invoices/print/<int:pk>/', views.TemplatePrintView.as_view(),
+         name='print_invoice'),
+    path('invoices/template/', views.TemplatesUpdateView.as_view(),
+         name='update_templates'),
 
     #
     path('transactionыаыфав/create/', views.TransactionCreateView.as_view(),

@@ -1,0 +1,88 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Настройка шаблонов
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_accounting/css/invoice_create.css' %}">
+
+{% endblock %}
+{% block content %}
+            <input type="hidden" id="link-id" value="invoice">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Настройка шаблонов
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_accounting:invoice_list' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Квитанции
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span> Настройка шаблонов </li>
+        </ul>
+    </section>
+
+    <section class="content content-custom" style="font-size: 14px">
+        <div class="box-header with-border" style="border-top: 3px solid #d2d6de">
+            <h3 class="box-title">Список шаблонов</h3>
+        </div>
+        <div class="box">
+            <div class="box-body">
+                {% for file in templates %}
+                    <div class="template">
+                        <p>
+                            {{ file.name }}
+                            {% if file.default %}
+                                <span class="text-bold">(по-умолчанию)</span>
+                            {% endif %}
+                        </p>
+                        <a href="{{ file.file.url }}"><i class="fa fa-download" aria-hidden="true"></i> Скачать шаблон</a>
+                        <a href="{% url 'crm_accounting:update_templates' %}?default_id={{ file.id }}" class="text-success">• Назначить шаблоном по умоланию</a>
+                        <a href="{% url 'crm_accounting:update_templates' %}?delete_id={{ file.id }}" class="text-danger" data-confirm="Вы уверены, что хотите удалить этот элемент?"><i class="fa fa-trash" aria-hidden="true"></i> Удалить шаблон</a>
+                    </div>
+                {% endfor %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="{{ form_template.file.id_for_label }}">
+                                    Загрузить пользовательский шаблон
+                                </label>
+                                {{ form_template.file }}
+                                {% for error in form_template.errors.file %}
+                                    <div class="errorlist">
+                                    {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form_template.name.id_for_label }}">
+                                    Название
+                                </label>
+                                {{ form_template.name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="justify-content: center">
+                        <a style="width: min-content; margin-right: 10px" class="btn btn-default" href="{% url 'crm_accounting:invoice_list' %}">Отменить</a>
+                        <button style="width: min-content" class="btn btn-success" type="submit">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+   </section>
+
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+
+
+{% endblock %}

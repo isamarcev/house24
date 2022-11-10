@@ -8,7 +8,6 @@ class Main(models.Model):
     slide2 = models.ImageField(upload_to='content/main', null=True, blank=True)
     slide3 = models.ImageField(upload_to='content/main', null=True, blank=True)
     apps_links = models.BooleanField(null=True)
-    # block = models.ForeignKey('Block', on_delete=models.PROTECT, null=True)
     seo = models.OneToOneField('Seo', on_delete=models.PROTECT, null=True)
 
     class Meta:
@@ -59,13 +58,9 @@ class Document(models.Model):
         return f"{self.title}"
 
 
-# def get_page():
-#     x = About.objects.get(pk=1).id
-#     return x
-
 class About(models.Model):
     header = models.CharField(max_length=100)
-    text = models.TextField(max_length=1000, null=True, blank=True)
+    text = models.TextField(max_length=2000, null=True, blank=True)
     image = models.ImageField(upload_to='content/about/', null=True, blank=True)
     additional_text = models.TextField(max_length=1000, null=True, blank=True)
     additional_header = models.CharField(max_length=100, null=True, blank=True)
@@ -80,8 +75,10 @@ class About(models.Model):
 
 
 class AdditionalGallery(models.Model):
-    image = models.ImageField(upload_to='content/additional-gallery/', null=True, blank=True)
-    page = models.ForeignKey('About', on_delete=models.CASCADE, null=True, blank=True)
+    image = models.ImageField(upload_to='content/additional-gallery/',
+                              null=True, blank=True)
+    page = models.ForeignKey('About', on_delete=models.CASCADE, null=True,
+                             blank=True)
 
     class Meta:
         verbose_name_plural = "Доплонительные Галереи"

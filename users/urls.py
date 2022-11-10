@@ -1,9 +1,17 @@
-from django.urls import path, include
+from django.urls import path, include, register_converter
 from . import views
+
+
 
 app_name = 'users'
 urlpatterns = [
     path('accounts/login/', views.LoginUser.as_view(), name='login'),
+    path('accounts/register/', views.RegisterUserView.as_view(),
+         name='register'),
+    path('accounts/register-done/', views.RegisterDoneView.as_view(),
+         name='register_done'),
+    path('confirm/<str:sign>/', views.confirm_register,
+         name='confirm_register'),
     path('accounts/admin-login/', views.LoginAdminUser.as_view(),
          name='admin-login'),
     path('accounts/logout/', views.LogoutUser.as_view(),
@@ -32,6 +40,9 @@ urlpatterns = [
 
 
     #CABINET
+
+    path('cabinet/statistic/', views.CabinetStatisticView.as_view(),
+         name='statistic_user_view'),
     path('cabinet/invoices/', views.CabinetInvoicesListView.as_view(),
          name='invoice_for_users'),
     path('cabinet/invoices/<int:pk>/', views.CabinetInvoicesDetail.as_view(),
@@ -39,7 +50,6 @@ urlpatterns = [
     path('cabinet/invoices/ajax-request/',
          views.CabinetInvoicesAjaxList.as_view(),
          name='invoice_for_users_ajax'),
-    path('cabinet/', views.LayoutTemplateView.as_view(), name='layout'),
 
     #TARIFF
     path('cabinet/tariff/', views.CabinetTariffForFlatView.as_view(),
@@ -53,6 +63,7 @@ urlpatterns = [
          name='messages_user_delete'),
     path('cabinet/messages/<int:pk>/', views.MessageUserDetailView.as_view(),
          name='messages_user_detail'),
+
     #REQUESTS
     path('cabinet/master-request/',
          views.RequestUserListView.as_view(),
@@ -71,8 +82,8 @@ urlpatterns = [
     path('cabinet/profile/',
          views.ProfileUserView.as_view(),
          name='user_profile'),
-    path('cabinet/profile/update',
-         views.ProfileUserView.as_view(),
+    path('cabinet/profile/update/',
+         views.ProfileUserUpdate.as_view(),
          name='user_profile_update'),
 
 
@@ -110,18 +121,4 @@ urlpatterns = [
          name='message_create'),
     path('messages/detail/<int:pk>/', views.MessageDetailView.as_view(),
          name='message_detail'),
-
-
-
-
-    # path('accounts/login/', views.LoginUser.as_view(), name='login'),
-
-    # path('admin/login/', views.LoginUser.as_view(), name='login'),
-
-    # path('accounts/logout/', views.LoginUser.as_view, name='logout'),
-
-    # path('about-us/', views.about, name='about'),
-    # path('services/', views.services, name='services'),
-    # path('contacts/', views.contacts, name='contacts'),
-
 ]

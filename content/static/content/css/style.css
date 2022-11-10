@@ -1,5 +1,133 @@
 @charset "utf-8";
 
+html {
+    /*overflow: hidden;*/
+
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #f8f8f8;
+    border-top: 1px solid #e7e7e7;
+}
+
+.slideTitle {
+    width: 55%;
+    color: #fff;
+    font-size: 60px;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    margin: auto;
+    transform: translateY(-50%);
+    text-align: center;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+}
+
+.page-header {
+    padding-bottom: 9px;
+    margin: 40px 0 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.header {
+    font-size: 24px;
+}
+
+.thumbnail {
+    display: block;
+    padding: 4px;
+    margin-bottom: 20px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    -webkit-transition: border .2s ease-in-out;
+    -o-transition: border .2s ease-in-out;
+    transition: border .2s ease-in-out;
+}
+
+.thumbnail>img {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.img-responsive, .thumbnail a>img, .thumbnail>img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.breadcrumb {
+    background-color: #fff;
+    padding: 8px 0;
+}
+
+.breadcrumb>li+li:before {
+    padding: 0 5px;
+    color: #ccc;
+    content: "/\00a0";
+}
+
+.imgFloatRight {
+    float: right;
+    margin: 0 0 15px 15px;
+}
+
+.about img {
+    max-width: 250px;
+}
+
+.media-heading {
+    margin: 0 0 0 5px;
+}
+.h4, h4 {
+    font-size: 18px;
+}
+.media-body, .media-left, .media-right {
+    display: table-cell;
+    vertical-align: top;
+}
+
+.media-body {
+    width: 10000px;
+}
+
+.media, .media-body {
+    overflow: hidden;
+    zoom: 1;
+}
+
+.services img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+.img-thumbnail {
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    padding: 4px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+/*.breadcrumb {*/
+/*    margin-bottom: 20px;*/
+/*    list-style: none;*/
+/*    border-radius: 4px;*/
+/*}*/
+
 /*html {*/
 /*    position: relative;*/
 /*    min-height: 100%;*/

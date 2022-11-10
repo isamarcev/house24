@@ -59,8 +59,8 @@
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" href="{% url 'users:owner_create' %}">Добавить владельца квартиры</a>
-                <a class="dropdown-item" href="#">Отправить сообщение должникам</a>
-                <a class="dropdown-item" href="#">Отправить приглашение</a>
+                <a class="dropdown-item" href="{% url 'users:message_create' %}">Отправить сообщение должникам</a>
+{#                <a class="dropdown-item" href="#">Отправить приглашение</a>#}
               </div>
             </div>
         </div>
@@ -79,14 +79,14 @@
                     </a>
                 </div>
                 </div>
-                    <div class="box-body" style="padding: 0">
-                        <table id="users" style="margin: 0;" class="table table-bordered table-hover table-striped linkedRow">
+                    <div class="box-body " style="padding: 0">
+                        <table id="users" style="margin: 0; width:100%" class="table table-bordered table-hover table-striped linkedRow">
                              <thead>
                                   <tr>
                                       <th tabindex="0" style="width: 110px; min-width: 110px" aria-controls="users" rowspan="1" colspan="1" >
                                           ID
                                       </th>
-                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1">
+                                      <th  tabindex="0"  aria-controls="users" rowspan="1" colspan="1" style="width: 200px; min-width: 200px">
                                           ФИО
                                       </th>
                                       <th tabindex="0" style="width: 140px; min-width: 140px;" aria-controls="users" rowspan="1" colspan="1">
@@ -172,7 +172,7 @@
 
                                             <td>
                                                 {% for flat in object.flat_set.all %}
-                                                    <a href="#">{{ flat }}</a>
+                                                    <a href="{% url 'houses:flat_detail' flat.id %}">{{ flat }}</a>
                                                 {% endfor %}
                                             </td>
 
@@ -190,21 +190,23 @@
                                             {% endif %}
                                             </td>
 
-                                            <td>
-                                                {% for flat in object.flat_set.all %}
+                                            <td id="debts-{{ object.id }}">
+                                                <script>
+                                                    let varDebts{{ object.id }} = 0
+                                                    {% for flat in object.flat_set.all %}
                                                     {% if flat.personal_account.balance < 0 %}
-                                                        Да
-                                                   {% else %}
-                                                        n
+                                                        varDebts{{ object.id }} += 1
                                                     {% endif %}
-                                                {% endfor %}
-
+                                                    {% endfor %}
+                                                if (varDebts{{ object.id }}>0) {
+                                                    document.getElementById('debts-{{ object.id }}').innerText = 'Да'
+                                                        } else {
+                                                    document.getElementById('debts-{{ object.id }}').innerText = 'Нет'
+                                                }
+                                                </script>
                                             </td>
-
                                             <td style="width: 10%">
                                                 <div class="btn-group pull-right" >
-                                                    <a class="btn btn-default btn-sm" href="#" title="Копировать" data-toggle="tooltip">
-                                                        <i class="fa fa-envelope"></i></a>
                                                     <a class="btn btn-default btn-sm" href="{% url 'users:owner_update' object.id %}" title="Редактировать" data-toggle="tooltip">
                                                         <i class="fa fa-pencil"></i></a>
                                                     <a class="btn btn-default btn-sm btn-delete " title="Удалить" href="{% url 'users:user_delete' object.id %}" name="{{ object.first_name }} {{ object.last_name }}" data-toggle="tooltip" data-pjax="0" >
@@ -295,10 +297,8 @@
     <script>
             $("#date_joined").datepicker({
             dateFormat: "mm.dd.yy",
-
 });
     </script>
-
             <script src="{% static 'users/js/owner_list.js' %}"></script>
 
 {% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'houses/layout/base_houses.html' %}
+{% load static %}
+{% block title %}
+    Печатная форма документа
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'content/css/content_css.css' %}" type="text/css">
+{% endblock %}
+{% block css_after %}
+    <link rel="stylesheet" href="{% static 'crm_accounting/css/invoice_create.css' %}">
+{% endblock %}
+{% block content %}
+            <input type="hidden" id="link-id" value="invoice">
+
+    <section class="content-header" style="position: relative; display: block!important; border-bottom: 1px solid #d2d6de">
+        <h1 style="color: #444; font-size: 24px"> Печатная форма документа
+        </h1>
+        <ul class="breadcrumb" style="float:right;background: transparent!important; margin-top: 0!important;
+        margin-bottom: 0!important; font-size: 12px!important; position: absolute!important;
+        top: 15px!important; right: 15px!important; border-radius: 2px!important;">
+            <li><a href="{% url 'houses:main' %}" style="color: #444; text-decoration: none"><i class="fa fa-home" style="margin-right: 5px"></i> Главная</a></li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_accounting:invoice_list' %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Квитанции
+                </a>
+            </li>
+            <li class="active" style="padding: 0 0 0 10px; color: #777;"><a href="{% url 'crm_accounting:invoice_detail' object.id %}" style="color: #444; text-decoration: none">
+                <span style="color: #ccc; margin-right: 5px" >></span> Квитанция № {{ object.number }}
+                </a>
+            </li>
+            <li style="padding: 0 0 0 10px; color: #777;"><span style="color: #ccc; margin-right: 5px" >></span> Печатная форма документа </li>
+        </ul>
+    </section>
+
+    <section class="content content-custom" style="font-size: 14px">
+        <div class="box-header with-border" style="border-top: 3px solid #d2d6de">
+                <h3 class="box-title">Список шаблонов</h3>
+            <div class="box-tools">
+                    <a style="height: 31px" href="{% url 'crm_accounting:update_templates' %}" class="btn btn-default btn-sm">
+                    <span class="hidden-xs">Настройка шаблонов</span>
+                    </a>
+                </a>
+            </div>
+        </div>
+        <div class="box" style="border-top: none">
+        <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+            <div class="box-body">
+            <div id="id_template">
+                {% for radio in templates.template %}
+                <div>
+                <label for="{{ radio.id_for_label }}" style="font-weight: 400">
+                    <span class="radio">{{ radio.tag }}</span>
+                     {{ radio.choice_label }}
+               </label>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="row" style="justify-content: right">
+                        <button style="width: min-content; margin-right: 10px" class="btn btn-success" name="action_download" type="submit">Скачать</button>
+                        <button style="width: max-content" class="btn btn-default" name="action_send_email" type="submit">Отправить на e-mail</button>
+                    </div>
+            </div>
+        </form>
+        </div>
+   </section>
+
+  <script>
+  </script>
+{% endblock %}
+{% block script %}
+
+
+{% endblock %}

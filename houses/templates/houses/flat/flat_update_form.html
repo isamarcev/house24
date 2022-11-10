@@ -181,6 +181,8 @@
                     })
                     $('#account_list').on('change', function () {
                         let value = ($(this))
+                        console.log(value)
+                        console.log(value.val())
                         $('#id_account_number').val(value.val())
                     })
 

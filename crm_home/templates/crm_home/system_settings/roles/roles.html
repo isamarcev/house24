@@ -92,6 +92,28 @@
                                         {% for hidden_field in object.hidden_fields %}
                                             {{ hidden_field }}
                                         {% endfor %}
+                                        {% if object.instance.name == 'Директор' %}
+                                        <tr>
+                                            <td>Директор</td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                            <td><input type="checkbox" disabled checked=""></td>
+                                        </tr>
+                                        </tr>
+                                        {% else %}
                                         <tr>
                                             <td>{{ object.instance.name }}</td>
                                             <td>{{ object.statistics }}</td>
@@ -111,6 +133,7 @@
                                             <td>{{ object.users }}</td>
                                             <td>{{ object.requisites }}</td>
                                         </tr>
+                                        {% endif %}
                                     {% endfor %}
                                   </tbody>
                         </table>

@@ -42,6 +42,8 @@ class TariffService(models.Model):
         verbose_name_plural = "Тарифы Услуги"
         verbose_name = "Тариф Услуга"
 
+    def __str__(self):
+        return f'{self.tariff.name} - {self.service.name}'
     # def clean_price(self):
     #     new_price = self.cleaned
 
@@ -77,6 +79,9 @@ class CounterData(models.Model):
 class Requisites(models.Model):
     title = models.CharField(max_length=100)
     info = models.TextField(max_length=1000)
+
+    def __str__(self):
+        return f'{self.title} {self.info}'
 
 
 class PaymentState(models.Model):

@@ -89,17 +89,21 @@
           <i class="fa fa-user-circle text-purple"></i>
             <span>{{ user }}</span>
         </a>
-          <ul class="dropdown-menu" id="dropdown_user" style="position: absolute; right: 0!important;left: auto!important;">
+          <ul class="dropdown-menu" id="dropdown_user" style="position: absolute; right: 0!important;left: auto!important; padding: 0">
                             <!-- User image -->
-                            <li class="user-header">
-                                <span><i class="fa fa-user-circle text-purple bg-gray-light img-circle"></i></span>
-                                <p> user.name </p>
+                            <li class="user-header" style="text-align: center; background-color: orange">
+                                {% if user.photo %}
+                                    <img src="{{ user.photo.url }}" alt="Фото пользователя" style="width: 100px; height: 100px; border-radius: 50%">
+                                    {% else %}
+                                    <img src="{% static 'content/img/empty.jpeg' %}" alt="Фото пользователя" style="width: 100px; border-radius: 50%; height: 100px">
+                                {% endif %}
+                                <p> {{ user.first_name }} {{ user.father_name }}</p>
                             </li>
                             <!-- Menu Footer-->
                             <li class="user-footer">
-                                <div class="pull-left">
+                                <div class="pull-left" style="float:left">
                                     <a class="btn btn-default btn-flat" href="{% url 'users:user_profile' %}">Профиль</a>                                </div>
-                                <div class="pull-right">
+                                <div class="pull-right" style="float:right">
                                     <a class="btn btn-default btn-flat" href="{% url 'users:logout' %}" data-method="post">Выход</a>                                </div>
                             </li>
                         </ul>
@@ -135,7 +139,7 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
               <li class="nav-item" >
-                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                 <a style="width: 100%; border-radius: 0; " class="nav-link">
                     <i class="fa fa-line-chart"></i>
                      <p style="align-items: center">Сводки
                         <i class="right fas fa-angle-left" style="top: 1rem"></i>
@@ -144,7 +148,7 @@
                 <ul class="nav nav-treeview">
                     {% for flat in flats %}
                           <li class="nav-item">
-                            <a href="{% url 'crm_home:set_services' %}" class="nav-link">
+                            <a href="{% url 'users:statistic_user_view' %}?flat_id={{ flat.id }}" class="nav-link sublink">
                               <i class="fa fa-building-o"></i>
                               <p>{{ flat.house }}, кв.{{ flat.number }}</p>
                             </a>
@@ -155,7 +159,7 @@
 
 
             <li class="nav-item" >
-                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                 <a style="width: 100%; border-radius: 0; " href="{% url 'users:invoice_for_users' %}" onclick="return false" class="nav-link">
                     <i class="fa fa-files-o"></i>
                      <p style="align-items: center">Квитанции
                         <i class="right fas fa-angle-left" style="top: 1rem"></i>
@@ -163,14 +167,14 @@
                  </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="{% url 'users:invoice_for_users' %}" class="nav-link">
+                    <a href="{% url 'users:invoice_for_users' %}" class="nav-link sublink">
                       <i class="fa fa-files-o"></i>
                       <p>Все квитанции</p>
                     </a>
                   </li>
                     {% for flat in flats %}
                           <li class="nav-item">
-                            <a href="{% url 'users:invoice_for_users' %}?flat_id={{ flat.id }}" class="nav-link">
+                            <a href="{% url 'users:invoice_for_users' %}?flat_id={{ flat.id }}" class="nav-link sublink">
                               <i class="fa fa-files-o"></i>
                               <p>{{ flat.house }}, кв.{{ flat.number }}</p>
                             </a>
@@ -181,7 +185,7 @@
 
 
             <li class="nav-item" >
-                 <a href="#" style="width: 100%; border-radius: 0; " class="nav-link">
+                 <a  style="width: 100%; border-radius: 0; " class="nav-link">
                     <i class="fa fa-money"></i>
                      <p style="align-items: center">Тарифы
                         <i class="right fas fa-angle-left" style="top: 1rem"></i>
@@ -190,7 +194,7 @@
                 <ul class="nav nav-treeview">
                   {% for flat in flats %}
                           <li class="nav-item">
-                            <a href="{% url 'users:tariff_for_users_flat' %}?flat_id={{ flat.id }}" class="nav-link">
+                            <a href="{% url 'users:tariff_for_users_flat' %}?flat_id={{ flat.id }}" class="nav-link sublink">
                               <i class="fa fa-file-text-o"></i>
                               <p>{{ flat.house }}, кв.{{ flat.number }}</p>
                             </a>
@@ -264,7 +268,14 @@
 <script src="{% static 'houses/dist/js/adminlte.min.js' %}"></script>
 {#                <script src="{% static 'houses/plugins/jquery/jquery.min.js' %}"></script>#}
 <script src="{% static 'houses/plugins/jquery-ui/jquery-ui.js' %}"></script>
-
+    <style>
+        .sublink {
+            background-color: transparent!important;
+        }
+        .sublink:hover {
+                color: #000000!important;
+        }
+    </style>
 <script src="{% static 'houses/js/main.js' %}"></script>
 {% block script %}
 

@@ -1,36 +1,35 @@
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q, Sum
 from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, UpdateView, CreateView, DetailView, \
-    TemplateView
+from django.views.generic import ListView, UpdateView, CreateView, \
+    DetailView, TemplateView
 from django.contrib import messages
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
-from crm_accounting.models import get_next_account, PersonalAccount, Invoice
+from crm_accounting.models import get_next_account, PersonalAccount, Invoice, \
+    Transaction
 
 from .forms import SectionForm, FloorForm, HouseForm, UserForm, FlatForm, \
     PersonalAccountForm
 from .models import *
-from crm_accounting.views import get_statistics
+from crm_accounting import views as account_views
 from users.models import CustomUser, Request
-
-
-
-# Create your views here.
 
 def main_page(request):
     return render(request, 'houses/layout/base_houses.html')
 
 
-class StatisticView(TemplateView):
+
+class StatisticView(account_views.AdminPermissionMixin, TemplateView):
     template_name = 'houses/statistics.html'
+    check_permission_name = 'statistics'
+
 
     def get_context_data(self):
         context = dict()
-        context = get_statistics(context)
+        context = account_views.get_statistics(context)
         context['houses_count'] = House.objects.all().count()
         context['active_users'] = CustomUser.objects.filter(role=None,
                                                             status='Активен')
@@ -39,37 +38,58 @@ class StatisticView(TemplateView):
         context['new_request_masters'] = Request.objects.filter(
             status="Новое").count()
         context['flats_count'] = Flat.objects.all().count()
-        context['personal_accounts_count'] = PersonalAccount.objects.all().\
+        context['personal_accounts_count'] = PersonalAccount.objects.all(). \
             count()
         month_list = [number for number in range(1, 13)]
         debts_per_month = [Invoice.objects.
-                      filter(date__month=number, status='Неоплачена').
-                      aggregate(Sum('amount'))
-                      for number in month_list]
-        print(debts_per_month)
-        debts_per_month_value = []
-        for i in debts_per_month:
-            if i.get('amount__sum'):
-                debts_per_month_value.append(int(i.get('amount__sum')))
-            else:
-                debts_per_month_value.append(0)
+                           filter(date__month=number, status='Неоплачена').
+                           aggregate(Sum('amount'))
+                           for number in month_list]
+        debts_per_month_value = [int(i.get('amount__sum'))
+                                 if i.get('amount__sum')
+                                 else 0
+                                 for i in debts_per_month]
         payed_per_month = [Invoice.objects.
-                      filter(date__month=number, status='Оплачена').
-                      aggregate(Sum('amount')).get('amount__sum')
-                      for number in month_list]
-        print(payed_per_month)
-        print(debts_per_month_value)
+                           filter(date__month=number, status='Оплачена').
+                           aggregate(Sum('amount'))
+                           for number in month_list]
+        payed_per_month_value = [int(i.get('amount__sum'))
+                                 if i.get('amount__sum')
+                                 else 0
+                                 for i in payed_per_month]
         context['debts_per_month'] = debts_per_month_value
-        context['payed_per_month'] = payed_per_month
-        # context['debts_per_month']
+        context['payed_per_month'] = payed_per_month_value
+        income_per_month_value = [int(i.get('amount__sum'))
+                                  if i.get('amount__sum')
+                                  else 0
+                                  for i in [Transaction.objects.
+                                            filter(date__month=number,
+                                                   completed=True,
+                                                   payment_state__type='in').
+                                            aggregate(Sum('amount')) for number
+                                            in month_list]]
+        outcome_per_month_value = [int(i.get('amount__sum'))
+                                   if i.get('amount__sum')
+                                   else 0
+                                   for i in [Transaction.objects.
+                                             filter(date__month=number,
+                                                    completed=True,
+                                                    payment_state__type='out').
+                                             aggregate(Sum('amount')) for
+                                             number
+                                             in month_list]]
+        context['income_per_month'] = income_per_month_value
+        context['outcome_per_month'] = outcome_per_month_value
         return context
 
 
-class HousesListView(ListView):
+class HousesListView(account_views.AdminPermissionMixin, ListView):
     model = House
+    check_permission_name = 'house'
 
 
-class HouseCreateView(CreateView):
+class HouseCreateView(account_views.AdminPermissionMixin, CreateView):
+
     section_formset = modelformset_factory(Section, SectionForm,
                                            fields=('title',), can_delete=True,
                                            extra=0)
@@ -80,6 +100,7 @@ class HouseCreateView(CreateView):
     model = House
     form_class = HouseForm
     template_name = 'houses/house_form.html'
+    check_permission_name = 'house'
 
     def get_context_data(self, **kwargs):
         data_section = {'section-TOTAL_FORMS': '0',
@@ -99,7 +120,7 @@ class HouseCreateView(CreateView):
         context['section_formset'] = section_formset
         context['floor_formset'] = floor_formset
         context['users_formset'] = users_formset
-        context['users'] = CustomUser.objects.filter(~Q(role=None))\
+        context['users'] = CustomUser.objects.filter(~Q(role=None)) \
             .select_related('role')
         return context
 
@@ -143,8 +164,10 @@ class HouseCreateView(CreateView):
             })
 
 
-class HousesDetail(DetailView):
+class HousesDetail(account_views.AdminPermissionMixin, DetailView):
     model = House
+    check_permission_name = 'house'
+
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -154,7 +177,7 @@ class HousesDetail(DetailView):
         return self.render_to_response(context)
 
 
-class HouseUpdateView(UpdateView):
+class HouseUpdateView(account_views.AdminPermissionMixin, UpdateView):
     section_formset = modelformset_factory(Section, SectionForm,
                                            fields=('title',), can_delete=True,
                                            extra=0)
@@ -165,6 +188,8 @@ class HouseUpdateView(UpdateView):
     model = House
     form_class = HouseForm
     template_name = 'houses/house_update_form.html'
+    check_permission_name = 'house'
+
 
     def get_context_data(self, **kwargs):
         section_formset = self.section_formset(prefix='section',
@@ -265,10 +290,11 @@ def get_role(request):
     return JsonResponse({'role': role}, status=200)
 
 
-class FlatsListView(ListView):
+class FlatsListView(account_views.AdminPermissionMixin, ListView):
     model = Flat
     template_name = 'houses/flat/flat_list.html'
     queryset = None
+    check_permission_name = 'flat'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = dict()
@@ -322,16 +348,19 @@ def delete_flat(request):
         return JsonResponse({'success': 'success'}, status=200)
 
 
-class FlatDetailView(DetailView):
+class FlatDetailView(account_views.AdminPermissionMixin, DetailView):
     model = Flat
     template_name = 'houses/flat/flat_detail.html'
+    check_permission_name = 'flat'
 
 
-class FlatUpdateView(UpdateView):
+
+class FlatUpdateView(account_views.AdminPermissionMixin, UpdateView):
     model = Flat
     form_class = FlatForm
     template_name = 'houses/flat/flat_update_form.html'
     success_url = reverse_lazy('houses:flat_list')
+    check_permission_name = 'flat'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -360,9 +389,9 @@ class FlatUpdateView(UpdateView):
                     if not account.first().flat:
                         account.first().flat = form_class.instance
                         form_class.instance.personal_account = account.first()
+                        account.first().save()
                         messages.success(request, 'Квартира успешно изменена')
-                    else:
-                        form_class.save()
+                    form_class.save()
                     return create_or_add_next(self, request, form_class)
                 else:
                     account_form.save(commit=False)
@@ -396,11 +425,13 @@ def create_or_add_next(self, request, form_class):
         return HttpResponseRedirect(self.success_url)
 
 
-class FlatCreate(CreateView):
+class FlatCreate(account_views.AdminPermissionMixin, CreateView):
     model = Flat
     form_class = FlatForm
     template_name = 'houses/flat/flat_form.html'
     success_url = reverse_lazy('houses:flat_list')
+    check_permission_name = 'flat'
+
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
