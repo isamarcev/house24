@@ -54,14 +54,17 @@ def get_statistics(context):
     outcome = models.Transaction.objects. \
         filter(payment_state__type='out').aggregate(Sum('amount'))
     cashbox_state = income['amount__sum'] - outcome['amount__sum']
+    if cashbox_state:
+        context['cashbox_state'] = cashbox_state
     sum_personal_accounts = models.PersonalAccount.objects.all().aggregate(
         Sum('balance'))
-    context['cashbox_state'] = cashbox_state
-    context['sum_accounts_balance'] = sum_personal_accounts.get('balance__sum')
+    if sum_personal_accounts:
+        context['sum_accounts_balance'] = sum_personal_accounts.get('balance__sum')
     invoices_dopts = models.Invoice.objects.filter(
         payment_state=True,status__in=['Неоплачена', 'Частично оплачена']). \
         aggregate(Sum('amount'))
-    context['invoices_dobts'] = invoices_dopts.get('amount__sum')
+    if invoices_dopts:
+        context['invoices_dobts'] = invoices_dopts.get('amount__sum')
     return context
 
 
