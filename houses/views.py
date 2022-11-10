@@ -145,7 +145,7 @@ class HouseCreateView(account_views.AdminPermissionMixin, CreateView):
                         form.save()
             if floor_formset.is_valid():
                 floor_formset.save(commit=False)
-                for form in section_formset.new_objects:
+                for form in floor_formset.new_objects:
                     if form.title:
                         form.house = form_class.instance
                         form.save()
