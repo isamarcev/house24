@@ -246,8 +246,6 @@ class UserUpdateView(account_views.AdminPermissionMixin, UpdateView):
         form_class = self.form_class(request.POST, instance=self.get_object())
         if form_class.is_valid():
             form_class.save(commit=False)
-            if len(request.POST.get('password')) == 0:
-                del form_class.instance.password
             form_class.save()
             return HttpResponseRedirect(reverse_lazy('users:users'))
         return render(request, self.template_name, self.get_context_data())
