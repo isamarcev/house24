@@ -11,3 +11,11 @@ celery:
 	celery -A home24 worker --loglevel=INFO
 docker:
 	sudo systemctl start docker
+prune:
+	docker system prune
+stopdelete:
+	docker-compose -f docker-compose.prod.yml down -v
+build:
+	docker-compose -f docker-compose.prod.yml build
+up:
+	docker-compose -f docker-compose.prod.yml up

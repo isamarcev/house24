@@ -2,6 +2,7 @@ from django.core.management import BaseCommand
 
 from content.models import About, Block, Main, Seo, ServicePage, AboutService, Contacts
 from crm_home.models import Requisites, Tariff, Unit, Service
+from houses.models import House
 from users.models import Role
 
 
@@ -145,5 +146,10 @@ class Command(BaseCommand):
         services_units = Service.objects.bulk_create([
             Service(name='Coding'),
             Service(name='Cooking')
+        ])
+
+        houses = House.objects.bulk_create([
+            House(title='ЖК Килограмм счастья', address='Бульвар Шевченка 78'),
+            House(title='ЖК Килограмм ванили', address='Бульвар Шевченка 76'),
         ])
 

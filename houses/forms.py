@@ -1,22 +1,104 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from .models import *
 
 
 class HouseForm(forms.ModelForm):
+    image_error_messages = {
+        "invalid_image":
+             'Файл вложенного формата недопустим. '
+             'Выберите файл с форматорми .png , .jpg .jpeg.'
+    }
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='', label='Название')
     address = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label_suffix='', label='Адрес')
-    image_1 = forms.ImageField(label_suffix='', label='Изображение #1. Развер: (522х350)', required=False)
-    image_2 = forms.ImageField(label_suffix='', label='Изображение #2. Развер: (248х160)', required=False)
-    image_3 = forms.ImageField(label_suffix='', label='Изображение #3. Развер: (248х160)', required=False)
-    image_4 = forms.ImageField(label_suffix='', label='Изображение #4. Развер: (248х160)', required=False)
-    image_5 = forms.ImageField(label_suffix='', label='Изображение #5. Развер: (248х160)', required=False)
-
+    image_1 = forms.ImageField(label_suffix='',
+                               label='Изображение #1. Размер: (522х350)',
+                               required=False,
+                               error_messages=image_error_messages)
+    image_2 = forms.ImageField(label_suffix='',
+                               label='Изображение #2. Размер: (248х160)',
+                               required=False,
+                               error_messages=image_error_messages)
+    image_3 = forms.ImageField(label_suffix='',
+                               label='Изображение #3. Размер: (248х160)',
+                               required=False,
+                               error_messages=image_error_messages)
+    image_4 = forms.ImageField(label_suffix='',
+                               label='Изображение #4. Размер: (248х160)',
+                               required=False,
+                               error_messages=image_error_messages)
+    image_5 = forms.ImageField(label_suffix='',
+                               label='Изображение #5. Размер: (248х160)',
+                               required=False,
+                               error_messages=image_error_messages)
+    good_format = ['png', 'jpg', 'jpeg']
     class Meta:
         model = House
-        fields = ['title', 'address', 'image_1', 'image_2', 'image_3', 'image_4', 'image_5']
+        fields = ['title', 'address', 'image_1', 'image_2', 'image_3',
+                  'image_4', 'image_5']
         exclude = ['id', ]
+        error_messages = {
+            'image_1': {"invalid_image":
+                        'Файл вложенного формата недопустим. '
+                        'Выберите файл с форматорми .png , .jpg .jpeg.'}
+            }
+
+    def clean_image_1(self):
+        image = self.cleaned_data.get('image_1')
+        if image:
+            format_file = image.name.split('.')[-1]
+            if format_file not in self.good_format:
+                raise ValidationError(
+                    'Файл вложенного формата недопустим. '
+                    'Выберите файл с форматорми .png , .jpg .jpeg'
+                )
+        return image
+
+    def clean_image_2(self):
+        image = self.cleaned_data.get('image_2')
+        if image:
+            format_file = image.name.split('.')[-1]
+            if format_file not in self.good_format:
+                raise ValidationError(
+                    'Файл вложенного формата недопустим. '
+                    'Выберите файл с форматорми .png , .jpg .jpeg'
+                )
+        return image
+
+    def clean_image_3(self):
+        image = self.cleaned_data.get('image_3')
+        if image:
+            format_file = image.name.split('.')[-1]
+            if format_file not in self.good_format:
+                raise ValidationError(
+                    'Файл вложенного формата недопустим. '
+                    'Выберите файл с форматорми .png , .jpg .jpeg'
+                )
+        return image
+
+    def clean_image_4(self):
+        image = self.cleaned_data.get('image_4')
+        if image:
+            format_file = image.name.split('.')[-1]
+            if format_file not in self.good_format:
+                raise ValidationError(
+                    'Файл вложенного формата недопустим. '
+                    'Выберите файл с форматорми .png , .jpg .jpeg'
+                )
+        return image
+
+    def clean_image_5(self):
+        image = self.cleaned_data.get('image_5')
+        if image:
+            format_file = image.name.split('.')[-1]
+            if format_file not in self.good_format:
+                raise ValidationError(
+                    'Файл вложенного формата недопустим. '
+                    'Выберите файл с форматорми .png , .jpg .jpeg'
+                )
+        return image
 
 
 class SectionForm(forms.ModelForm):
@@ -38,8 +120,11 @@ class FloorForm(forms.ModelForm):
 
 
 class UserForm(forms.ModelForm):
-    name = forms.ModelChoiceField(queryset=CustomUser.objects.filter(role=True), label_suffix='', label='ФИО',
-                                  widget=forms.Select(attrs={'class': 'form-select'}), empty_label="Выберите...")
+    name = forms.ModelChoiceField(
+        queryset=CustomUser.objects.filter(~Q(role=None)),
+        label_suffix='', label='ФИО',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        empty_label="Выберите...")
 
     class Meta:
         model = CustomUser
