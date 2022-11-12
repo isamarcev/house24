@@ -123,8 +123,8 @@
                     if (data.success) {
                         var row = $('#instance-' + id)
                         row.css('display', 'none')
-                    } else {
-                        alert('Something wrong.')
+                    } else if (data.errors) {
+                        alert(data.errors)
                     }
                 }
             })

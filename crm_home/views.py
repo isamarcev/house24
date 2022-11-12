@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
+from django.db.models.deletion import ProtectedError
 from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -124,7 +125,9 @@ class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
             form_tariff.save()
             services_formset.save(commit=False)
             for form in services_formset:
-                if form.instance.service:
+                if form.instance not in services_formset.deleted_objects and form.instance.service:
+                    form.instance.pk = None
+                    form.instance._state.adding = True
                     form.instance.tariff = form_tariff.instance
                     form.instance.save()
             return HttpResponseRedirect(reverse_lazy('crm_home:tariffs'))
@@ -179,16 +182,19 @@ def get_unit_for_service(request):
 
 def delete_tariff(request):
     if request.GET:
+        pk = request.GET.get('id')
+        tariff = get_object_or_404(Tariff, pk=pk)
+        tariff_services = TariffService.objects.filter(tariff=tariff)
         try:
-            pk = request.GET.get('id')
-            tariff = Tariff.objects.get(pk=pk)
-            tariff_services = TariffService.objects.filter(tariff=tariff)
+            tariff.delete()
             for tariff_and_service in tariff_services:
                 tariff_and_service.delete()
-            tariff.delete()
             return JsonResponse({'success': 'success'}, status=200)
-        finally:
-            return JsonResponse({'error': 'error'}, status=500)
+        except ProtectedError:
+            return JsonResponse(
+                {'errors': "Этот тариф присутствует в квартирах. Отказано!"}
+            )
+
 
 
 class RolesUpdateView(account_views.AdminPermissionMixin, FormView):

@@ -10,8 +10,8 @@ urlpatterns = [
 
 
     # counter
-    path('account/counter/detail/<int:pk>/', views.main_page,
-         name='counter_data'),
+    # path('account/counter/detail/<int:pk>/', views.main_page,
+    #      name='counter_data'),
 
     # transaction приходная ведомость
     path('account/', views.AccountListView.as_view(), name='account_list'),
