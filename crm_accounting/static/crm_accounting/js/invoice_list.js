@@ -129,6 +129,8 @@ $(document).ready( function CreateTable() {
                             console.log(row[8])
                         var url = 'update'
                             return '<div class="btn-group pull-right" >'+
+                                '<a class="btn btn-default btn-sm" href="' + urlInvoiceCopy + '?invoice_id=' + row[8] + '" title="Копировать" data-toggle="tooltip">' +
+                                '<i class="fa fa-clone"></i></a>'+
                                 '<a class="btn btn-default btn-sm" href="'+url+'/'+row[8]+'" title="Редактировать">'+
                                 '<i class="fa fa-pencil"></i></a>'+
                                 '<a class="btn btn-default btn-sm btn-delete" onclick="delete_invoice(event, this)" id="'+row[8]+'" title="Удалить">'+

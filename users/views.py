@@ -167,34 +167,34 @@ class UsersListView(account_views.AdminPermissionMixin, ListView):
         return context
 
 
-class AjaxUsersListView(View):
+class AjaxUsersListView(BaseDatatableView):
+    model = CustomUser
+    columns = ['id', 'first_name', 'last_name',
+               'role', 'phone', 'email', 'status']
 
-    @staticmethod
-    def get(request, *args, **kwargs):
-        user = request.GET['user']
-        role_name = request.GET['role']
-        phone = request.GET['phone']
-        email = request.GET['email']
-        status_value = request.GET['status']
-        users = CustomUser.objects.filter(Q(first_name__icontains=user)
-                                          | Q(last_name__icontains=user),
-                                          Q(role__name__icontains=role_name),
-                                          Q(phone__contains=phone),
-                                          Q(email__icontains=email),
-                                          Q(status__contains=status_value)). \
-            order_by('id')
-        user_list = []
-        for user in users:
-            instance = {
-                'id': user.id,
-                'user': f'{user.first_name} {user.last_name}',
-                'role': str(user.role.name).title(),
-                'phone': user.phone,
-                'email': user.email,
-                'status': user.status
-            }
-            user_list.append(instance)
-        return JsonResponse({'users': user_list})
+    def get_initial_queryset(self):
+        return self.model.objects.filter(~Q(role=None))
+
+    def filter_queryset(self, qs):
+        user_names = self.request.GET.get('user')
+        role = self.request.GET.get('role')
+        phone = self.request.GET.get('phone')
+        email = self.request.GET.get('email')
+        status = self.request.GET.get('status')
+        if role:
+            qs = qs.filter(role_id=role)
+        if phone:
+            qs = qs.filter(phone__icontains=phone)
+        if email:
+            qs = qs.filter(email__icontains=email)
+        if status:
+            qs = qs.filter(status=status)
+        if user_names:
+            qs = qs.filter(
+                Q(first_name__icontains=user_names)|Q(
+                    last_name__icontains=user_names))
+        return qs
+
 
 
 class UserCreateView(account_views.AdminPermissionMixin, CreateView):

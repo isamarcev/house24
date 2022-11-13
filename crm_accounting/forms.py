@@ -174,7 +174,7 @@ class InvoiceForm(forms.ModelForm):
             },
             'section': {
                 'blank': "Это поле обязательно к заполнению.",
-                'required':"Это поле обязательно к заполнению."
+                'required': "Это поле обязательно к заполнению."
 
         },
             'flat': {

@@ -150,7 +150,7 @@ class AccountListViewAjax(BaseDatatableView):
         number = self.request.GET.get('number')
         house = self.request.GET.get('house')
         section = self.request.GET.get('section')
-        flat = self.request.GET.get('floor')
+        flat = self.request.GET.get('flat')
         status = self.request.GET.get('status')
         owner = self.request.GET.get('owner')
         dolg = self.request.GET.get('dolg')
@@ -161,12 +161,12 @@ class AccountListViewAjax(BaseDatatableView):
         if section:
             qs = qs.filter(section=section)
         if flat:
-            qs = qs.filter(flat=flat)
+            qs = qs.filter(flat__number=flat)
         if owner:
             qs = qs.filter(flat__owner=owner)
         if dolg:
             if dolg == 'false':
-                qs = qs.filter(balance__gt=0)
+                qs = qs.filter(balance__gte=0)
             elif dolg == 'true':
                 qs = qs.filter(balance__lt=0)
         if status:
@@ -598,10 +598,9 @@ class InvoiceListViewAjax(BaseDatatableView):
         if owner:
             qs = qs.filter(flat__owner_id=owner)
         if flat:
-            qs = qs.filter(flat__number__icontains=flat)
+            qs = qs.filter(flat__number=flat)
         if payment_state:
             qs = qs.filter(payment_state=payment_state)
-        # x = self.model.objects.filter()
         return qs
 
 
@@ -630,6 +629,23 @@ class InvoiceCreateView(AdminPermissionMixin, CreateView):
                         'form-INITIAL_FORMS': '0',
                         }
         context['service_formset'] = self.service_formset(data=date_service)
+        invoice_id = self.request.GET.get('invoice_id')
+        if invoice_id:
+            invoice_for_copy = get_object_or_404(models.Invoice, id=invoice_id)
+            initial = {
+                'flat': invoice_for_copy.flat,
+                'house': invoice_for_copy.flat.house,
+                'section': invoice_for_copy.flat.section,
+                'tariff': invoice_for_copy.tariff,
+                'personal_account': invoice_for_copy.flat.personal_account,
+                'amount': invoice_for_copy.amount,
+                'status': invoice_for_copy.status,
+                'payment_state': invoice_for_copy.payment_state
+            }
+            context['form'] = self.form_class(initial=initial)
+            context['service_formset'] = self.service_formset(
+                queryset=models.InvoiceService.objects.filter(
+                    invoice=invoice_for_copy).select_related('service__unit'))
         context['services'] = forms.Service.objects.all()
         context['units'] = forms.Unit.objects.all()
         return context
@@ -637,14 +653,16 @@ class InvoiceCreateView(AdminPermissionMixin, CreateView):
     def post(self, request, *args, **kwargs):
         form_class = self.form_class(request.POST or None)
         service_formset = self.service_formset(request.POST or None)
-        if form_class.is_valid():
+        if all([form_class.is_valid(), service_formset.is_valid()]):
             form_class.save()
-            if service_formset.is_valid():
-                service_formset.save(commit=False)
-                for service in service_formset.new_objects:
-                    if service.total:
-                        service.invoice = form_class.instance
-                        service.save()
+            service_formset.save(commit=False)
+            for form in service_formset:
+                if form.instance not in service_formset.deleted_objects\
+                        and all([form.instance.service, form.instance.total]):
+                    form.instance.pk = None
+                    form.instance._state.adding = True
+                    form.instance.invoice = form_class.instance
+                    form.instance.save()
             form_class.calculate_invoice(form_class)
             return HttpResponseRedirect(reverse_lazy
                                         ('crm_accounting:invoice_list'))
@@ -700,19 +718,13 @@ class InvoiceUpdateView(AdminPermissionMixin, UpdateView):
         if all([form_class.is_valid(), service_formset.is_valid()]):
             form_class.save()
             service_formset.save(commit=False)
-            for service in service_formset.new_objects:
-                if service.total:
-                    service.invoice = form_class.instance
-                    service.save()
-            for service in service_formset.deleted_objects:
-                service.delete()
-            for service in service_formset.changed_objects:
-                if all([service[0].total, service[0].service]):
-                    service[0].invoice = form_class.instance
-                    service[0].save()
-                else:
-                    service[0].delete()
-            service_formset.save()
+            for form in service_formset:
+                if form.instance not in service_formset.deleted_objects \
+                        and all([form.instance.service, form.instance.total]):
+                    form.instance.invoice = form_class.instance
+                    form.instance.save()
+            for form in service_formset.deleted_objects:
+                form.delete()
             form_class.calculate_invoice(form_class)
             messages.success(request, "Квитанция изменена")
             return HttpResponseRedirect(reverse_lazy
@@ -722,13 +734,37 @@ class InvoiceUpdateView(AdminPermissionMixin, UpdateView):
                                             service_formset=service_formset))
 
 
+def calculate_invoice(account_id):
+    """Calculate balance of PERSONAL ACCOUNT"""
+    account = models.PersonalAccount.objects.get(id=account_id)
+    income_balance = models.Transaction.objects.filter(
+        personal_account=account,
+        payment_state__type='in',
+        completed=True).\
+        aggregate(Sum('amount')).get('amount__sum')
+    outcome_balance = models.Invoice.objects.filter(
+        personal_account=account,
+        payment_state=True,
+        status='Оплачена').\
+        aggregate(Sum('amount')).get('amount__sum')
+    if not income_balance:
+        income_balance = 0
+    if not outcome_balance:
+        outcome_balance = 0
+    account.balance = income_balance - outcome_balance
+    account.save()
+
+
 class InvoiceDeleteView(DeleteView):
     model = models.Invoice
 
     def post(self, request, *args, **kwargs):
         delete_list = request.POST.get('deleted_list').split(',')
         if request.user.is_superuser:
-            self.model.objects.filter(id__in=delete_list).delete()
+            invoices = self.model.objects.filter(id__in=delete_list)
+            for invoice in invoices:
+                calculate_invoice(invoice.personal_account)
+                invoice.delete()
             return JsonResponse({'success': 'success'})
         else:
             return JsonResponse({'success': 'У Вас нет прав для удаления!'})
@@ -815,6 +851,7 @@ class FlatAjaxList(View):
     @staticmethod
     def get(request):
         section_id = request.GET.get('section_id')
+        house_id = request.GET.get('house_id')
         flats = list()
         if section_id:
             query_flats = Flat.objects.filter(section_id=section_id)
@@ -822,7 +859,12 @@ class FlatAjaxList(View):
                 instance = {'flat_id': flat.id,
                             'flat_title': flat.number}
                 flats.append(instance)
-        print(flats)
+        elif house_id:
+            query_flats = Flat.objects.filter(house_id=house_id)
+            for flat in query_flats:
+                instance = {'flat_id': flat.id,
+                            'flat_title': flat.number}
+                flats.append(instance)
         return JsonResponse({'flats': flats})
 
 

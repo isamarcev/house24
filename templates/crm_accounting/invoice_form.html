@@ -214,6 +214,54 @@
                                         </thead>
                                         <tbody id="formset">
                                         {{ service_formset.management_form }}
+                                        {% for form in service_formset %}
+                                            {% for hidden in form.hidden_fields %}
+                                                {{ hidden }}
+                                            {% endfor %}
+                                            <tr id="{{ form.prefix }}-form">
+{#                                                <input type="hidden" name="{{ form.prefix }}-id" id="id_{{ form.prefix }}-id">#}
+                                                <td>
+                                                    <select name="{{ form.prefix }}-service"
+                                                            id="id_{{ form.prefix }}-service"
+                                                            class="form-select">
+                                                        <option value="">Выберите...</option>
+                                                        {% for service in services %}
+                                                            {% if service.id == form.instance.service.id %}
+                                                            <option value="{{ service.id }}" selected>{{ service.name }}</option>
+                                                            {% else %}
+                                                            <option value="{{ service.id }}" >{{ service.name }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control loaded" name="{{ form.prefix }}-amount" onchange="get_total_created({{ forloop.counter0 }})" id="id_{{ form.prefix }}-amount" value="{{ form.instance.amount }}">
+                                                </td>
+                                                <td>
+                                                    <select name="{{ form.prefix }}-unit"
+                                                            id="id_{{ form.prefix }}-unit"
+                                                            class="form-select">
+                                                        <option value="">Выберите...</option>
+                                                        {% for unit in units %}
+                                                            {% if unit.id == form.instance.service.unit.id %}
+                                                            <option value="{{ unit.id }}" selected>{{ unit.title }}</option>
+                                                            {% else %}
+                                                            <option value="{{ unit.id }}" >{{ unit.title }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="{{ form.prefix }}-price" onchange="get_total_created({{ forloop.counter0 }})" id="id_{{ form.prefix }}-price" class="form-control" value="{{ form.instance.price }}">
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="{{ form.prefix }}-total" id="id_{{ form.prefix }}-total" value="{{ form.instance.total }}" class="form-control total-price">
+                                                </td>
+                                                <td>
+                                                    <button type="button" name="{{ form.prefix }}" id="{{ form.prefix }}-button" class="btn btn-default btn-sm form-row-remove-btn" onclick="delete_service(this.name)" title="Удалить услугу"><i class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
                                         </tbody>
                                         <tbody id="empty_form" style="display: none" >
                                             <tr id="form-__prefix__-form">
@@ -268,8 +316,8 @@
                                                 </td>
                                                 <td style="min-width: 180px;">
                                                     <div class="h5">
-                                                        <input type="hidden" name="amount" id="id_amount">
-                                                        Итого: <b><span id="price-total">0.00</span></b> грн
+                                                        <input type="hidden" name="amount" id="id_amount" value="{{ form.initial.amount }}">
+                                                        Итого: <b><span id="price-total">{{ form.initial.amount }}</span></b> грн
                                                     </div>
                                                 </td>
                                                 <td style="width: 40px; min-width: 40px;"></td>

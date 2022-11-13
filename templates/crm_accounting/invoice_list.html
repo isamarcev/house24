@@ -261,6 +261,7 @@
     <script>
         const urlInvoiceList = '{% url 'crm_accounting:get_invoices_ajax_list' %}'
         const urlInvoiceDelete = '{% url 'crm_accounting:delete_invoice' %}'
+        const urlInvoiceCopy = '{% url 'crm_accounting:invoice_create' %}'
     </script>
     <style>
         .sorting {
@@ -273,5 +274,6 @@
         }
 
     </style>
+
     <script src="{% static 'crm_accounting/js/invoice_list.js' %}"></script>
 {% endblock %}

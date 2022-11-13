@@ -93,7 +93,6 @@ class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
                                             can_delete=True, extra=0)
     check_permission_name = 'tariff'
 
-
     def get_context_data(self, **kwargs):
         context = dict()
         data = {'service-TOTAL_FORMS': '0',
@@ -108,7 +107,6 @@ class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
             tariff = get_object_or_404(Tariff.objects.
                                        prefetch_related('tariffservice_set'),
                                        id=tariff_id)
-            x = TariffService.objects.filter(tariff=tariff)
             context['form_tariff'] = forms.TariffForm(initial={
                 'name': tariff.name,
                 'describe': tariff.describe
@@ -125,7 +123,8 @@ class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
             form_tariff.save()
             services_formset.save(commit=False)
             for form in services_formset:
-                if form.instance not in services_formset.deleted_objects and form.instance.service:
+                if form.instance not in services_formset.deleted_objects \
+                        and form.instance.service:
                     form.instance.pk = None
                     form.instance._state.adding = True
                     form.instance.tariff = form_tariff.instance
@@ -143,18 +142,21 @@ class TariffUpdateView(account_views.AdminPermissionMixin, UpdateView):
     model = Tariff
     check_permission_name = 'tariff'
 
-
     def get_context_data(self, **kwargs):
         context = {'form_tariff': forms.TariffForm(instance=self.object),
-                   'services_formset': self.services_formset(queryset=TariffService.objects.filter(tariff=self.object).select_related('service__unit'),
-                                                             prefix='service_update'),
+                   'services_formset': self.services_formset(
+                       queryset=TariffService.objects.filter(
+                           tariff=self.object).select_related('service__unit'),
+                       prefix='service_update'),
                    'services': Service.objects.all().select_related('unit')}
         return context
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
-        services_formset = self.services_formset(request.POST, queryset=TariffService.objects.filter(tariff=obj),
-                                                 prefix='service_update')
+        services_formset = self.services_formset(
+            request.POST,
+            queryset=TariffService.objects.filter(tariff=obj),
+            prefix='service_update')
         form_tariff = forms.TariffForm(request.POST, instance=obj)
         if all([form_tariff.is_valid(), services_formset.is_valid()]):
             form_tariff.save()
@@ -196,13 +198,11 @@ def delete_tariff(request):
             )
 
 
-
 class RolesUpdateView(account_views.AdminPermissionMixin, FormView):
     queryset = Role.objects.all()
     template_name = 'crm_home/system_settings/roles/roles.html'
     roles_formset = modelformset_factory(Role, RoleForm, extra=0)
     check_permission_name = 'role'
-
 
     def get_context_data(self, **kwargs):
         context = {
@@ -223,7 +223,6 @@ class RequisitesUpdateView(account_views.AdminPermissionMixin, UpdateView):
     model = Requisites
     form_class = forms.RequisitesForm
     check_permission_name = 'requisites'
-
 
     def get_object(self, queryset=None):
         return Requisites.objects.first()

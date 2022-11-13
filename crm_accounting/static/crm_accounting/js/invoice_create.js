@@ -64,7 +64,11 @@ function get_info_by_flat() {
 
 
 function get_flat() {
-    var section_id = ($("#id_section"))
+    var house_id = ($("#id_house").val())
+    console.log(house_id)
+    var section_id = ($("#id_section").val())
+    console.log(section_id)
+
     var flat_id = ($("#id_flat"))
     var personal_account = ($('#id_personal_account'))
     var empty_value = '<option value="">Выберите...</option>'
@@ -74,7 +78,29 @@ function get_flat() {
                 url: urlGetFlat,
                 type: 'get',
                 data: {
-                    'section_id': section_id.val(),
+                    'section_id': section_id,
+                },
+                success: (data) => {
+                    console.log(data)
+                    var flats = "";
+                    $(data.flats).each(function(index, value) {
+                    flats += "<option value='"+value.flat_id+"'>"+value.flat_title+"</option>"
+                    })
+                    flat_id.append(flats)
+                    var owner = ($('#owner'))
+                    var phone = ($('#phone'))
+                    owner.html('ые выбран')
+                    phone.html('ые выбран')
+                    personal_account.val('')
+                }
+        }
+    )}
+    else if (house_id) {
+            $.ajax({
+                url: urlGetFlat,
+                type: 'get',
+                data: {
+                    'house_id': house_id,
                 },
                 success: (data) => {
                     console.log(data)
@@ -221,8 +247,11 @@ $("#add_service").click(function () {
 
 $(document).ready(function () {
     $("#id_house").on('change', get_section)
+    $("#id_house").on('change', get_flat)
     $("#id_section").on('change', get_flat)
     $("#id_flat").on('change', get_info_by_flat)
+
+    $('.loaded').on('change', get_total_row())
 
     $('[aria-controls="select2-id_owner-container"]').removeClass("select2-selection select2-selection--single")
     $('body > div.wrapper > div > form > section > div > div > div > div > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > span > span.selection > span').removeClass("select2-selection select2-selection--single")
