@@ -112,7 +112,7 @@
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" href="{% url 'crm_accounting:account_create' %}">Добавить лицевой счет</a>
-                <a class="dropdown-item" href="#">Выгрузить в Excel</a>
+                <a class="dropdown-item" onclick="downloadExcel()">Выгрузить в Excel</a>
               </div>
             </div>
         </div>
@@ -226,6 +226,23 @@
 {% endblock %}
 {% block script %}
     <script src="{% static 'users/dist/datatables/datatables.min.js' %}"></script>
+
+    <script>
+    </script>
+    <script>
+        function downloadExcel() {
+            var number = $('#account_number').val();
+            var status = $('#status').val();
+            var flat = $('#flat').val();
+            var house = $('#house').val();
+            var section = $('#section').val();
+            var owner = $('#owner').val();
+            var dolg = $('#dolg').val();
+            var urlDownload = '{% url 'crm_accounting:get_accounts_excel' %}';
+            var all_link = urlDownload + `?number=${number}&status=${status}&flat=${flat}&house=${house}&section=${section}&owner=${owner}&dolg=${dolg}`
+            location.href = all_link
+        }
+    </script>
 
     <script>
         function delete_flat(event, elem) {

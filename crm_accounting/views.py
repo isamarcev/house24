@@ -189,6 +189,80 @@ class DeletePersonalAccount(DeleteView):
                 {'success': 'Удаление счета доступно только Директору'})
 
 
+class DownloadExcelAccounts(View):
+
+    def get(self, request):
+        number = self.request.GET.get('number')
+        status = self.request.GET.get('status')
+        flat = self.request.GET.get('flat')
+        house = self.request.GET.get('house')
+        section = self.request.GET.get('section')
+        owner = self.request.GET.get('owner')
+        dolg = self.request.GET.get('dolg')
+        print(self.request.GET)
+        qs = models.PersonalAccount.objects.all()
+        if number:
+            qs = qs.filter(account_number__icontains=number)
+        if status:
+            qs = qs.filter(status=status)
+        if flat:
+            qs = qs.filter(flat__number=flat)
+        if house:
+            qs = qs.filter(house_id=house)
+        if section:
+            qs = qs.filter(flat__section_id=section)
+        if owner:
+            qs = qs.filter(flat__owner_id=owner)
+        if dolg:
+            if dolg == 'true':
+                qs = qs.filter(balance__lt=0)
+            else:
+                qs = qs.filter(balance__gte=0)
+        if qs:
+            wb = Workbook()
+            sheet = wb.active
+            sheet.column_dimensions['A'].width = 20
+            sheet.column_dimensions['B'].width = 15
+            sheet.column_dimensions['C'].width = 15
+            sheet.column_dimensions['D'].width = 15
+            sheet.column_dimensions['E'].width = 15
+            sheet.column_dimensions['F'].width = 30
+            sheet.column_dimensions['G'].width = 10
+            sheet.title = 'rabge names'
+            sheet['A1'] = 'Лицевой счет'
+            sheet['B1'] = 'Статус'
+            sheet['C1'] = 'Дом'
+            sheet['D1'] = 'Секция'
+            sheet['E1'] = 'Квартира'
+            sheet['F1'] = 'Владелец'
+            sheet['G1'] = 'Остаток'
+            len_qs = len(qs) + 2
+            start_row = 2
+            while start_row != len_qs:
+                for obj in qs:
+                    sheet.insert_rows(start_row)
+                    sheet[f'A{start_row}'] = obj.account_number
+                    sheet[f'B{start_row}'] = obj.status
+                    sheet[f'C{start_row}'] = f'{obj.house}'
+                    sheet[f'D{start_row}'] = f'{obj.section}'
+                    sheet[f'E{start_row}'] = f'{obj.flat}'
+                    sheet[f'F{start_row}'] = f'{obj.flat.owner}'
+                    sheet[f'G{start_row}'] = f'{obj.balance}'
+                    start_row += 1
+            with NamedTemporaryFile(prefix='.xlsx') as tmp:
+                temp_path = tmp.name
+                wb.save(temp_path)
+                tmp.seek(0)
+                stream = tmp.read()
+            filepath = os.path.join(BASE_DIR, temp_path)
+            response = HttpResponse(stream, content_type=filepath)
+            date = datetime.today().strftime("%Y%m%d")
+            response['Content-Disposition'] \
+                = "attachment; filename=%s" % f'accounts_{date}.xlsx'
+            return response
+
+
+
 class PersonalAccountDetailView(AdminPermissionMixin, DetailView):
     model = models.PersonalAccount
     template_name = 'crm_accounting/personalaccount_detail.html'
@@ -797,7 +871,8 @@ class TemplatesUpdateView(TemplateView):
     def post(self, request):
         form_template = forms.TemplateForm(request.POST, request.FILES)
         if form_template.is_valid():
-            form_template.save()
+            if form_template.cleaned_data.get('file'):
+                form_template.save()
             return HttpResponseRedirect(
                 reverse_lazy('crm_accounting:invoice_list'))
         else:

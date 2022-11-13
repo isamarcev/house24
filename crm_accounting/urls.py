@@ -25,6 +25,11 @@ urlpatterns = [
          name='account_update'),
     path('account/delete/', views.DeletePersonalAccount.as_view(),
          name='delete_account'),
+    path('account/get-excel/', views.DownloadExcelAccounts.as_view(),
+         name='get_accounts_excel'),
+
+
+
     path('get-flats/', views.get_flats, name='get_flats'),
     path('get-users/', views.get_users, name='get_users'),
 
