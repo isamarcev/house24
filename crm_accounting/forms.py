@@ -174,7 +174,7 @@ class InvoiceForm(forms.ModelForm):
             },
             'section': {
                 'blank': "Это поле обязательно к заполнению.",
-                'required':"Это поле обязательно к заполнению."
+                'required': "Это поле обязательно к заполнению."
 
         },
             'flat': {
@@ -284,11 +284,12 @@ class TemplateForm(forms.ModelForm):
     def clean_file(self):
         x = self.cleaned_data.get('file')
         good_format = ['xlsx', 'xls']
-        format_file = x.name.split('.')[-1]
-        if format_file not in good_format:
-            raise ValidationError(
-                'Файл вложенного формата недопустим. Выберите файл .xlsx .xls'
-            )
+        if x:
+            format_file = x.name.split('.')[-1]
+            if format_file not in good_format:
+                raise ValidationError(
+                    'Файл вложенного формата недопустим. Выберите файл .xlsx .xls'
+                )
         return x
 
     def clean_name(self):

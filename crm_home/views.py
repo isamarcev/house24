@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
+from django.db.models.deletion import ProtectedError
 from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -92,7 +93,6 @@ class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
                                             can_delete=True, extra=0)
     check_permission_name = 'tariff'
 
-
     def get_context_data(self, **kwargs):
         context = dict()
         data = {'service-TOTAL_FORMS': '0',
@@ -107,7 +107,6 @@ class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
             tariff = get_object_or_404(Tariff.objects.
                                        prefetch_related('tariffservice_set'),
                                        id=tariff_id)
-            x = TariffService.objects.filter(tariff=tariff)
             context['form_tariff'] = forms.TariffForm(initial={
                 'name': tariff.name,
                 'describe': tariff.describe
@@ -124,7 +123,10 @@ class TariffCreateVIew(account_views.AdminPermissionMixin, CreateView):
             form_tariff.save()
             services_formset.save(commit=False)
             for form in services_formset:
-                if form.instance.service:
+                if form.instance not in services_formset.deleted_objects \
+                        and form.instance.service:
+                    form.instance.pk = None
+                    form.instance._state.adding = True
                     form.instance.tariff = form_tariff.instance
                     form.instance.save()
             return HttpResponseRedirect(reverse_lazy('crm_home:tariffs'))
@@ -140,18 +142,21 @@ class TariffUpdateView(account_views.AdminPermissionMixin, UpdateView):
     model = Tariff
     check_permission_name = 'tariff'
 
-
     def get_context_data(self, **kwargs):
         context = {'form_tariff': forms.TariffForm(instance=self.object),
-                   'services_formset': self.services_formset(queryset=TariffService.objects.filter(tariff=self.object).select_related('service__unit'),
-                                                             prefix='service_update'),
+                   'services_formset': self.services_formset(
+                       queryset=TariffService.objects.filter(
+                           tariff=self.object).select_related('service__unit'),
+                       prefix='service_update'),
                    'services': Service.objects.all().select_related('unit')}
         return context
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
-        services_formset = self.services_formset(request.POST, queryset=TariffService.objects.filter(tariff=obj),
-                                                 prefix='service_update')
+        services_formset = self.services_formset(
+            request.POST,
+            queryset=TariffService.objects.filter(tariff=obj),
+            prefix='service_update')
         form_tariff = forms.TariffForm(request.POST, instance=obj)
         if all([form_tariff.is_valid(), services_formset.is_valid()]):
             form_tariff.save()
@@ -179,16 +184,18 @@ def get_unit_for_service(request):
 
 def delete_tariff(request):
     if request.GET:
+        pk = request.GET.get('id')
+        tariff = get_object_or_404(Tariff, pk=pk)
+        tariff_services = TariffService.objects.filter(tariff=tariff)
         try:
-            pk = request.GET.get('id')
-            tariff = Tariff.objects.get(pk=pk)
-            tariff_services = TariffService.objects.filter(tariff=tariff)
+            tariff.delete()
             for tariff_and_service in tariff_services:
                 tariff_and_service.delete()
-            tariff.delete()
             return JsonResponse({'success': 'success'}, status=200)
-        finally:
-            return JsonResponse({'error': 'error'}, status=500)
+        except ProtectedError:
+            return JsonResponse(
+                {'errors': "Этот тариф присутствует в квартирах. Отказано!"}
+            )
 
 
 class RolesUpdateView(account_views.AdminPermissionMixin, FormView):
@@ -196,7 +203,6 @@ class RolesUpdateView(account_views.AdminPermissionMixin, FormView):
     template_name = 'crm_home/system_settings/roles/roles.html'
     roles_formset = modelformset_factory(Role, RoleForm, extra=0)
     check_permission_name = 'role'
-
 
     def get_context_data(self, **kwargs):
         context = {
@@ -217,7 +223,6 @@ class RequisitesUpdateView(account_views.AdminPermissionMixin, UpdateView):
     model = Requisites
     form_class = forms.RequisitesForm
     check_permission_name = 'requisites'
-
 
     def get_object(self, queryset=None):
         return Requisites.objects.first()

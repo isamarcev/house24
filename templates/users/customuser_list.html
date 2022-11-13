@@ -108,7 +108,7 @@
                                                 <select name="roles" id="role" class="form-select-sm" style="font-size: 16px">
                                                     <option value=""></option>
                                                     {% for role in roles %}
-                                                        <option value="{{ role.name }}">{{ role.name }}</option>
+                                                        <option value="{{ role.id }}">{{ role.name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </th>
@@ -127,49 +127,7 @@
                                         </tr>
                                   </thead>
                                   <tbody>
-                                    {% for object in users %}
-                                        <tr data-href="{% url 'users:user_detail' object.id %}" id="instance-{{ object.id }}">
-                                            <td>{{ forloop.counter }}</td>
-                                            <td class="td-height">{{ object.first_name }} {{ object.last_name }}</td>
-                                            <td class="td-height">{{ object.role }}</td>
-                                            <td class="td-height">
-                                                {% if object.phone %}
-                                                    {{ object.phone }}
-                                                    {% else %}
-                                                    Не указан
-                                                {% endif %}
-                                            </td>
-                                            <td class="td-height">{{ object.email }}</td>
 
-                                            <td style="width: 5%">
-                                            {% if object.status == "Активен" %}
-                                                <small class="label label-success">{{ object.status }}</small>
-                                            {% elif object.status == "Новый" %}
-                                                <small class="label label-warning">{{ object.status }}</small>
-                                            {% else %}
-                                                <small class="label label-danger">{{ object.status }}</small>
-                                            {% endif %}
-                                            </td>
-
-                                            <td style="width: 10%">
-                                                <div class="btn-group pull-right" >
-                                                    <a class="btn btn-default btn-sm" href="{% url 'users:user_create' %}?user_id={{ object.id }}" title="Копировать" data-toggle="tooltip">
-                                                        <i class="fa fa-clone"></i></a>
-                                                    <a class="btn btn-default btn-sm" href="{% url 'users:user_update' object.id %}" title="Редактировать" data-toggle="tooltip">
-                                                        <i class="fa fa-pencil"></i></a>
-                                                    {% if not object.is_superuser %}
-                                                    <a class="btn btn-default btn-sm btn-delete " title="Удалить" href="{% url 'users:user_delete' object.id %}" name="{{ object.first_name }} {{ object.last_name }}" data-toggle="tooltip" data-pjax="0" >
-                                                        <i class="fa fa-trash " ></i></a>
-                                                    {% else %}
-                                                    <a class="btn btn-default btn-sm " title="Удалить" name="{{ object.first_name }} {{ object.last_name }}" onclick="cannot_delete(event)" data-toggle="tooltip" data-pjax="0" >
-                                                        <i class="fa fa-trash " ></i></a>
-                                                    {% endif %}
-
-                                                </div>
-                                            </td>
-
-                                        </tr>
-                                    {% endfor %}
                                   </tbody>
                         </table>
                         <div class="empty" id="empty" style="height: 40px; padding: 10px 20px; display: none; background-color: #f9f9f9">Ничего не найдено.</div>
@@ -190,81 +148,99 @@
 
     <script>
         $(document).ready( function CreateTable() {
-        $('#users').DataTable(
+        var table = $('#users').DataTable(
             {
                 "order": [],
-                "bInfo": false,
-                "bPaginate": false,
+                "bSortCellsTop": true,
                 "bFilter": false,
+                 "iDisplayLength": 10,
+                "lengthChange": false,
+                {#dom: 't',#}
+                "language": {
+                    "zeroRecords": "Ничего не найдено",
+                    "info": "Количество пользователей:  _MAX_",
+                    'infoFiltered': '',
+                    "infoEmpty": "",
+                    "paginate": {
+                        "next":       "След.",
+                        "previous":   "Пред."
+                    },
+                  },
                 "aoColumnDefs": [
-                    { 'bSortable': false, 'aTargets': [0, 1 , 2, 3, 4, 5, 6] }
-                    ]
+                    { 'bSortable': false, 'targets': [0, 1, 2, 3, 4, 5, 6] },
+                    ],
+                "fnServerParams": function ( aoData ) {
+                      aoData.push(
+                          { "name": 'user', "value": $('#user').val() },
+                          { "name": 'role', "value": $('#role').val() },
+                          { "name": 'phone', "value": $('#phone').val() },
+                          { "name": 'email', "value": $('#email').val() },
+                          { "name": 'status', "value": $('#status').val() },
+                      );
+                },
+                processing: true,
+                serverSide: true,
+                sAjaxSource: "{% url 'users:ajax-users' %}",
+                columns: [
+                    {name: "id", data: 0},
+                    {name: "user_names", data: null, render: function (data, type, row) {
+                        var allNames = row[1] + ' ' + row[2];
+                        return allNames
+                        }},
+                    {name: "role", data: 3},
+                    {name: "phone", data: 4},
+                    {name: "email", data: 5},
+                    {name: "status", data: null, render: function (data, type, row) {
+                            console.log(row[1])
+                        if (row[6] === 'Активен') {
+                            this.data = `<small class="label label-success">${row[6]}</small>`
+                        } else if (row[6] === 'Отключен') {
+                            this.data = `<small class="label label-danger">${row[6]}</small>`
+                        } else if (row[6] === 'Новый') {
+                            this.data = `<small class="label label-warning">${row[6]}</small>`
+                        } else {
+                            this.data = "Не выбран"
+                        }
+                            return this.data
+                        }},
+                    {name: 'link', data: null, render: function (data, type, row){
+                            var url = 'update';
+
+                            return '<div class="btn-group pull-right" >'+
+                                '<a class="btn btn-default btn-sm" href="invite/'+ row[0] +'" title="Отправить приглашение" name="'+ row[0] + '" data-toggle="tooltip"><i class="fa fa-repeat"></i></a>' +
+                                '<a class="btn btn-default btn-sm" href="update/'+row[0]+'" title="Редактировать">'+
+                                '<i class="fa fa-pencil"></i></a>'+
+                                '<a class="btn btn-default btn-sm btn-delete" onclick="delete_flat(event, this)" id="'+row[7]+'" title="Удалить">'+
+                                '<i class="fa fa-trash " ></i></a></div>'
+                        }}
+                ],
+                "createdRow": function( row, data, dataIndex ) {
+                    var url = 'detail/'+data[0]
+                    $(row).attr( 'data-href', url );
+                    $(row).on("click", function() {
+                        document.location = $(this).data('href');
+                        });
             }
-        );
-    } );
+            });
+        $('#user').on('change blur clear', function () {
+            table.columns(1).search($(this).val()).draw();
+        } );
+        $('#role').on('change blur clear', function () {
+            table.columns([2]).search($(this).val()).draw();
+        });
+        $('#phone').on('change blur clear', function () {
+            table.columns([3]).search($(this).val()).draw();
+        });
+        $('#email').on('change blur clear', function () {
+            table.columns([4]).search($(this).val()).draw();
+        });
+        $('#status').on('change blur clear', function () {
+            table.columns([5]).search($(this).val()).draw();
+        });
+    });
     </script>
     <!-- AJAX -->
-    <script>
-        function ajax_request() {
-            const user = document.getElementById('user').value;
-            const role = document.getElementById('role').value;
-            const phone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const status = document.getElementById('status').value;
 
-
-            $.ajax({
-                url:`{% url 'users:ajax-users' %}`,
-                type: 'get',
-                data: {
-                    'user': user,
-                    'role': role,
-                    'phone': phone,
-                    'email': email,
-                    'status': status
-                },
-                success: (data) => {
-                    console.log(data);
-                    $('#users tbody').empty();
-                    if (data.users.length === 0) {
-                        console.log('Hello')
-                        $('#empty').css('display', 'block');
-                    } else {
-                        let rows = "";
-                        $(data.users).each(function (index, value) {
-                            rows +=  "<tr data-href='/users/detail/" + value.id + "/' id='instance-" + value.id + "' class='odd' style='background-color: rgb(249, 249, 249);'><td>" + (index + 1) + "</td><td class='td-height'>" + value.user + "</td><td class='td-height'>"+ value.role + "</td><td class='td-height'>" + value.phone + "</td><td class='td-height'>"+ value.email + "</td><td style='width: 5%'><small class='label'>" + value.status + "</small></td><td style='width: 10%'><div class='btn-group pull-right' ><a class='btn btn-default btn-sm' href='#' title='Копировать'><i class='fa fa-clone'></i></a><a class='btn btn-default btn-sm' href='/users/update/" + value.id + "/' title='Редактировать'><i class='fa fa-pencil'></i></a><a class='btn btn-default btn-sm btn-delete ' title='Удалить' href='/users/delete/" + value.id + "/' id='" + value.id + "'><i class='fa fa-trash '></i></a></div></td></tr>"
-                        })
-                        $('#users tbody').append(rows);
-                        $('tr[data-href]').on("click", function() {
-                            document.location = $(this).data('href');
-                        });
-                        let labels = document.getElementsByClassName('label');
-                        for (let y of labels) {
-                            if (y.textContent === 'Активен') {
-                                y.classList.add('label-success')
-                            } else if (y.textContent === 'Новый'){
-                                y.classList.add('label-warning')
-                            } else {
-                                y.classList.add('label-danger')
-                            }
-                        }
-                        $('#empty').css('display', 'none');
-                        $('.btn-delete').on('click', function (event){
-                                var result = confirm('Вы действительно хотите удалить пользователя?')
-                                if (!result) {
-                                    event.preventDefault()
-                                    event.stopImmediatePropagation()
-                                    return false
-                                }
-                        })
-                    }
-                    },
-                error: (error) => {
-                    console.log("Errors !!!= "+error);
-                }
-            })
-        }
-    </script>
 
     <script>
     $(document).ready( function () {

@@ -42,22 +42,57 @@
                             <div class="form-group">
                                 {{ form.image_1.label_tag }}
                                 {{ form.image_1 }}
+                                {% if form.errors.image_1 %}
+                                    <div class="errorlist-password" style="color: #dd4b39">
+                                    {% for field in form.errors.image_1 %}
+                                        {{ field }}
+                                    {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="form-group">
                                 {{ form.image_2.label_tag }}
                                 {{ form.image_2 }}
+                                {% if form.errors.image_2 %}
+                                    <div class="errorlist-password" style="color: #dd4b39">
+                                    {% for field in form.errors.image_2 %}
+                                        {{ field }}
+                                    {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="form-group">
                                 {{ form.image_3.label_tag }}
                                 {{ form.image_3 }}
+                                {% if form.errors.image_3 %}
+                                    <div class="errorlist-password" style="color: #dd4b39">
+                                    {% for field in form.errors.image_3 %}
+                                        {{ field }}
+                                    {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="form-group">
                                 {{ form.image_4.label_tag }}
                                 {{ form.image_4 }}
+                                {% if form.errors.image_4 %}
+                                    <div class="errorlist-password" style="color: #dd4b39">
+                                    {% for field in form.errors.image_4 %}
+                                        {{ field }}
+                                    {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="form-group">
                                 {{ form.image_5.label_tag }}
                                 {{ form.image_5 }}
+                                {% if form.errors.image_5 %}
+                                    <div class="errorlist-password" style="color: #dd4b39">
+                                    {% for field in form.errors.image_5 %}
+                                        {{ field }}
+                                    {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         <!-- END FORM TITLE, ADDRESS, IMAGES -->
@@ -176,7 +211,7 @@
                                                             <select name="users-__prefix__-name" id="id_users-__prefix__-name" class="form-select">
                                                                 <option value=""></option>
                                                                 {% for user in users %}
-                                                                    <option value="{{ user.id }}" name="{{ user.role }}">{{ user }}</option>
+                                                                    <option value="{{ user.id }}" >{{ user }}</option>
                                                                 {% endfor %}
                                                             </select>
 {#                                                        {{ users_formset }}#}

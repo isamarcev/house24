@@ -43,7 +43,7 @@ class TariffService(models.Model):
         verbose_name = "Тариф Услуга"
 
     def __str__(self):
-        return f'{self.tariff.name} - {self.service.name}'
+        return f'{self.tariff} - {self.service}'
     # def clean_price(self):
     #     new_price = self.cleaned
 

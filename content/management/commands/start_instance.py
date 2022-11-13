@@ -2,8 +2,8 @@ from django.core.management import BaseCommand
 
 from content.models import About, Block, Main, Seo, ServicePage, AboutService, Contacts
 from crm_home.models import Requisites, Tariff, Unit, Service
-from users.models import Role
-
+from houses.models import House, Flat
+from users.models import Role, CustomUser
 
 slideurl = 'shortenerua.herokuapp.com/ZXQAA/'
 imageurl = 'shortenerua.herokuapp.com/ky1q8/'
@@ -146,4 +146,37 @@ class Command(BaseCommand):
             Service(name='Coding'),
             Service(name='Cooking')
         ])
+
+        owners = CustomUser.objects.bulk_create([
+            CustomUser(username=10, email='qwert@qwert.com',
+                       password='qwerty40req', status='Новый',
+                       first_name='John', last_name='Doe'),
+            CustomUser(username=11, email='qwerty@qwert.com',
+                       password='qwerty40req', status='Новый',
+                       first_name='Johny', last_name='Doeh'),
+            CustomUser(username=12, email='qwertye@qwert.com',
+                       password='qwerty40req', status='Новый',
+                       first_name='Johne', last_name='Doee'),
+        ])
+
+        houses = House.objects.bulk_create([
+            House(title='ЖК Килограмм счастья', address='Бульвар Шевченка 78'),
+            House(title='ЖК Килограмм ванили', address='Бульвар Шевченка 76'),
+        ])
+        houses_from_db = House.objects.all()
+        for house in houses_from_db:
+            iter_count = 10
+            for owner in owners:
+                flats = Flat.objects.bulk_create([
+                    Flat(number=str(iter_count),
+                         area=iter_count,
+                         house=house,
+                         owner=owner),
+                    Flat(number=str(iter_count+1),
+                         area=int(iter_count+1),
+                         house=house,
+                         owner=owner),
+                ])
+                iter_count += 1
+
 

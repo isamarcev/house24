@@ -129,13 +129,16 @@ class HouseCreateView(account_views.AdminPermissionMixin, CreateView):
         section_formset = self.section_formset(request.POST, prefix='section')
         floor_formset = self.floor_formset(request.POST, prefix='floor')
         users_formset = self.user_formset(request.POST, prefix='users')
+
         if form_class.is_valid():
             form_class.save()
             if users_formset.is_valid():
                 users_formset.save(commit=False)
                 for user in users_formset:
                     use = user.cleaned_data.get('name')
-                    form_class.instance.users.add(use)
+                    delete = user.cleaned_data.get('DELETE')
+                    if use and not delete:
+                        form_class.instance.users.add(use)
             form_class.save()
             if section_formset.is_valid():
                 section_formset.save(commit=False)
@@ -159,15 +162,14 @@ class HouseCreateView(account_views.AdminPermissionMixin, CreateView):
                 'section_formset': section_formset,
                 'floor_formset': floor_formset,
                 'users_formset': users_formset,
-                'users': CustomUser.objects.filter(role=True).select_related(
-                    'role')
+                'users': CustomUser.objects.filter(~Q(role=None)).
+                          select_related('role')
             })
 
 
 class HousesDetail(account_views.AdminPermissionMixin, DetailView):
     model = House
     check_permission_name = 'house'
-
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -189,7 +191,6 @@ class HouseUpdateView(account_views.AdminPermissionMixin, UpdateView):
     form_class = HouseForm
     template_name = 'houses/house_update_form.html'
     check_permission_name = 'house'
-
 
     def get_context_data(self, **kwargs):
         section_formset = self.section_formset(prefix='section',
@@ -228,11 +229,9 @@ class HouseUpdateView(account_views.AdminPermissionMixin, UpdateView):
             if users_formset.is_valid():
                 users_formset.save(commit=False)
                 for obj in users_formset.cleaned_data:
-                    if len(obj) == 0:
-                        del obj
-                    elif obj['DELETE']:
-                        form_class.instance.users.remove(obj['id'])
-                    elif obj['name'] != obj['id']:
+                    if obj.get('DELETE'):
+                        form_class.instance.users.remove(obj.get('name'))
+                    elif obj.get('name') != obj.get('id'):
                         form_class.instance.users.remove(obj['id'])
                         form_class.instance.users.add(obj['name'])
             form_class.save()
@@ -264,7 +263,7 @@ class HouseUpdateView(account_views.AdminPermissionMixin, UpdateView):
                     form.delete()
             floor_formset.save()
             section_formset.save()
-            messages.success(request, "Дом добавлен")
+            messages.success(request, "Дом изменен")
             return HttpResponseRedirect(reverse_lazy('houses:house_list'))
         else:
             return render(request, self.template_name, context={

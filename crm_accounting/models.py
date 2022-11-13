@@ -105,7 +105,8 @@ class Invoice(models.Model):
                               max_length=15)
     date = models.DateField(default=datetime.datetime.now)
     house = models.ForeignKey('houses.House', on_delete=models.CASCADE)
-    section = models.ForeignKey('houses.Section', on_delete=models.CASCADE)
+    section = models.ForeignKey('houses.Section', on_delete=models.CASCADE,
+                                null=True, blank=True)
     flat = models.ForeignKey('houses.Flat', on_delete=models.CASCADE)
     personal_account = models.CharField(max_length=50, null=True, blank=True)
     payment_state = models.BooleanField(verbose_name='Проведена',
