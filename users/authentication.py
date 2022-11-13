@@ -46,7 +46,7 @@ class IdAuthentication(ModelBackend):
             user = CustomUser._default_manager.get_by_natural_key(username)
             if user.role and request_path_list[3] == 'login':
                 return None
-            elif not user.role and request_path_list[3] == 'admin-login':
+            elif request_path_list[3] == 'admin-login':
                 return None
             else:
                 return user

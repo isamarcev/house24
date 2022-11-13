@@ -199,7 +199,6 @@ class DownloadExcelAccounts(View):
         section = self.request.GET.get('section')
         owner = self.request.GET.get('owner')
         dolg = self.request.GET.get('dolg')
-        print(self.request.GET)
         qs = models.PersonalAccount.objects.all()
         if number:
             qs = qs.filter(account_number__icontains=number)
@@ -260,7 +259,6 @@ class DownloadExcelAccounts(View):
             response['Content-Disposition'] \
                 = "attachment; filename=%s" % f'accounts_{date}.xlsx'
             return response
-
 
 
 class PersonalAccountDetailView(AdminPermissionMixin, DetailView):
