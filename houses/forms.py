@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
 from django.db.models import Q
 
 from .models import *
@@ -48,6 +49,11 @@ class HouseForm(forms.ModelForm):
     def clean_image_1(self):
         image = self.cleaned_data.get('image_1')
         if image:
+            w, h = get_image_dimensions(image)
+            if w != 522 and h != 350:
+                raise ValidationError(
+                    'Загрузите изображение правильного размера'
+                )
             format_file = image.name.split('.')[-1]
             if format_file not in self.good_format:
                 raise ValidationError(
@@ -59,6 +65,11 @@ class HouseForm(forms.ModelForm):
     def clean_image_2(self):
         image = self.cleaned_data.get('image_2')
         if image:
+            w, h = get_image_dimensions(image)
+            if w != 248 and h != 160:
+                raise ValidationError(
+                    'Загрузите изображение правильного размера'
+                )
             format_file = image.name.split('.')[-1]
             if format_file not in self.good_format:
                 raise ValidationError(
@@ -70,6 +81,11 @@ class HouseForm(forms.ModelForm):
     def clean_image_3(self):
         image = self.cleaned_data.get('image_3')
         if image:
+            w, h = get_image_dimensions(image)
+            if w != 248 and h != 160:
+                raise ValidationError(
+                    'Загрузите изображение правильного размера'
+                )
             format_file = image.name.split('.')[-1]
             if format_file not in self.good_format:
                 raise ValidationError(
@@ -81,6 +97,11 @@ class HouseForm(forms.ModelForm):
     def clean_image_4(self):
         image = self.cleaned_data.get('image_4')
         if image:
+            w, h = get_image_dimensions(image)
+            if w != 248 and h != 160:
+                raise ValidationError(
+                    'Загрузите изображение правильного размера'
+                )
             format_file = image.name.split('.')[-1]
             if format_file not in self.good_format:
                 raise ValidationError(
@@ -92,6 +113,11 @@ class HouseForm(forms.ModelForm):
     def clean_image_5(self):
         image = self.cleaned_data.get('image_5')
         if image:
+            w, h = get_image_dimensions(image)
+            if w != 248 and h != 160:
+                raise ValidationError(
+                    'Загрузите изображение правильного размера'
+                )
             format_file = image.name.split('.')[-1]
             if format_file not in self.good_format:
                 raise ValidationError(
