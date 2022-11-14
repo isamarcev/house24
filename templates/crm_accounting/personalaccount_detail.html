@@ -63,8 +63,12 @@
                         <tr>
                             <td class="user-label">Дом</td>
                             <td>
-                                <a class="link-list" href="{% url 'houses:house_detail' object.house.id %}">
-                                {{ object.house }}
+                                {% if object.house %}
+                                    <a class="link-list" href="{% url 'houses:house_detail' object.house.id %}">
+                                    {{ object.house }}
+                                {% else %}
+                                        Не выбран
+                                {% endif %}
                                 </a>
                             </td>
                         </tr>
