@@ -47,7 +47,7 @@ class IdAuthentication(ModelBackend):
                 username=username)
             if user.role and request_path_list[3] == 'login':
                 return None
-            elif not user.role and request_path_list[3] == 'admin-login':
+            elif request_path_list[3] == 'admin-login':
                 return None
             else:
                 return user

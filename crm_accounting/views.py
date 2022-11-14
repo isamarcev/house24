@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.db.models import Q
 from django.db.models.aggregates import Sum
-from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, \
+    Http404
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView, \
@@ -259,6 +260,8 @@ class DownloadExcelAccounts(View):
             response['Content-Disposition'] \
                 = "attachment; filename=%s" % f'accounts_{date}.xlsx'
             return response
+        else:
+            raise Http404
 
 
 class PersonalAccountDetailView(AdminPermissionMixin, DetailView):
@@ -645,6 +648,8 @@ class DownloadExcelTransaction(View):
         if personal_account:
             qs = qs.filter(
                 personal_account__account_number__contains=personal_account)
+        print(qs)
+        print(request.GET)
         if qs:
             wb = Workbook()
             sheet = wb.active
@@ -706,6 +711,8 @@ class DownloadExcelTransaction(View):
             response['Content-Disposition'] \
                 = "attachment; filename=%s" % f'transactions_{date}.xlsx'
             return response
+        else:
+            raise Http404
 
 
 class InvoiceListView(AdminPermissionMixin, ListView):

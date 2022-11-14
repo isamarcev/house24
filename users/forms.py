@@ -80,6 +80,8 @@ class CustomUserForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         password = self.cleaned_data.get('password1')
+        if user.is_superuser:
+            user.role = Role.objects.first()
         if password != '':
             user.set_password(password)
         if commit:
