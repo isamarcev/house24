@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.db.models import Q
 from django.db.models.aggregates import Sum
-from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, \
+    Http404
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView, \
@@ -259,6 +260,8 @@ class DownloadExcelAccounts(View):
             response['Content-Disposition'] \
                 = "attachment; filename=%s" % f'accounts_{date}.xlsx'
             return response
+        else:
+            raise Http404
 
 
 class PersonalAccountDetailView(AdminPermissionMixin, DetailView):
@@ -338,6 +341,7 @@ class TransactionCreateView(AdminPermissionMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = dict()
+        errors = kwargs.get('form_class')
         context['manager_list'] = CustomUser.objects.filter(~Q(role=None)). \
             select_related('role')
         type_of_transaction = self.request.GET.get('type')
@@ -379,8 +383,8 @@ class TransactionCreateView(AdminPermissionMixin, CreateView):
             context['type'] = 'расходная ведомость'
         context['payment_states'] = PaymentState.objects.filter(
             type=type_of_transaction)
-        print(context)
-        print(self.form_class)
+        if errors:
+            context['form'] = errors
         return context
 
     def post(self, request, *args, **kwargs):
@@ -390,7 +394,7 @@ class TransactionCreateView(AdminPermissionMixin, CreateView):
             return HttpResponseRedirect(self.success_url)
         else:
             return render(request, 'crm_accounting/transaction_form.html',
-                          context={'form': form_class})
+                          self.get_context_data(form_class=form_class))
 
 
 def get_personal_accounts_ajax(request):
@@ -421,8 +425,6 @@ class TransactionListView(AdminPermissionMixin, ListView):
             account_id = get_object_or_404(models.PersonalAccount,
                                            id=account_id)
             context['account_id'] = account_id.account_number
-            print(account_id.account_number)
-
         context = get_statistics(context)
         return context
 
@@ -484,7 +486,6 @@ class TransactionListViewAjax(BaseDatatableView):
 class DeleteTransaction(DeleteView):
     model = models.Transaction
 
-
     def get(self, request, *args, **kwargs):
         transaction = self.model.objects.get(
             pk=request.GET.get('transaction')
@@ -510,7 +511,6 @@ class TransactionUpdateView(AdminPermissionMixin, UpdateView):
     success_url = reverse_lazy('crm_accounting:transaction_list')
     template_name = 'crm_accounting/transaction_update_form.html'
     check_permission_name = 'cashbox'
-
 
     def get_context_data(self, **kwargs):
         instance = self.get_object()
@@ -617,6 +617,102 @@ def download_file(request):
     response['Content-Disposition'] \
         = "attachment; filename=%s" % f'{transaction.number}.xlsx'
     return response
+
+
+class DownloadExcelTransaction(View):
+
+    def get(self, request):
+        number = self.request.GET.get('number')
+        date = self.request.GET.get('date')
+        completed = self.request.GET.get('completed')
+        paymentstate = self.request.GET.get('paymentstate')
+        owner = self.request.GET.get('owner')
+        personal_account = self.request.GET.get('personal_account')
+        type_of_payment = self.request.GET.get('type_of_payment')
+        qs = models.Transaction.objects.all()
+        if number:
+            qs = qs.filter(number__contains=number)
+        if date:
+            qs = filter_qs_daterange(date, qs)
+        if completed:
+            if completed == 'completed':
+                qs = qs.filter(completed=True)
+            elif completed == 'not_completed':
+                qs = qs.filter(completed=False)
+        if paymentstate:
+            qs = qs.filter(payment_state=paymentstate)
+        if type_of_payment:
+            qs = qs.filter(payment_state__type=type_of_payment)
+        if owner:
+            qs = qs.filter(owner=owner)
+        if personal_account:
+            qs = qs.filter(
+                personal_account__account_number__contains=personal_account)
+        print(qs)
+        print(request.GET)
+        if qs:
+            wb = Workbook()
+            sheet = wb.active
+            sheet.column_dimensions['A'].width = 20
+            sheet.column_dimensions['B'].width = 15
+            sheet.column_dimensions['C'].width = 10
+            sheet.column_dimensions['D'].width = 10
+            sheet.column_dimensions['E'].width = 15
+            sheet.column_dimensions['F'].width = 15
+            sheet.column_dimensions['G'].width = 10
+            sheet.column_dimensions['H'].width = 10
+            sheet.column_dimensions['J'].width = 25
+            sheet.column_dimensions['K'].width = 20
+            sheet.title = 'rabge names'
+            sheet['A1'] = '#'
+            sheet['B1'] = 'Дата'
+            sheet['C1'] = 'Приход/расход'
+            sheet['D1'] = 'Статус'
+            sheet['E1'] = 'Статья'
+            sheet['F1'] = 'Квитанция'
+            sheet['G1'] = 'Услуга'
+            sheet['H1'] = 'Сумма'
+            sheet['I1'] = 'Валюта'
+            sheet['J1'] = 'Владелец квартиры'
+            sheet['K1'] = 'Лицевой счет'
+            len_qs = len(qs) + 2
+            start_row = 2
+            while start_row != len_qs:
+                for obj in qs:
+                    sheet.insert_rows(start_row)
+                    sheet[f'A{start_row}'] = obj.number
+                    sheet[f'B{start_row}'] = obj.date.strftime('%d.%m.%Y')
+                    if obj.payment_state.type == 'in':
+                        sheet[f'C{start_row}'] = "Приход"
+                    elif obj.payment_state.type == 'out':
+                        sheet[f'C{start_row}'] = 'Расход'
+                    if obj.completed:
+                        sheet[f'D{start_row}'] = 'Проведен'
+                    else:
+                        sheet[f'D{start_row}'] = 'Не проведен'
+                    sheet[f'E{start_row}'] = f'{obj.payment_state.title}'
+                    sheet[f'F{start_row}'] = ''
+                    sheet[f'G{start_row}'] = ''
+                    sheet[f'H{start_row}'] = f'{obj.amount}'
+                    sheet[f'I{start_row}'] = 'UAH'
+                    if obj.owner:
+                        sheet[f'J{start_row}'] = f'{obj.owner}'
+                    if obj.personal_account:
+                        sheet[f'K{start_row}'] = f'{obj.personal_account}'
+                    start_row += 1
+            with NamedTemporaryFile(prefix='.xlsx') as tmp:
+                temp_path = tmp.name
+                wb.save(temp_path)
+                tmp.seek(0)
+                stream = tmp.read()
+            filepath = os.path.join(BASE_DIR, temp_path)
+            response = HttpResponse(stream, content_type=filepath)
+            date = datetime.today().strftime("%Y%m%d")
+            response['Content-Disposition'] \
+                = "attachment; filename=%s" % f'transactions_{date}.xlsx'
+            return response
+        else:
+            raise Http404
 
 
 class InvoiceListView(AdminPermissionMixin, ListView):

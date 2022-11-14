@@ -112,7 +112,7 @@
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" href="{% url 'crm_accounting:transaction_create' %}?type=in"> Создать приход </a>
                 <a class="dropdown-item" href="{% url 'crm_accounting:transaction_create' %}?type=out">Создать расход</a>
-                <a class="dropdown-item" href="#">Выгрузить в Excel</a>
+                <a class="dropdown-item" onclick="downloadExcel()">Выгрузить в Excel</a>
               </div>
             </div>
         </div>
@@ -240,6 +240,7 @@
     <script>
         const UrlTransactionList = '{% url 'crm_accounting:get_transaction_ajax_list' %}'
         const UrlDeleteTransaction = '{% url 'crm_accounting:delete_transaction' %}'
+        const UrlDownloadExcel = '{% url 'crm_accounting:download_excel_transaction' %}'
     </script>
 
     <script>
@@ -258,6 +259,21 @@
             padding: 10px 0 0 25px;
         }
     </style>
+
+    <script>
+        function downloadExcel() {
+            var number = $('#number').val();
+            var date = $('#date').val();
+            var completed = $('#completed').val();
+            var paymentstate = $('#paymentstate').val();
+            var personal_account = $('#id_personal_account').val();
+            var owner = $('#owner').val();
+            var type_of_payment = $('#type_of_payment').val();
+            var all_link = UrlDownloadExcel + `?number=${number}&date=${date}&completed=${completed}&paymentstate=${paymentstate}&personal_account=${personal_account}&owner=${owner}&type_of_payment=${type_of_payment}`
+            location.href = all_link
+        }
+    </script>
+
     <script src="{% static 'crm_accounting/js/transaction_list.js' %}"></script>
 
 {% endblock %}

@@ -43,7 +43,8 @@ class IdAuthentication(ModelBackend):
         if username is None or password is None:
             return
         try:
-            user = CustomUser._default_manager.get_by_natural_key(username)
+            user = CustomUser._default_manager.get(
+                username=username)
             if user.role and request_path_list[3] == 'login':
                 return None
             elif request_path_list[3] == 'admin-login':
@@ -52,6 +53,8 @@ class IdAuthentication(ModelBackend):
                 return user
         except CustomUser.DoesNotExist:
             CustomUser().set_password(password)
+        except ValueError:
+            return None
 
 
 

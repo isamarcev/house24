@@ -36,7 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['161.35.74.99', '127.0.0.1']
+ALLOWED_HOSTS = ['104.248.47.215', '127.0.0.1']
 
 LOGIN_URL = '/users/accounts/login/'
 

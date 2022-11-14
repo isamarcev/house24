@@ -50,12 +50,17 @@ urlpatterns = [
          name='delete_transaction'),
     path('transactions/export/', views.download_file,
          name='export_transaction'),
+    path('transactions/download-excell/',
+         views.DownloadExcelTransaction.as_view(),
+         name='download_excel_transaction'),
     path('transactions/get-personal-accounts-ajax/',
          views.get_personal_accounts_ajax,
          name='get_personal_accounts_ajax'),
     path('transactions/get-ajax-transaction-list/',
          views.TransactionListViewAjax.as_view(),
          name='get_transaction_ajax_list'),
+
+
 
     # invoices
     path('account/invoice/detail/<int:pk>/', views.main_page,
