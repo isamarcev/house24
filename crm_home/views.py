@@ -199,7 +199,7 @@ def delete_tariff(request):
 
 
 class RolesUpdateView(account_views.AdminPermissionMixin, FormView):
-    queryset = Role.objects.all()
+    queryset = Role.objects.filter(~Q(name='Директор'))
     template_name = 'crm_home/system_settings/roles/roles.html'
     roles_formset = modelformset_factory(Role, RoleForm, extra=0)
     check_permission_name = 'role'
