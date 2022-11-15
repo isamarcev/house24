@@ -61,7 +61,7 @@
                                         <select name="section" id="id_section" class="form-select">
                                             <option value="">Выберите...</option>
                                             {% for section in sections %}
-                                                {% if section == object.section%}
+                                                {% if section == object.section %}
                                                     <option value="{{ section.id }}" selected>{{ section }}</option>
                                                     {% else %}
                                                     <option value="{{ section.id }}">{{ section }}</option>
@@ -235,7 +235,7 @@
     </script>
     <script>
         $(document).ready(function (){
-            $('#id_house').change()
+            {#$('#id_house').change()#}
             $('[aria-controls="select2-id_owner-container"]').removeClass("select2-selection select2-selection--single")
             $('body > div.wrapper > div > section.content.content-custom > div > div > div > div > form > div > div:nth-child(2) > div > span > span.selection > span').removeClass("select2-selection select2-selection--single")
         })

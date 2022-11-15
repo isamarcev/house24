@@ -370,8 +370,8 @@ class FlatUpdateView(account_views.AdminPermissionMixin, UpdateView):
         context = super().get_context_data()
         context['account'] = PersonalAccountForm(
             instance=self.object.personal_account)
-        context['sections'] = Section.objects.filter(flat=self.object)
-        context['floors'] = Floor.objects.filter(flat=self.object)
+        context['sections'] = Section.objects.filter(house=self.object.house)
+        context['floors'] = Floor.objects.filter(house=self.object.house)
         return context
 
     def post(self, request, *args, **kwargs):

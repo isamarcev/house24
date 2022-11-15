@@ -158,17 +158,27 @@ class UserForm(forms.ModelForm):
 
 
 class FlatForm(forms.ModelForm):
-    house = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='Выберите...',
-                                   widget=forms.Select(attrs={'class': 'form-select'}), label='Дом')
-    owner = forms.ModelChoiceField(queryset=CustomUser.objects.filter(role=None), empty_label='Выберите...',
-                                   widget=forms.Select(attrs={'class': 'form-select'}), label='Владелец')
-    tariff = forms.ModelChoiceField(queryset=Tariff.objects.all(), empty_label='Выберите...',
-                                   widget=forms.Select(attrs={'class': 'form-select'}), label='Тариф')
+    house = forms.ModelChoiceField(queryset=House.objects.all(),
+                                   empty_label='Выберите...',
+                                   widget=forms.Select(
+                                       attrs={'class': 'form-select'}),
+                                   label='Дом')
+    owner = forms.ModelChoiceField(queryset=CustomUser.objects.filter(
+        role=None),
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Владелец')
+    tariff = forms.ModelChoiceField(queryset=Tariff.objects.all(),
+                                    empty_label='Выберите...',
+                                    widget=forms.Select(
+                                       attrs={'class': 'form-select'}),
+                                    label='Тариф')
 
     class Meta:
 
         model = Flat
-        fields = ['number', 'area', 'house', 'section', 'floor', 'owner', 'tariff']
+        fields = ['number', 'area', 'house', 'section',
+                  'floor', 'owner', 'tariff']
         labels = {
             'number': "Номер квартиры",
             'area': "Площадь (кв.м.)",
@@ -178,12 +188,14 @@ class FlatForm(forms.ModelForm):
         widgets = {
             'number': forms.TextInput(attrs={'class': 'form-control'}),
             'area': forms.NumberInput(attrs={'class': 'form-control'}),
+            'section': forms.Select(attrs={'class': 'form-select'}),
+            'floor': forms.Select(attrs={'class': 'form-select'}),
         }
 
 
 class PersonalAccountForm(forms.ModelForm):
-    account_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
-                                     label='Лицевой счет', required=False)
+    account_number = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control'}),label='Лицевой счет', required=False)
 
     class Meta:
         model = PersonalAccount
